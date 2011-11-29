@@ -20,14 +20,26 @@ type GetOptError struct {
   message string
 }
 
-func (self Options) parse(args []string) (map[string] string, *GetOptError) {
+func (optionsDefinition Options) parse(args []string) (map[string] string, *GetOptError) {
   options := make(map[string] string)
+  requiredValues := make([]string, 0)
+
+  for _, option := range optionsDefinition {
+    if option.arg_type == Required {
+      requiredValues = append(requiredValues, option.long_opt)
+    }
+  }
 
   for i:=1; i<len(args); i++ { // args[0] is no opt
     if args[i] == "--" || args[i][0] != '-' {
       break
     }
+  }
 
+  for _, option := range requiredValues {
+    if _, found := options[option]; found == false {
+      return options, &GetOptError{1, "required option " + option + " is not set"}
+    }
   }
 
   return options, nil

@@ -9,8 +9,8 @@ func TestRequiredOptions(t *testing.T) {
     {"port", "p", Required, "listening port", "3000"},
   }.parse([]string{"--port", "3000"})
 
-  if err == nil {
-    t.Errorf("expected getopt to fail")
+  if err != nil {
+    t.Errorf(err.message)
   }
 }
 
