@@ -1,9 +1,7 @@
-
 include $(GOROOT)/src/Make.inc
 
 TARG=getopt
-
 GOFILES=\
-				getopt.go\
+					getopt.go\
 
-include $(GOROOT)/src/Make.cmd
+include $(GOROOT)/src/Make.pkg
