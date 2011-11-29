@@ -1,0 +1,6 @@
+6.out
+*.swp
+*.6
+_obj/
+_test/
+_*.go
