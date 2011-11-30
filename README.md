@@ -8,7 +8,7 @@ Usage example
 -------------
 
 Ok, let's do this by example. Our example binary is a monitoring app that can
-monitor the health of any binary. Calling `monitor --help` would produce the
+monitor the health of any binary. Calling `MON_METHOD=heartbeat monitor --help` would produce the
 following output:
 
     Usage: monitor -m <method> [-l <logfile>] [--verbose] [-d] <command> [-- <command args>]
@@ -19,6 +19,9 @@ following output:
       -l                         log to file <logfile>
           --verbose              show verbose output
       -d, --daemon               start in daemon mode
+
+    Options currently set by environment variables:
+      method: heartbeat (via MON_METHOD)
 
 calling `monitor -h` will produce a condensed help:
 
