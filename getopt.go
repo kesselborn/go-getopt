@@ -55,9 +55,18 @@ func parseLongOpt(option string) (opt string, val string, found bool) {
   }
 
   return opt, val, found
-
 }
 
+func isValue(option string) bool {
+  _, _, isShortOpt := parseShortOpt(option)
+  _, _, isLongOpt := parseLongOpt(option)
+
+  return !isShortOpt && !isLongOpt && !argumentsEnd(option)
+}
+
+func argumentsEnd(option string) bool {
+  return option == "--"
+}
 
 func (optionsDefinition Options) parse(args []string) (map[string] string, []string, []string, *GetOptError) {
   options := make(map[string] string)
