@@ -1,5 +1,9 @@
 package getopt
 
+import(
+  "strings"
+)
+
 const Required = 1
 const Optional = 2
 const Flag = 3
@@ -37,13 +41,20 @@ func parseShortOpt(option string) (opt string, val string, found bool) {
 }
 
 
-func parseLongOpt(option string) (opt string, found bool) {
+func parseLongOpt(option string) (opt string, val string, found bool) {
   if len(option) > 3 && option[0:2] == "--" {
     found = true
-    opt = option[2:]
+
+    optTokens := strings.Split(option[2:], "=")
+
+    opt = optTokens[0]
+
+    if len(optTokens) > 1 {
+      val = optTokens[1]
+    }
   }
 
-  return opt, found
+  return opt, val, found
 
 }
 
