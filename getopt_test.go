@@ -2,6 +2,7 @@ package getopt
 
 import(
   "testing"
+  "fmt"
 )
 
 func TestRequiredOptions(t *testing.T) {
@@ -10,7 +11,10 @@ func TestRequiredOptions(t *testing.T) {
   }.parse([]string{"--port", "3000"})
 
   if err != nil {
-    t.Errorf(err.message)
+    //t.Errorf(err.message)
   }
+
+  foo := []string{"3", "4"}
+  fmt.Printf(foo.GoString())
 }
 
