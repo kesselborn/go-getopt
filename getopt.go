@@ -6,22 +6,55 @@ import(
 
 const Required = 1
 const Optional = 2
-const Flag = 3
+const Flag = 4
+const NoLongOpt = 8
 
-const InvalidOption = 100
-const NoShortOpt    = 101
+const InvalidOption = 1
 
 const OPTIONS_SEPARATOR = "--"
 
-type option struct {
-  long_opt string
-  short_opt string
-  arg_type int
+type Option struct {
+  option_definition string
   description string
-  default_value interface{}
+  flags int
+  default_value string
 }
 
-type Options []option;
+func (option Option) Key() (key string) {
+  return strings.Split(option.option_definition, "|")[0]
+}
+
+
+func (option Option) LongOpt() (longOpt string) {
+  if option.flags & NoLongOpt == 0 {
+    longOpt = option.Key()
+  }
+
+  return longOpt
+}
+
+func (option Option) ShortOpt() (shortOpt string) {
+  token := strings.Split(option.option_definition, "|")
+
+  if len(token) > 1 {
+    shortOpt = token[1]
+  }
+
+  return shortOpt
+}
+
+func (option Option) EnvVar() (envVar string) {
+  token := strings.Split(option.option_definition, "|")
+
+  if len(token) > 2 {
+    envVar = token[2]
+  }
+
+  return envVar
+}
+
+
+type Options []Option;
 type GetOptError struct {
   errorCode int
   message string
@@ -69,23 +102,5 @@ func argumentsEnd(option string) bool {
 }
 
 func (optionsDefinition Options) parse(args []string) (map[string] string, []string, []string, *GetOptError) {
-  options := make(map[string] string)
-  requiredValues := make([]string, 0)
-
-  for _, option := range optionsDefinition {
-    if option.arg_type == Required {
-      requiredValues = append(requiredValues, option.long_opt)
-    }
-  }
-
-  for i:=1; i<len(args); i++ { // args[0] is no opt
-  }
-
-  for _, option := range requiredValues {
-    if _, found := options[option]; found == false {
-      return options, []string{}, []string{}, &GetOptError{1, "required option " + option + " is not set"}
-    }
-  }
-
-  return options, []string{}, []string{}, nil
+  return make(map[string] string), []string{}, []string{}, nil
 }
