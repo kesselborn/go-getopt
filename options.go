@@ -13,3 +13,14 @@ func (options Options) FindOption(optionString string) (option Option, found boo
 
   return option, found
 }
+
+func (options Options) RequiredOptions() (requiredOptions []string) {
+
+  for _, cur := range options {
+    if cur.flags & Required != 0 {
+      requiredOptions = append(requiredOptions, cur.LongOpt())
+    }
+  }
+
+  return requiredOptions
+}

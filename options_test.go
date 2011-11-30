@@ -1,10 +1,9 @@
 package getopt
+import "testing"
 
-import(
-  "testing"
-)
 
-func TestOptionsMethods(t *testing.T) {
+
+func TestFindOption(t *testing.T) {
   option1 := Option{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""}
   option2 := Option{"logfile|l"          , "log to file <logfile>"                        , Optional | NoLongOpt, ""}
   option3 := Option{"verbose"            , "show verbose output"                          , Flag, ""}
