@@ -1,6 +1,22 @@
 package getopt
 import "testing"
 
+func TestIsRequiredOption(t *testing.T) {
+  options := Options{
+    {"verbose"            , "show verbose output"                          , Required, ""},
+    {"logfile|l"          , "log to file <logfile>"                        , Required | NoLongOpt, ""},
+    {"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+  }
+
+  if options.IsRequired("verbose") != true  { t.Errorf("required flag for 'verbose' not recognized") }
+
+  if options.IsRequired("logfile") != false { t.Errorf("required flag for 'logfile' not recognized") } // NoLongOpt
+  if options.IsRequired("l")       != true  { t.Errorf("required flag for 'l' not recognized") }
+
+  if options.IsRequired("method")  != false { t.Errorf("non-required flag for 'method' incorrectly recognized as required flag for") }
+  if options.IsRequired("m")       != false { t.Errorf("non-required flag for 'm' incorrectly recognized as flag") }
+}
+
 func TestIsFlagOption(t *testing.T) {
   options := Options{
     {"verbose"            , "show verbose output"                          , Flag, ""},
