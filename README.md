@@ -101,9 +101,7 @@ an example vaule for required options. Can be empty strings. For optional
 options, if a `nil` example is set, the `options` map won't contain an entry
 if this option is not passed in by a user. If set to a value different to nil,
 the `options` map will contain the default value if the user does not pass in
-the option. Types of the values will be saved as stated here. If you pass
-in multiple values separated by comma or whitespace, pass in an array here:
-`{"foo", "bar"}` or `{1,2}`.
+the option. Types of the values will be saved as stated here. 
 
 The parse method
 ----------------
