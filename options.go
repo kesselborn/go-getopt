@@ -14,6 +14,14 @@ func (options Options) FindOption(optionString string) (option Option, found boo
   return option, found
 }
 
+func (options Options) IsFlag(optionName string) (isFlag bool) {
+  if option, found := options.FindOption(optionName); found && option.flags & Flag != 0 {
+    isFlag = true
+  }
+
+  return isFlag
+}
+
 func (options Options) RequiredOptions() (requiredOptions []string) {
 
   for _, cur := range options {
