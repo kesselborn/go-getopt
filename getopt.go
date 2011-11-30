@@ -23,7 +23,7 @@ type GetOptError struct {
   message string
 }
 
-func isShortOpt(option string) (opt string, val string, found bool) {
+func parseShortOpt(option string) (opt string, val string, found bool) {
   if len(option) > 1 && option[0] == '-' && option[1] >= 'A' && option[1] <= 'z' {
     found = true
     opt = option[1:2]
@@ -36,15 +36,17 @@ func isShortOpt(option string) (opt string, val string, found bool) {
   return opt, val, found
 }
 
-func isLongOpt(option string) {
+
+func parseLongOpt(option string) (opt string, found bool) {
+  if len(option) > 3 && option[0:2] == "--" {
+    found = true
+    opt = option[2:]
+  }
+
+  return opt, found
 
 }
 
-func parseShortOpt(shortOpt string, optionDefinition Options) (key string, value string, err *GetOptError) {
-  if key[0] != '-' { return "", "", &GetOptError{NoShortOpt, ""} }
-
-  return "", "", nil
-}
 
 func (optionsDefinition Options) parse(args []string) (map[string] string, []string, []string, *GetOptError) {
   options := make(map[string] string)
