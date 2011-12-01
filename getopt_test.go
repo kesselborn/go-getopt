@@ -13,6 +13,7 @@ func TestShortOptionsFlagsParsing(t *testing.T) {
   options := Options{
     {"debug|d", "debug mode", Flag, ""},
     {"verbose|v", "verbose mode", Flag, ""},
+    {"dryrun|D", "dry run only", Flag, ""},
   }
 
   if opts, _, _, _ := options.parse([]string{"-d"}, "", 0 );
@@ -24,6 +25,12 @@ func TestShortOptionsFlagsParsing(t *testing.T) {
     opts["debug"] != "true" || opts["verbose"] != "false" {
       t.Errorf("verbose flag was not set to false by default")
   }
+
+  if opts, _, _, _ := options.parse([]string{"-d", "-v"}, "", 0 );
+    opts["debug"] != "true" || opts["verbose"] != "true" {
+      t.Errorf("did not recognize all flags")
+  }
+
 }
 
 func TestShortOptionRequiredParsing(t *testing.T) {
@@ -56,4 +63,22 @@ func TestShortOptionRequiredParsing(t *testing.T) {
       t.Errorf("required option wasn't set")
   }
 
+}
+
+func TestConcatenatedOptionsParsing(t *testing.T) {
+  options := Options{
+    {"debug|d", "debug mode", Flag, ""},
+    {"verbose|v", "verbose mode", Flag, ""},
+    {"dryrun|D", "dry run only", Flag, ""},
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dv"}, "", 0 );
+    opts["debug"] != "true" || opts["verbose"] != "true" {
+      t.Errorf("did not recognize all flags when concatenation options")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvD"}, "", 0 );
+    opts["debug"] != "true" || opts["verbose"] != "true" || opts["dryrun"] != "true" {
+      t.Errorf("did not recognize all flags when concatenation options")
+  }
 }

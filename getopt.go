@@ -48,7 +48,18 @@ func (optionsDefinition Options) parse(args []string,
 
     opt, val, found = parseShortOpt(token)
 
-    if !found {
+    if found {
+      buffer := token
+      for found && optionsDefinition.IsFlag(opt) && len(buffer) > 2 {
+        currentOption, _ := optionsDefinition.FindOption(opt)
+        key := currentOption.Key()
+
+        options[key] = "true"
+        buffer = "-" + buffer[2:]
+        opt, val, found = parseShortOpt(buffer)
+      }
+
+    } else {
       opt, val, found = parseLongOpt(token)
     }
 
