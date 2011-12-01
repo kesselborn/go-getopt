@@ -18,6 +18,7 @@ type GetOptError struct {
   message string
 }
 
+
 func (optionsDefinition Options) parse(args []string,
                                        description string,
                                        flags int) (
@@ -105,5 +106,5 @@ func (optionsDefinition Options) parse(args []string,
 
   }
 
-  return options, arguments, passThrough, err
+  return
 }
