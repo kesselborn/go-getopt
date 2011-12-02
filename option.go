@@ -5,7 +5,7 @@ type Option struct {
   option_definition string
   description string
   flags int
-  default_value string
+  default_value interface{}
 }
 
 func (option Option) eq(other Option) bool {

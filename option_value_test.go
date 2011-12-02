@@ -26,6 +26,7 @@ func equalIntArray(array1 []int64, array2 []int64) (equal bool) {
 
 func TestStringAssignValue(t *testing.T) {
   if value, _ := assignValue("foo", "bar");      value.String      != "bar" { t.Errorf("assigning string did not work") }
+  if value, _ := assignValue("", "bar");         value.String      != "bar" { t.Errorf("assigning string did not work") }
   if value, _ := assignValue([]string{}, "bar"); value.StrArray[0] != "bar" { t.Errorf("assigning string to StringArr did not work") }
 
   if value, _ := assignValue([]string{}, "bar,baz"); !equalStringArray(value.StrArray, []string{"bar", "baz"}) {

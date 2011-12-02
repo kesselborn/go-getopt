@@ -9,6 +9,7 @@ const InvalidOption = 1
 const MissingValue = 2
 const InvalidValue = 4
 const MissingOption = 8
+const OptionValueError = 16
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -22,14 +23,14 @@ type GetOptError struct {
 func (optionsDefinition Options) parse(args []string,
                                        description string,
                                        flags int) (
-                                  options map[string] string,
+                                  options map[string] OptionValue,
                                   arguments []string,
                                   passThrough []string,
                                   err *GetOptError) {
-  options = make(map[string] string)
+  options = make(map[string] OptionValue)
 
   for _, flagOption := range optionsDefinition.FlagOptions() {
-    options[flagOption] = "false"
+    options[flagOption], err = assignValue(false, "false")
   }
 
   for i:=0; i < len(args); i++ {
@@ -52,10 +53,13 @@ func (optionsDefinition Options) parse(args []string,
     if found {
       buffer := token
       for found && optionsDefinition.IsFlag(opt) && len(buffer) > 2 {
+        // concatenated options ... continue parsing
         currentOption, _ := optionsDefinition.FindOption(opt)
         key := currentOption.Key()
 
-        options[key] = "true"
+        options[key], err = assignValue(currentOption.default_value, "true")
+
+        // make it look as if we have a normal option with a '-' prefix
         buffer = "-" + buffer[2:]
         opt, val, found = parseShortOpt(buffer)
       }
@@ -73,7 +77,7 @@ func (optionsDefinition Options) parse(args []string,
     }
 
     if optionsDefinition.IsFlag(opt) {
-      options[key] = "true"
+      options[key], err = assignValue(true, "true")
     } else {
       if val == "" {
         if len(args) > i + 1 && isValue(args[i + 1]) {
@@ -91,14 +95,14 @@ func (optionsDefinition Options) parse(args []string,
         break
       }
 
-      options[key] = val
+      options[key], err = assignValue(currentOption.default_value, val)
     }
 
   }
 
   if err == nil {
     for _, requiredOption := range optionsDefinition.RequiredOptions() {
-      if options[requiredOption] == "" {
+      if options[requiredOption].set == false {
         err = &GetOptError{ MissingOption, "Option '" + requiredOption + "' is missing" }
         break
       }

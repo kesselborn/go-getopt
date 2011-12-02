@@ -17,17 +17,17 @@ func TestShortOptionsFlagsParsing(t *testing.T) {
   }
 
   if opts, _, _, _ := options.parse([]string{"-d"}, "", 0 );
-    opts["debug"] != "true" {
+    opts["debug"].Bool != true {
       t.Errorf("debug flag was not set")
   }
 
   if opts, _, _, _ := options.parse([]string{"-d"}, "", 0 );
-    opts["debug"] != "true" || opts["verbose"] != "false" {
+    opts["debug"].Bool != true || opts["verbose"].Bool != false {
       t.Errorf("verbose flag was not set to false by default")
   }
 
   if opts, _, _, _ := options.parse([]string{"-d", "-v"}, "", 0 );
-    opts["debug"] != "true" || opts["verbose"] != "true" {
+    opts["debug"].Bool != true || opts["verbose"].Bool != true {
       t.Errorf("did not recognize all flags")
   }
 
@@ -39,13 +39,13 @@ func TestShortOptionRequiredParsing(t *testing.T) {
   }
 
   if opts, _, _, _ := options.parse([]string{"-m", "heartbeat"}, "", 0 );
-    opts["method"] != "heartbeat" {
-      t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"] + "'")
+    opts["method"].String != "heartbeat" {
+      t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"].String + "'")
   }
 
   if opts, _, _, _ := options.parse([]string{"-mheartbeat"}, "", 0 );
-    opts["method"] != "heartbeat" {
-      t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"] + "'")
+    opts["method"].String != "heartbeat" {
+      t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"].String + "'")
   }
 
   if _, _, _, err := options.parse([]string{"-m"}, "", 0 );
@@ -67,20 +67,20 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 
 func TestConcatenatedOptionsParsing(t *testing.T) {
   options := Options{
-    {"debug|d", "debug mode", Flag, ""},
-    {"verbose|v", "verbose mode", Flag, ""},
-    {"dryrun|D", "dry run only", Flag, ""},
+    {"debug|d", "debug mode", Flag, true},
+    {"verbose|v", "verbose mode", Flag, true},
+    {"dryrun|D", "dry run only", Flag, true},
     {"logfile|l", "log file", Optional, ""},
     {"mode|m", "operating mode", Required, ""},
   }
 
   if opts, _, _, _ := options.parse([]string{"-dv"}, "", 0 );
-    opts["debug"] != "true" || opts["verbose"] != "true" {
+    opts["debug"].Bool != true || opts["verbose"].Bool != true {
       t.Errorf("did not recognize all flags when concatenation options (2 options)")
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvD"}, "", 0 );
-    opts["debug"] != "true" || opts["verbose"] != "true" || opts["dryrun"] != "true" {
+    opts["debug"].Bool != true || opts["verbose"].Bool != true || opts["dryrun"].Bool != true {
       t.Errorf("did not recognize all flags when concatenation options (3 options)")
   }
 
@@ -90,14 +90,14 @@ func TestConcatenatedOptionsParsing(t *testing.T) {
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvDl/tmp/log.txt"}, "", 0 );
-    opts["debug"]   != "true" || opts["verbose"] != "true" ||
-    opts["dryrun"]  != "true" || opts["logfile"] != "/tmp/log.txt" {
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["logfile"].String != "/tmp/log.txt" {
       t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional)")
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvDl", "/tmp/log.txt"}, "", 0 );
-    opts["debug"]   != "true" || opts["verbose"] != "true" ||
-    opts["dryrun"]  != "true" || opts["logfile"] != "/tmp/log.txt" {
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["logfile"].String != "/tmp/log.txt" {
       t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional separated by space)")
   }
 
@@ -112,20 +112,20 @@ func TestConcatenatedOptionsParsing(t *testing.T) {
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvDl", "/tmp/log.txt"}, "", 0 );
-    opts["debug"]   != "true" || opts["verbose"] != "true" ||
-    opts["dryrun"]  != "true" || opts["logfile"] != "/tmp/log.txt" {
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["logfile"].String != "/tmp/log.txt" {
       t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional separated by space)")
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvDmdaemon"}, "", 0 );
-    opts["debug"]   != "true" || opts["verbose"] != "true" ||
-    opts["dryrun"]  != "true" || opts["mode"]    != "daemon" {
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["mode"].String    != "daemon" {
       t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required)")
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvDm", "daemon"}, "", 0 );
-    opts["debug"]   != "true" || opts["verbose"] != "true" ||
-    opts["dryrun"]  != "true" || opts["mode"]    != "daemon" {
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["mode"].String    != "daemon" {
       t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required separated by space)")
   }
 
