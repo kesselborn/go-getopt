@@ -65,7 +65,7 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 
 }
 
-func TestConcatenatedOptionsParsing(t *testing.T) {
+func TestConcatenatedOptionsParsingSimple(t *testing.T) {
   options := Options{
     {"debug|d", "debug mode", Flag, true},
     {"verbose|v", "verbose mode", Flag, true},
@@ -89,18 +89,6 @@ func TestConcatenatedOptionsParsing(t *testing.T) {
       t.Errorf("did not recognize a missing required option in concatenation mode")
   }
 
-  if opts, _, _, _ := options.parse([]string{"-dvDl/tmp/log.txt"}, "", 0 );
-    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
-    opts["dryrun"].Bool  != true || opts["logfile"].String != "/tmp/log.txt" {
-      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional)")
-  }
-
-  if opts, _, _, _ := options.parse([]string{"-dvDl", "/tmp/log.txt"}, "", 0 );
-    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
-    opts["dryrun"].Bool  != true || opts["logfile"].String != "/tmp/log.txt" {
-      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional separated by space)")
-  }
-
   if _, _, _, err := options.parse([]string{"-Dl"}, "", 0 );
     err == nil || err.errorCode != MissingValue {
       t.Errorf("did not realize that I missed a value")
@@ -109,6 +97,22 @@ func TestConcatenatedOptionsParsing(t *testing.T) {
   if _, _, _, err := options.parse([]string{"-Dl", "-d"}, "", 0 );
     err == nil || err.errorCode != MissingValue {
       t.Errorf("did not realize that I missed a value")
+  }
+
+}
+
+func TestConcatenatedOptionsParsingWithStringValueOptionAtTheEnd(t *testing.T) {
+  options := Options{
+    {"debug|d", "debug mode", Flag, true},
+    {"verbose|v", "verbose mode", Flag, true},
+    {"dryrun|D", "dry run only", Flag, true},
+    {"logfile|l", "log file", Optional, ""},
+    {"mode|m", "operating mode", Required, ""},
+  }
+  if opts, _, _, _ := options.parse([]string{"-dvDl/tmp/log.txt"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["logfile"].String != "/tmp/log.txt" {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional)")
   }
 
   if opts, _, _, _ := options.parse([]string{"-dvDl", "/tmp/log.txt"}, "", 0 );
@@ -127,6 +131,81 @@ func TestConcatenatedOptionsParsing(t *testing.T) {
     opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
     opts["dryrun"].Bool  != true || opts["mode"].String    != "daemon" {
       t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required separated by space)")
+  }
+
+}
+
+func TestConcatenatedOptionsParsingWithIntValueOptionAtTheEnd(t *testing.T) {
+  options := Options{
+    {"debug|d", "debug mode", Flag, true},
+    {"verbose|v", "verbose mode", Flag, true},
+    {"dryrun|D", "dry run only", Flag, true},
+    {"port|p", "port", Optional, 3000},
+    {"instances|i", "instances", Required, 1},
+  }
+  if opts, _, _, _ := options.parse([]string{"-dvDp3000"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["port"].Int != 3000 {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDp", "3000"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["port"].Int != 3000 {
+      fmt.Printf("%#v", opts)
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int separated by space)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDp", "3000"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["port"].Int != 3000 {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int separated by space)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDi4"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["instances"].Int    != 4 {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDi", "4"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || opts["instances"].Int    != 4 {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required int separated by space)")
+  }
+
+}
+
+func TestConcatenatedOptionsParsingWithIntArrayValueOptionAtTheEnd(t *testing.T) {
+  options := Options{
+    {"debug|d", "debug mode", Flag, true},
+    {"verbose|v", "verbose mode", Flag, true},
+    {"dryrun|D", "dry run only", Flag, true},
+    {"ports|p", "ports", Optional, []int{3000, 3001, 3002}},
+    {"timeouts|t", "timeouts", Required, []int{1,2,4,10,30}},
+  }
+  if opts, _, _, _ := options.parse([]string{"-dvDp5000,5001,5002"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || !equalIntArray(opts["ports"].IntArray, []int64{5000, 5001, 5002}) {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int array)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDp", "5000,5001,5002"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || !equalIntArray(opts["ports"].IntArray, []int64{5000, 5001, 5002}) {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int array separated by space)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDt10,20,30"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || !equalIntArray(opts["timeouts"].IntArray, []int64{10,20,30}) {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required int array)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{"-dvDt", "10,20,30"}, "", 0 );
+    opts["debug"].Bool   != true || opts["verbose"].Bool != true ||
+    opts["dryrun"].Bool  != true || !equalIntArray(opts["timeouts"].IntArray, []int64{10,20,30}) {
+      t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required int array separated by space)")
   }
 
 }
