@@ -242,19 +242,49 @@ func TestEnvironmentValueParsing(t *testing.T) {
 
   if opts, _, _, _ := options.parse([]string{}, []string{"INSTANCES=13"}, "", 0);
     opts["instances"].Int != 13 {
-      fmt.Printf("%#v" , opts)
       t.Errorf("did not recognize option set via ENV variable (INSTANCES=13)")
   }
 }
 
 func TestDefaultValueParsing(t *testing.T) {
-//  options := Options{
-//    {"debug|d|DEBUG", "debug mode", Flag, true},
-//    {"ports|p|PORT", "ports", Required, []int{3000, 3001, 3002}},
-//    {"logfile||LOGFILE", "ports", Optional | ExampleIsDefault, "/var/log/foo.log"},
-//  }
-}
+  options := Options{
+    {"debug|d|DEBUG", "debug mode", Optional | ExampleIsDefault, true},
+    {"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+    {"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000,5001,5002}},
+    {"instances||INSTANCES", "instances", Optional | ExampleIsDefault, 4},
+    {"keys||KEYS", "keys", Optional | ExampleIsDefault, []string{"foo","bar","baz"}},
+    {"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+  }
 
-func TestEnvVars(t *testing.T) {
-  t.Errorf("env var tests missing")
+  if opts, _, _, _ := options.parse([]string{}, []string{}, "", 0);
+    opts["debug"].Bool !=  true {
+      t.Errorf("did not recognize default value (boolean debug)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{}, []string{}, "", 0);
+    opts["instances"].Int !=  4 {
+      t.Errorf("did not recognize default value (int instances)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{}, []string{}, "", 0);
+    opts["logfile"].String !=  "/var/log/foo.log" {
+      t.Errorf("did not recognize default value (string logfile)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{}, []string{}, "", 0);
+    !equalIntArray(opts["ports"].IntArray, []int64{3000, 3001, 3002}) {
+      t.Errorf("did not recognize default value (int64 array ports)")
+  }
+
+  if opts, _, _, _ := options.parse([]string{}, []string{}, "", 0);
+    !equalIntArray(opts["secondaryports"].IntArray, []int64{5001,5002,5003}) {
+      t.Errorf("did not recognize default value (int array ports)")
+  }
+
+
+  if opts, _, _, _ := options.parse([]string{}, []string{}, "", 0);
+    !equalStringArray(opts["keys"].StrArray, []string{"foo","bar","baz"}) {
+      t.Errorf("did not recognize default value (string array keys)")
+  }
+
 }

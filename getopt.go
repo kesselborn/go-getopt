@@ -71,9 +71,13 @@ func (optionsDefinition Options) parse(args []string,
 
   options = make(map[string] OptionValue)
 
-  // all flags are false by default
-  for _, flagOption := range optionsDefinition.FlagOptions() {
-    options[flagOption], err = assignValue(false, "false")
+  for _, option := range optionsDefinition {
+    switch {
+      case option.flags & Flag != 0:                // all flags are false by default
+        options[option.Key()], err = assignValue(false, "false")
+      case option.flags & ExampleIsDefault != 0:    // set default
+        options[option.Key()], err = assign(option.default_value)
+    }
   }
 
   // set overwrites

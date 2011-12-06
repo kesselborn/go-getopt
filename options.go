@@ -38,17 +38,6 @@ func (options Options) IsFlag(optionName string) (isFlag bool) {
   return isFlag
 }
 
-func (options Options) FlagOptions() (flagOptions []string) {
-
-  for _, cur := range options {
-    if cur.flags & Flag != 0 {
-      flagOptions = append(flagOptions, cur.LongOpt())
-    }
-  }
-
-  return flagOptions
-}
-
 func (options Options) RequiredOptions() (requiredOptions []string) {
 
   for _, cur := range options {

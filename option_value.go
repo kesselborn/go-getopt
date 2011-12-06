@@ -18,6 +18,44 @@ type OptionValue struct {
   set bool
 }
 
+func assign(value interface{}) (returnValue OptionValue, err *GetOptError) {
+  valType := reflect.TypeOf(value).String()
+  var e os.Error
+
+  // mmm ...there should be an easier way
+  switch valType {
+    case "string":
+      returnValue.String = value.(string)
+    case "bool":
+      returnValue.Bool = value.(bool)
+    case "int":
+      returnValue.Int = int64(value.(int))
+    case "int64":
+      returnValue.Int = value.(int64)
+    case "[]string":
+      returnValue.StrArray = value.([]string)
+    case "[]int":
+      var ints []int = value.([]int)
+      long_ints := make([]int64, len(ints))
+      for i, integer := range ints {
+        long_ints[i] = int64(integer)
+      }
+      returnValue.IntArray = long_ints
+    case "[]int64":
+      returnValue.IntArray = value.([]int64)
+    default:
+      e = os.NewError("Couldn't assign value of type '" + valType + "'")
+  }
+
+  if e == nil {
+    returnValue.set = true
+  } else {
+    err = &GetOptError{ OptionValueError, "Conversion Error: " + e.String()}
+  }
+
+  return
+
+}
 
 func assignValue(referenceValue interface{}, value string) (returnValue OptionValue, err *GetOptError) {
   valType := reflect.TypeOf(referenceValue).String()
