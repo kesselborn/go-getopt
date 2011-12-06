@@ -288,3 +288,81 @@ func TestDefaultValueParsing(t *testing.T) {
   }
 
 }
+
+func TestArgumentsParsing(t *testing.T) {
+  options := Options{
+    {"debug|d|DEBUG", "debug mode", Flag, true},
+    {"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"-d",  "foobar", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) || opts["debug"].Bool != true {
+      t.Errorf("did not recognize arguments (two at the end)")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"foobar", "-d", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) || opts["debug"].Bool != true {
+      t.Errorf("did not recognize arguments separated by bool option")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"foobar", "barbaz", "-d"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) || opts["debug"].Bool != true {
+      t.Errorf("did not recognize arguments before option")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"-d", "-p5000,6000", "foobar", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) ||
+     opts["debug"].Bool != true ||
+    !equalIntArray(opts["ports"].IntArray, []int64{5000,6000}) {
+      t.Errorf("parsing error of command line: '-d -p5000,6000 foobar barbaz'")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"-dp5000,6000", "foobar", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) ||
+     opts["debug"].Bool != true ||
+    !equalIntArray(opts["ports"].IntArray, []int64{5000,6000}) {
+      t.Errorf("parsing error of command line: '-dp5000,6000 foobar barbaz'")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"-d", "foobar", "-p5000,6000", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) ||
+     opts["debug"].Bool != true ||
+    !equalIntArray(opts["ports"].IntArray, []int64{5000,6000}) {
+      t.Errorf("parsing error of command line: '-d foobar -p5000,6000 barbaz'")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"-p5000,6000", "foobar", "-d", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"foobar","barbaz"}) ||
+     opts["debug"].Bool != true ||
+    !equalIntArray(opts["ports"].IntArray, []int64{5000,6000}) {
+      t.Errorf("parsing error of command line: '-p5000,6000 foobar -d barbaz'")
+  }
+
+  if opts, arguments, _, _ := options.parse([]string{"barbaz", "-d", "-p5000,6000", "foobar"}, []string{}, "", 0);
+    !equalStringArray(arguments, []string{"barbaz","foobar"}) ||
+     opts["debug"].Bool != true ||
+    !equalIntArray(opts["ports"].IntArray, []int64{5000,6000}) {
+      fmt.Printf("args: %#v\nopts: %#v\nports: %#v\n", arguments, opts["debug"].Bool, opts["ports"].IntArray)
+      t.Errorf("parsing error of command line: 'barbaz -d -p5000,6000 foobar'")
+  }
+
+}
+
+func TestPassThroughParsing(t *testing.T) {
+  options := Options{
+    {"debug|d|DEBUG", "debug mode", Flag, true},
+    {"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+  }
+
+  if _, _, passThrough, _ := options.parse([]string{"foobar", "--", "barbaz"}, []string{}, "", 0);
+    !equalStringArray(passThrough, []string{"foobar"}) {
+      t.Errorf("simple pass through not recognized")
+  }
+
+  if _, _, passThrough, _ := options.parse([]string{"foobar", "--", "ls", "-lah", "/tmp"}, []string{}, "", 0);
+    !equalStringArray(passThrough, []string{"ls", "-lah", "/tmp"}) {
+      t.Errorf("pass through not recognized")
+  }
+}
+
+

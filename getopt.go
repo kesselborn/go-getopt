@@ -1,7 +1,7 @@
 package getopt
 import (
   "strings"
-//  "fmt"
+  //"fmt"
 )
 
 const Required = 1
@@ -70,6 +70,7 @@ func (optionsDefinition Options) parse(args []string,
                                   err *GetOptError) {
 
   options = make(map[string] OptionValue)
+  arguments = make([]string, 0)
 
   for _, option := range optionsDefinition {
     switch {
@@ -91,12 +92,13 @@ func (optionsDefinition Options) parse(args []string,
       token := args[i]
 
       if argumentsEnd(token) {
+        passThrough = args[i:]
         break
       }
 
       if isValue(token) {
-        arguments = args[i:]
-        break
+        arguments = append(arguments, token)
+        continue
       }
 
       opt, val, found = parseShortOpt(token)
