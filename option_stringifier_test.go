@@ -4,6 +4,63 @@ import(
   "testing"
 )
 
+func TestUsageOutput(t *testing.T) {
+  if got, expected := (Option{"method", "...", IsArg, ""}.Usage()),
+                      "METHOD"
+     got != expected {
+       t.Errorf("Error creating usage text (argument):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method|m", "...", Required, ""}.Usage()),
+                      "-m METHOD"
+     got != expected {
+       t.Errorf("Error creating usage text (Required):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method", "...", Required, ""}.Usage()),
+                      "--method METHOD"
+     got != expected {
+       t.Errorf("Error creating usage text (Required, no short):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method|m", "...", Optional, ""}.Usage()),
+                      "[-m METHOD]"
+     got != expected {
+       t.Errorf("Error creating usage text (Optional):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method", "...", Optional, ""}.Usage()),
+                      "[--method METHOD]"
+     got != expected {
+       t.Errorf("Error creating usage text (Optional, no short):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method|m", "...", Flag | Optional, ""}.Usage()),
+                      "[-m]"
+     got != expected {
+       t.Errorf("Error creating usage text (optional flag):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method", "...", Flag | Optional, ""}.Usage()),
+                      "[--method]"
+     got != expected {
+       t.Errorf("Error creating usage text (optional flag, no short):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method|m", "...", Flag, ""}.Usage()),
+                      "-m"
+     got != expected {
+       t.Errorf("Error creating usage text (flag):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"method", "...", Flag, ""}.Usage()),
+                      "--method"
+     got != expected {
+       t.Errorf("Error creating usage text (flag, no short):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+}
+
 func TestBasicOutput(t *testing.T) {
   if got, expected := (Option{"method|m", "method: one of either 'heartbeat' or 'nagios'", Required | NoLongOpt, ""}.String(20)),
                       "\t-m METHOD                  method: one of either 'heartbeat' or 'nagios'";

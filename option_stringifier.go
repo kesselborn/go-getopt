@@ -46,6 +46,27 @@ func (option Option) ShortOptString() (shortOptString string) {
   return
 }
 
+func (option Option) Usage() (usageString string) {
+  switch {
+    case option.flags & IsArg > 0:
+      usageString = strings.ToUpper(option.Key())
+    case option.HasShortOpt():
+      usageString = "-" + option.ShortOpt()
+    default:
+      usageString = "--" + option.LongOpt()
+  }
+
+  if option.flags & Flag == 0 && option.flags & IsArg == 0  {
+    usageString = usageString + " " + strings.ToUpper(option.Key())
+  }
+
+  if option.flags & Optional > 0 {
+    usageString = "[" + usageString + "]"
+  }
+
+  return
+}
+
 func (option Option) Description() (description string) {
   description = option.description
 
