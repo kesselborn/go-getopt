@@ -4,12 +4,6 @@ import (
   //"fmt"
 )
 
-const Required = 1
-const Optional = 2
-const Flag = 4
-const NoLongOpt = 8
-const ExampleIsDefault = 16
-
 const InvalidOption = 1
 const MissingValue = 2
 const InvalidValue = 4

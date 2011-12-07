@@ -1,6 +1,13 @@
 package getopt
 import "strings"
 
+const Required = 1
+const Optional = 2
+const Flag = 4
+const NoLongOpt = 8
+const ExampleIsDefault = 16
+
+
 type Option struct {
   option_definition string
   description string
@@ -32,6 +39,10 @@ func (option Option) LongOpt() (longOpt string) {
   return longOpt
 }
 
+func (option Option) HasLongOpt() (result bool) {
+  return option.LongOpt() != ""
+}
+
 func (option Option) ShortOpt() (shortOpt string) {
   token := strings.Split(option.option_definition, "|")
 
@@ -42,6 +53,11 @@ func (option Option) ShortOpt() (shortOpt string) {
   return shortOpt
 }
 
+func (option Option) HasShortOpt() (result bool) {
+  return option.ShortOpt() != ""
+}
+
+
 func (option Option) EnvVar() (envVar string) {
   token := strings.Split(option.option_definition, "|")
 
@@ -51,3 +67,8 @@ func (option Option) EnvVar() (envVar string) {
 
   return envVar
 }
+
+func (option Option) HasEnvVar() (result bool) {
+  return option.EnvVar() != ""
+}
+
