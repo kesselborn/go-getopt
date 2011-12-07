@@ -43,7 +43,7 @@ func (optionsDefinition Options) setOverwrites(options map[string] OptionValue, 
 
   for key, acceptedEnvVar := range acceptedEnvVars {
     if value := overwritesMap[key]; value != "" {
-      options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.default_value, value)
+      options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.defaultValue, value)
       if err != nil {
         break
       }
@@ -71,7 +71,7 @@ func (optionsDefinition Options) parse(args []string,
       case option.flags & Flag != 0:                // all flags are false by default
         options[option.Key()], err = assignValue(false, "false")
       case option.flags & ExampleIsDefault != 0:    // set default
-        options[option.Key()], err = assign(option.default_value)
+        options[option.Key()], err = assign(option.defaultValue)
     }
   }
 
@@ -104,7 +104,7 @@ func (optionsDefinition Options) parse(args []string,
           currentOption, _ := optionsDefinition.FindOption(opt)
           key := currentOption.Key()
 
-          options[key], err = assignValue(currentOption.default_value, "true")
+          options[key], err = assignValue(currentOption.defaultValue, "true")
 
           // make it look as if we have a normal option with a '-' prefix
           buffer = "-" + buffer[2:]
@@ -142,7 +142,7 @@ func (optionsDefinition Options) parse(args []string,
           break
         }
 
-        options[key], err = assignValue(currentOption.default_value, val)
+        options[key], err = assignValue(currentOption.defaultValue, val)
       }
 
     }

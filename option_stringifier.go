@@ -49,7 +49,7 @@ func (option Option) ShortOptString() (shortOptString string) {
 func (option Option) Description() (description string) {
   description = option.description
 
-  defaultValue := fmt.Sprintf("%v", option.default_value)
+  defaultValue := fmt.Sprintf("%v", option.defaultValue)
   // %v for arrays prints something like [3 4 5] ... let's transform that to 3,4,5:
   defaultValue = strings.Replace(strings.Replace(strings.Replace(defaultValue,"[", "",-1), "]", "", -1), " ", ",", -1)
 

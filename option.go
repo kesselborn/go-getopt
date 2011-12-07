@@ -12,14 +12,14 @@ type Option struct {
   option_definition string
   description string
   flags int
-  default_value interface{}
+  defaultValue interface{}
 }
 
 func (option Option) eq(other Option) bool {
   return option.option_definition == other.option_definition &&
          option.description == other.description &&
          option.flags == other.flags &&
-         option.default_value == other.default_value
+         option.defaultValue == other.defaultValue
 }
 
 func (option Option) neq(other Option) bool {
