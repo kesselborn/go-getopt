@@ -7,16 +7,21 @@ import(
 
 func (option Option) String(longOptLength int) (output string){
   fmtStringLongAndShort := fmt.Sprintf("\t-%%-1s, --%%-%ds %%s", longOptLength) // "p", "port=PORT", "the port that should be used"
-  fmtStringShort        := fmt.Sprintf("\t-%%-1s%%-%ds    %%s", longOptLength) // "p", "PORT", "the port that should be used"
-  fmtStringLong         := fmt.Sprintf("\t    --%%-%ds %%s", longOptLength)   // "port=PORT", "the port that should be used"
+  fmtStringShort        := fmt.Sprintf("\t-%%-1s%%-%ds    %%s", longOptLength)  // "p", "PORT", "the port that should be used"
+  fmtStringLong         := fmt.Sprintf("\t    --%%-%ds %%s", longOptLength)     // "port=PORT", "the port that should be used"
+  fmtArgument           := fmt.Sprintf("\t%%-%ds       %%s", longOptLength)     // "port=PORT", "the port that should be used"
 
-  switch {
-    case option.HasLongOpt() && option.HasShortOpt():
-      output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.Description())
-    case option.HasShortOpt():
-      output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), strings.ToUpper(option.Key()), option.Description())
-    case option.HasLongOpt():
-      output = fmt.Sprintf(fmtStringLong, option.LongOptString(), option.Description())
+  if option.description != "" {
+    switch {
+      case option.flags & IsArg > 0:
+        output = fmt.Sprintf(fmtArgument, strings.ToUpper(option.Key()), option.Description())
+      case option.HasLongOpt() && option.HasShortOpt():
+        output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.Description())
+      case option.HasShortOpt():
+        output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), strings.ToUpper(option.Key()), option.Description())
+      case option.HasLongOpt():
+        output = fmt.Sprintf(fmtStringLong, option.LongOptString(), option.Description())
+    }
   }
 
   return output
@@ -78,7 +83,7 @@ func (option Option) Description() (description string) {
     switch {
       case option.flags & Optional > 0 && option.flags & ExampleIsDefault > 0:
         description = description + " (default: " + defaultValue + ")"
-      case option.flags & Required > 0 || option.flags & Optional > 0:
+      case option.flags & Required > 0 || option.flags & Optional > 0 || option.flags & IsArg > 0:
         description = description + " (e.g. " + defaultValue + ")"
     }
   }

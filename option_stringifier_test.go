@@ -5,6 +5,12 @@ import(
 )
 
 func TestUsageOutput(t *testing.T) {
+  if got, expected := (Option{"method", "...", IsArg | Optional, ""}.Usage()),
+                      "[METHOD]"
+     got != expected {
+       t.Errorf("Error creating usage text (argument):\ngot:      " + got + "\nexpected: " + expected )
+  }
+
   if got, expected := (Option{"method", "...", IsArg, ""}.Usage()),
                       "METHOD"
      got != expected {
@@ -58,6 +64,7 @@ func TestUsageOutput(t *testing.T) {
      got != expected {
        t.Errorf("Error creating usage text (flag, no short):\ngot:      " + got + "\nexpected: " + expected )
   }
+
 
 }
 
@@ -145,5 +152,25 @@ func TestOutputWithEnvVar(t *testing.T) {
                       "\t-m METHOD                  method (default: heartbeat); setable via $METHOD";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
+  }
+}
+
+func TestOutputArgument(t *testing.T) {
+  if got, expected := (Option{"logfile", "", IsArg, ""}.String(20)),
+                      "";
+     got != expected {
+       t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"logfile", "dump log into this file", IsArg, ""}.String(20)),
+                      "\tLOGFILE                    dump log into this file";
+     got != expected {
+       t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"logfile", "dump log into this file", IsArg, "/tmp/foo"}.String(20)),
+                      "\tLOGFILE                    dump log into this file (e.g. /tmp/foo)";
+     got != expected {
+       t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
   }
 }
