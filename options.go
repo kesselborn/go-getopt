@@ -62,7 +62,7 @@ func (options Options) Usage(programName string) (output string) {
 }
 
 func (options Options) Help(programName string, description string) (output string) {
-  output = options.Usage(programName) + "\nOptions:\n"
+  output = options.Usage(programName) + description + "\n\nOptions:\n"
   longOptTextLength := 0
 
   for _, option := range options {

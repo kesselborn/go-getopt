@@ -45,6 +45,7 @@ func TestHelp(t *testing.T) {
 
     Usage: testprogram -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
 
+this is not a program
 
 Options:
     -d, --debug                           debug mode; setable via $DEBUG
