@@ -65,16 +65,3 @@ func TestFindOption(t *testing.T) {
   if _, found := options.FindOption("logfile"); found == true   { t.Errorf("shouldn't find an option 'logfile'") }
 }
 
-//func TestRequiredOptions(t *testing.T) {
-//  option1 := Option{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""}
-//  option2 := Option{"logfile|l"          , "log to file <logfile>"                        , Optional | NoLongOpt, ""}
-//  option3 := Option{"verbose"            , "show verbose output"                          , Required, ""}
-//
-//  options := Options{ option1, option2, option3 }
-//
-//  if options.RequiredOptions() != []string{"method", "verbose"} { t.Errorf("did not find correct required options") }
-//
-//
-//}
-
-

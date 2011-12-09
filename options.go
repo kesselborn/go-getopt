@@ -48,3 +48,8 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 
   return requiredOptions
 }
+
+func (options Options) Usage(programName string) (output string) {
+
+  return
+}

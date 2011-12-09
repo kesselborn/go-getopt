@@ -58,8 +58,18 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 
   for _, option := range optionsDefinition {
     switch {
-      case option.flags == (Optional | Required):
+      case option.flags & Optional > 0 && option.flags & Required > 0:
         err = &GetOptError{ ConsistencyError, "an option can not be Required and Optional" }
+      case option.flags & Flag > 0 && option.flags & ExampleIsDefault > 0:
+        err = &GetOptError{ ConsistencyError, "an option can not be a Flag and have ExampleIsDefault" }
+      case option.flags & Required > 0 && option.flags & ExampleIsDefault > 0:
+        err = &GetOptError{ ConsistencyError, "an option can not be Required and have ExampleIsDefault" }
+      case option.flags & Required > 0 && option.flags & IsArg > 0:
+        err = &GetOptError{ ConsistencyError, "an option can not be Required and be an argument (IsArg)" }
+      case option.flags & NoLongOpt > 0 && !option.HasShortOpt() && option.flags & IsArg == 0 :
+        err = &GetOptError{ ConsistencyError, "an option must have either NoLongOpt or a ShortOption" }
+      case option.flags & Flag > 0 && option.flags & IsArg > 0:
+        err = &GetOptError{ ConsistencyError, "an option can not be a Flag and be an argument (IsArg)" }
     }
   }
 

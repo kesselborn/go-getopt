@@ -27,4 +27,8 @@ func TestConsistencyChecking(t *testing.T) {
     err == nil || err.errorCode != ConsistencyError {
     t.Errorf("flags IsArg & Flag")
   }
+  if _, _, _, err := (Options{{"verbose", "...", IsArg | NoLongOpt, ""}}.parse([]string{}, []string{}, "", 0));
+    err != nil {
+    t.Errorf("argument with NoLongOpt and no short opt is ok")
+  }
 }
