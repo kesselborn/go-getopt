@@ -1,15 +1,16 @@
 package getopt
 import (
   "strings"
-  //"fmt"
+  "os"
 )
 
 const InvalidOption = 1
 const MissingValue = 2
-const InvalidValue = 4
-const MissingOption = 8
-const OptionValueError = 16
-const ConsistencyError = 32
+const InvalidValue = 3
+const MissingOption = 4
+const OptionValueError = 5
+const ConsistencyError = 6
+const UsageOrHelp = 7
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -76,6 +77,53 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
   return
 }
 
+func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOpt string) {
+  shortOpt = "-h"
+  longOpt = "--help"
+
+  for _, option := range optionsDefinition {
+    if option.flags & Usage > 0 {
+      shortOpt = "-" + option.ShortOpt()
+    }
+    if option.flags & Help > 0 {
+      longOpt = "--" + option.LongOpt()
+    }
+  }
+
+  return
+}
+
+// copied from the os package ... why isn't this exposed :(
+func basename(name string) string {
+  i := len(name) - 1
+  // Remove trailing slashes
+  for ; i > 0 && name[i] == '/'; i-- {
+    name = name[:i]
+  }
+  // Remove leading directory name
+  for i--; i >= 0; i-- {
+    if name[i] == '/' {
+      name = name[i+1:]
+      break
+    }
+  }
+
+  return name
+}
+
+// todo: method signature sucks
+func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string, description string) (err *GetOptError) {
+  for _, arg := range args {
+    switch {
+      case arg == usageString:
+          err = &GetOptError{ UsageOrHelp, optionsDefinition.Usage(basename(os.Args[0]))}
+      case arg == helpString:
+          err = &GetOptError{ UsageOrHelp, optionsDefinition.Help(basename(os.Args[0]), description) }
+    }
+  }
+
+  return
+}
 
 func (optionsDefinition Options) parse(args []string,
                                        defaults []string,
@@ -85,6 +133,7 @@ func (optionsDefinition Options) parse(args []string,
                                   arguments []string,
                                   passThrough []string,
                                   err *GetOptError) {
+
 
   if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
     options = make(map[string] OptionValue)
@@ -99,11 +148,17 @@ func (optionsDefinition Options) parse(args []string,
       }
     }
 
+
+
     // set overwrites
-    err = optionsDefinition.setOverwrites(options, defaults)
+    usageString, helpString := optionsDefinition.usageHelpOptionNames()
+    err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
     if err == nil {
-      for i:=0; i < len(args); i++ {
+      err = optionsDefinition.setOverwrites(options, defaults)
+
+      for i:=0; i < len(args) && err == nil; i++ {
+
         var opt, val string
         var found bool
 
@@ -123,6 +178,7 @@ func (optionsDefinition Options) parse(args []string,
 
         if found {
           buffer := token
+
           for found && optionsDefinition.IsFlag(opt) && len(buffer) > 2 {
             // concatenated options ... continue parsing
             currentOption, _ := optionsDefinition.FindOption(opt)

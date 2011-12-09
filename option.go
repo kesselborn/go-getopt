@@ -8,6 +8,8 @@ const NoLongOpt = 8
 const ExampleIsDefault = 16
 const IsArg = 32
 const Argument = 64
+const Usage = 128
+const Help = 256
 
 type Option struct {
   option_definition string

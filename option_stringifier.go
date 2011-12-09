@@ -31,7 +31,7 @@ func (option Option) LongOptString() (longOptString string) {
   if option.HasLongOpt() {
     longOptString = option.LongOpt()
 
-    if option.flags & Flag == 0 {
+    if option.flags & Flag == 0  && option.flags & Usage == 0 && option.flags & Help == 0  {
       longOptString = longOptString + "=" + strings.ToUpper(option.LongOpt())
     }
   }
@@ -43,7 +43,7 @@ func (option Option) ShortOptString() (shortOptString string) {
   if option.HasShortOpt() {
     shortOptString = option.ShortOpt()
 
-    if option.flags & Flag == 0 && !option.HasLongOpt() {
+    if option.flags & Flag == 0 && !option.HasLongOpt()  && option.flags & Usage == 0 && option.flags & Help == 0{
       shortOptString = shortOptString + " " + strings.ToUpper(option.LongOpt())
     }
   }
@@ -61,7 +61,7 @@ func (option Option) Usage() (usageString string) {
       usageString = "--" + option.LongOpt()
   }
 
-  if option.flags & Flag == 0 && option.flags & IsArg == 0  {
+  if option.flags & Flag == 0 && option.flags & IsArg == 0 && option.flags & Usage == 0 && option.flags & Help == 0  {
     var separator string
     if option.HasShortOpt() {
       separator = " "
@@ -72,7 +72,7 @@ func (option Option) Usage() (usageString string) {
     usageString = usageString + separator + strings.ToUpper(option.Key())
   }
 
-  if option.flags & Optional > 0 {
+  if option.flags & Optional > 0 || option.flags & Help > 0 || option.flags & Usage > 0 {
     usageString = "[" + usageString + "]"
   }
 

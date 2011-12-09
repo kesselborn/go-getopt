@@ -62,7 +62,11 @@ func (options Options) Usage(programName string) (output string) {
 }
 
 func (options Options) Help(programName string, description string) (output string) {
-  output = options.Usage(programName) + description + "\n\nOptions:\n"
+  output = options.Usage(programName)
+  if description != "" {
+    output = output + description + "\n"
+  }
+
   longOptTextLength := 0
 
   for _, option := range options {
@@ -73,17 +77,24 @@ func (options Options) Help(programName string, description string) (output stri
 
   longOptTextLength = longOptTextLength + 2
 
-  var arguments string
+  var argumentsString string
+  var optionsString string
 
   for _, option := range options {
     if option.flags & IsArg > 0 {
-      arguments = arguments + option.HelpText(longOptTextLength) + "\n"
+      argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
     } else {
-      output = output + option.HelpText(longOptTextLength) + "\n"
+      optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
     }
   }
 
-  output = output + "\nArguments:\n" + arguments + "\n"
+  if optionsString != "" {
+    output = output + "\nOptions:\n" + optionsString
+  }
+
+  if argumentsString != "" {
+    output = output + "\nArguments:\n" + argumentsString + "\n"
+  }
 
   return
 }
