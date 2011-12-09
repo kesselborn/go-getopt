@@ -6,10 +6,10 @@ import(
 )
 
 func (option Option) String(longOptLength int) (output string){
-  fmtStringLongAndShort := fmt.Sprintf("\t-%%-1s, --%%-%ds %%s", longOptLength) // "p", "port=PORT", "the port that should be used"
-  fmtStringShort        := fmt.Sprintf("\t-%%-1s%%-%ds    %%s", longOptLength)  // "p", "PORT", "the port that should be used"
-  fmtStringLong         := fmt.Sprintf("\t    --%%-%ds %%s", longOptLength)     // "port=PORT", "the port that should be used"
-  fmtArgument           := fmt.Sprintf("\t%%-%ds       %%s", longOptLength)     // "port=PORT", "the port that should be used"
+  fmtStringLongAndShort := fmt.Sprintf("        -%%-1s, --%%-%ds %%s", longOptLength) // "p", "port=PORT", "the port that should be used"
+  fmtStringShort        := fmt.Sprintf("        -%%-1s%%-%ds    %%s", longOptLength)  // "p", "PORT", "the port that should be used"
+  fmtStringLong         := fmt.Sprintf("            --%%-%ds %%s", longOptLength)     // "port=PORT", "the port that should be used"
+  fmtArgument           := fmt.Sprintf("        %%-%ds       %%s", longOptLength)     // "port=PORT", "the port that should be used"
 
   if option.description != "" {
     switch {
@@ -62,7 +62,14 @@ func (option Option) Usage() (usageString string) {
   }
 
   if option.flags & Flag == 0 && option.flags & IsArg == 0  {
-    usageString = usageString + " " + strings.ToUpper(option.Key())
+    var separator string
+    if option.HasShortOpt() {
+      separator = " "
+    } else {
+      separator = "="
+    }
+
+    usageString = usageString + separator + strings.ToUpper(option.Key())
   }
 
   if option.flags & Optional > 0 {
