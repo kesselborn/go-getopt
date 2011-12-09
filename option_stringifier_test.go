@@ -69,107 +69,107 @@ func TestUsageOutput(t *testing.T) {
 }
 
 func TestBasicOutput(t *testing.T) {
-  if got, expected := (Option{"method|m", "method: one of either 'heartbeat' or 'nagios'", Required | NoLongOpt, ""}.String(20)),
-                      "        -m METHOD                  method: one of either 'heartbeat' or 'nagios'";
+  if got, expected := (Option{"method|m", "method: one of either 'heartbeat' or 'nagios'", Required | NoLongOpt, ""}.HelpText(20)),
+                      "    -m METHOD                  method: one of either 'heartbeat' or 'nagios'";
      got != expected {
        t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method", "method: one of either 'heartbeat' or 'nagios'", Required, ""}.String(20)),
-                      "            --method=METHOD        method: one of either 'heartbeat' or 'nagios'";
+  if got, expected := (Option{"method", "method: one of either 'heartbeat' or 'nagios'", Required, ""}.HelpText(20)),
+                      "        --method=METHOD        method: one of either 'heartbeat' or 'nagios'";
      got != expected {
        t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method|m", "method: one of either 'heartbeat' or 'nagios'", Required, ""}.String(20)),
-                      "        -m, --method=METHOD        method: one of either 'heartbeat' or 'nagios'";
+  if got, expected := (Option{"method|m", "method: one of either 'heartbeat' or 'nagios'", Required, ""}.HelpText(20)),
+                      "    -m, --method=METHOD        method: one of either 'heartbeat' or 'nagios'";
      got != expected {
        t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected )
   }
 }
 
-func TestBasicOutputWithExampleStringValue(t *testing.T) {
-  if got, expected := (Option{"method|m", "method", Optional | NoLongOpt, "heartbeat"}.String(20)),
-                      "        -m METHOD                  method (e.g. heartbeat)";
+func TestBasicOutputWithExampleHelpTextValue(t *testing.T) {
+  if got, expected := (Option{"method|m", "method", Optional | NoLongOpt, "heartbeat"}.HelpText(20)),
+                      "    -m METHOD                  method (e.g. heartbeat)";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method", "method", Optional, "heartbeat"}.String(20)),
-                      "            --method=METHOD        method (e.g. heartbeat)";
+  if got, expected := (Option{"method", "method", Optional, "heartbeat"}.HelpText(20)),
+                      "        --method=METHOD        method (e.g. heartbeat)";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method|m", "method", Optional, "heartbeat"}.String(20)),
-                      "        -m, --method=METHOD        method (e.g. heartbeat)";
+  if got, expected := (Option{"method|m", "method", Optional, "heartbeat"}.HelpText(20)),
+                      "    -m, --method=METHOD        method (e.g. heartbeat)";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
 
-  if got, expected := (Option{"method|m", "method", Required | NoLongOpt, "heartbeat"}.String(20)),
-                      "        -m METHOD                  method (e.g. heartbeat)";
+  if got, expected := (Option{"method|m", "method", Required | NoLongOpt, "heartbeat"}.HelpText(20)),
+                      "    -m METHOD                  method (e.g. heartbeat)";
      got != expected {
        t.Errorf("Error stringifying required option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method", "method", Required, "heartbeat"}.String(20)),
-                      "            --method=METHOD        method (e.g. heartbeat)";
+  if got, expected := (Option{"method", "method", Required, "heartbeat"}.HelpText(20)),
+                      "        --method=METHOD        method (e.g. heartbeat)";
      got != expected {
        t.Errorf("Error stringifying required option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method|m", "method", Required, "heartbeat"}.String(20)),
-                      "        -m, --method=METHOD        method (e.g. heartbeat)";
+  if got, expected := (Option{"method|m", "method", Required, "heartbeat"}.HelpText(20)),
+                      "    -m, --method=METHOD        method (e.g. heartbeat)";
      got != expected {
        t.Errorf("Error stringifying required option:\ngot:      " + got + "\nexpected: " + expected )
   }
 }
 
-func TestBasicOutputWithDefaultStringValue(t *testing.T) {
-  if got, expected := (Option{"method|m", "method", Optional | ExampleIsDefault | NoLongOpt, "heartbeat"}.String(20)),
-                      "        -m METHOD                  method (default: heartbeat)";
+func TestBasicOutputWithDefaultHelpText(t *testing.T) {
+  if got, expected := (Option{"method|m", "method", Optional | ExampleIsDefault | NoLongOpt, "heartbeat"}.HelpText(20)),
+                      "    -m METHOD                  method (default: heartbeat)";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method", "method", Optional | ExampleIsDefault, "heartbeat"}.String(20)),
-                      "            --method=METHOD        method (default: heartbeat)";
+  if got, expected := (Option{"method", "method", Optional | ExampleIsDefault, "heartbeat"}.HelpText(20)),
+                      "        --method=METHOD        method (default: heartbeat)";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"method|m", "method", Optional | ExampleIsDefault, "heartbeat"}.String(20)),
-                      "        -m, --method=METHOD        method (default: heartbeat)";
+  if got, expected := (Option{"method|m", "method", Optional | ExampleIsDefault, "heartbeat"}.HelpText(20)),
+                      "    -m, --method=METHOD        method (default: heartbeat)";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 }
 
 func TestOutputWithEnvVar(t *testing.T) {
-  if got, expected := (Option{"method|m|METHOD", "method", Optional | ExampleIsDefault | NoLongOpt, "heartbeat"}.String(20)),
-                      "        -m METHOD                  method (default: heartbeat); setable via $METHOD";
+  if got, expected := (Option{"method|m|METHOD", "method", Optional | ExampleIsDefault | NoLongOpt, "heartbeat"}.HelpText(20)),
+                      "    -m METHOD                  method (default: heartbeat); setable via $METHOD";
      got != expected {
        t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected )
   }
 }
 
 func TestOutputArgument(t *testing.T) {
-  if got, expected := (Option{"logfile", "", IsArg, ""}.String(20)),
+  if got, expected := (Option{"logfile", "", IsArg, ""}.HelpText(20)),
                       "";
      got != expected {
        t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"logfile", "dump log into this file", IsArg, ""}.String(20)),
-                      "        LOGFILE                    dump log into this file";
+  if got, expected := (Option{"logfile", "dump log into this file", IsArg, ""}.HelpText(20)),
+                      "    LOGFILE                    dump log into this file";
      got != expected {
        t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
   }
 
-  if got, expected := (Option{"logfile", "dump log into this file", IsArg, "/tmp/foo"}.String(20)),
-                      "        LOGFILE                    dump log into this file (e.g. /tmp/foo)";
+  if got, expected := (Option{"logfile", "dump log into this file", IsArg, "/tmp/foo"}.HelpText(20)),
+                      "    LOGFILE                    dump log into this file (e.g. /tmp/foo)";
      got != expected {
        t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
   }

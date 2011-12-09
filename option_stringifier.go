@@ -5,11 +5,11 @@ import(
   "fmt"
 )
 
-func (option Option) String(longOptLength int) (output string){
-  fmtStringLongAndShort := fmt.Sprintf("        -%%-1s, --%%-%ds %%s", longOptLength) // "p", "port=PORT", "the port that should be used"
-  fmtStringShort        := fmt.Sprintf("        -%%-1s%%-%ds    %%s", longOptLength)  // "p", "PORT", "the port that should be used"
-  fmtStringLong         := fmt.Sprintf("            --%%-%ds %%s", longOptLength)     // "port=PORT", "the port that should be used"
-  fmtArgument           := fmt.Sprintf("        %%-%ds       %%s", longOptLength)     // "port=PORT", "the port that should be used"
+func (option Option) HelpText(longOptLength int) (output string){
+  fmtStringLongAndShort := fmt.Sprintf("    -%%-1s, --%%-%ds %%s", longOptLength) // "p", "port=PORT", "the port that should be used"
+  fmtStringShort        := fmt.Sprintf("    -%%-1s%%-%ds    %%s", longOptLength)  // "p", "PORT", "the port that should be used"
+  fmtStringLong         := fmt.Sprintf("        --%%-%ds %%s", longOptLength)     // "port=PORT", "the port that should be used"
+  fmtArgument           := fmt.Sprintf("    %%-%ds       %%s", longOptLength)     // "port=PORT", "the port that should be used"
 
   if option.description != "" {
     switch {
@@ -86,7 +86,7 @@ func (option Option) Description() (description string) {
   // %v for arrays prints something like [3 4 5] ... let's transform that to 3,4,5:
   defaultValue = strings.Replace(strings.Replace(strings.Replace(defaultValue,"[", "",-1), "]", "", -1), " ", ",", -1)
 
-  if defaultValue != "" {
+  if defaultValue != "" && option.defaultValue != nil {
     switch {
       case option.flags & Optional > 0 && option.flags & ExampleIsDefault > 0:
         description = description + " (default: " + defaultValue + ")"
@@ -101,19 +101,4 @@ func (option Option) Description() (description string) {
 
   return
 }
-
-//
-//func main() {
-//  longOptLength := 50
-//  fmtStringLongAndShort := fmt.Sprintf("-%%s, --%%-%ds %%s\n", longOptLength)   // "p", "port=PORT", "the port that should be used"
-//  fmtStringShort        := fmt.Sprintf("-%%s %%-%ds    %%s\n", longOptLength) // "p", "PORT", "the port that should be used"
-//  fmtStringLong         := fmt.Sprintf("    --%%-%ds %%s\n", longOptLength)   // "port=PORT", "the port that should be used"
-//
-//  fmt.Printf(fmtStringLongAndShort , "p", "port=PORT", "the port that should be used")
-//  fmt.Printf(fmtStringShort, "p", "PORT", "the port that should be used")
-//  fmt.Printf(fmtStringLong, "port=PORT", "the port that should be used")
-//  fmt.Printf(fmtStringLongAndShort , "d", "debug", "switch on debugging")
-//  fmt.Printf(fmtStringShort, "d", "", "switch on debug")
-//  fmt.Printf(fmtStringLong, "debug", "switch on debug")
-//}
 

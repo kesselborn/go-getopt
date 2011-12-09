@@ -50,6 +50,40 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 }
 
 func (options Options) Usage(programName string) (output string) {
+  output = "\n\n    Usage: " + programName
+
+  for _, option := range options {
+    output = output + " " + option.Usage()
+  }
+
+  output = output + "\n\n"
+
+  return
+}
+
+func (options Options) Help(programName string, description string) (output string) {
+  output = options.Usage(programName) + "\nOptions:\n"
+  longOptTextLength := 0
+
+  for _, option := range options {
+    if length := len(option.LongOptString()); length > longOptTextLength {
+      longOptTextLength = length
+    }
+  }
+
+  longOptTextLength = longOptTextLength + 2
+
+  var arguments string
+
+  for _, option := range options {
+    if option.flags & IsArg > 0 {
+      arguments = arguments + option.HelpText(longOptTextLength) + "\n"
+    } else {
+      output = output + option.HelpText(longOptTextLength) + "\n"
+    }
+  }
+
+  output = output + "\nArguments:\n" + arguments + "\n"
 
   return
 }
