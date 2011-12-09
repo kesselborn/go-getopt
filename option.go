@@ -9,16 +9,6 @@ const ExampleIsDefault = 16
 const IsArg = 32
 const Argument = 64
 
-// check before parsing:
-// NoLongOpt && NoShortOpt
-// Options Required Flag
-// flag && ExampleIsDefault
-// Required && ExampleIsDefault
-// IsArg and others
-// Argument and ...
-// no description but default value
-
-
 type Option struct {
   option_definition string
   description string
