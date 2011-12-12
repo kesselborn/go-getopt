@@ -130,7 +130,7 @@ func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString 
 	return
 }
 
-func (optionsDefinition Options) parse(args []string,
+func (optionsDefinition Options) Parse(args []string,
 defaults []string,
 description string,
 flags int) (options map[string]OptionValue,

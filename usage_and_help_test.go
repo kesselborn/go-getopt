@@ -146,7 +146,7 @@ func TestUsageAndHelpOption(t *testing.T) {
 
 `
 
-	if _, _, _, err := options.parse([]string{"barbaz", "-d", "-h", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedUsage {
+	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "-h", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedUsage {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
@@ -161,7 +161,7 @@ Options:
 
 `
 
-	if _, _, _, err := options.parse([]string{"barbaz", "-d", "--help", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedHelp {
+	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "--help", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedHelp {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
@@ -180,7 +180,7 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 
 `
 
-	if _, _, _, err := options.parse([]string{"barbaz", "-d", "-c", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedUsage {
+	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "-c", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedUsage {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
@@ -195,7 +195,7 @@ Options:
 
 `
 
-	if _, _, _, err := options.parse([]string{"barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedHelp {
+	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.errorCode != UsageOrHelp || err.message != expectedHelp {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
