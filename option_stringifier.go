@@ -1,3 +1,8 @@
+// Copyright (c) 2011, SoundCloud Ltd., Daniel Bornkessel
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+// Source code and contact info at http://github.com/kesselborn/go-getopt
+
 package getopt
 
 import(
