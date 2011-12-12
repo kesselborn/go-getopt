@@ -7,121 +7,121 @@ package getopt
 
 import "fmt"
 
-type Options []Option;
+type Options []Option
 
 func (options Options) FindOption(optionString string) (option Option, found bool) {
-  for _, cur := range options {
-    if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
-      option = cur
-      found = true
-      break
-    }
-  }
+	for _, cur := range options {
+		if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
+			option = cur
+			found = true
+			break
+		}
+	}
 
-  return option, found
+	return option, found
 }
 
 func (options Options) IsOptional(optionName string) (isRequired bool) {
-  if option, found := options.FindOption(optionName); found && option.flags & Optional != 0 {
-    isRequired = true
-  }
+	if option, found := options.FindOption(optionName); found && option.flags&Optional != 0 {
+		isRequired = true
+	}
 
-  return isRequired
+	return isRequired
 }
 
 func (options Options) IsRequired(optionName string) (isRequired bool) {
-  if option, found := options.FindOption(optionName); found && option.flags & Required != 0 {
-    isRequired = true
-  }
+	if option, found := options.FindOption(optionName); found && option.flags&Required != 0 {
+		isRequired = true
+	}
 
-  return isRequired
+	return isRequired
 }
 
 func (options Options) IsFlag(optionName string) (isFlag bool) {
-  if option, found := options.FindOption(optionName); found && option.flags & Flag != 0 {
-    isFlag = true
-  }
+	if option, found := options.FindOption(optionName); found && option.flags&Flag != 0 {
+		isFlag = true
+	}
 
-  return isFlag
+	return isFlag
 }
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
 
-  for _, cur := range options {
-    if cur.flags & Required != 0 {
-      requiredOptions = append(requiredOptions, cur.LongOpt())
-    }
-  }
+	for _, cur := range options {
+		if cur.flags&Required != 0 {
+			requiredOptions = append(requiredOptions, cur.LongOpt())
+		}
+	}
 
-  return requiredOptions
+	return requiredOptions
 }
 
 func (options Options) Usage(programName string) (output string) {
-  output = "\n\n    Usage: " + programName
+	output = "\n\n    Usage: " + programName
 
-  for _, option := range options {
-    output = output + " " + option.Usage()
-  }
+	for _, option := range options {
+		output = output + " " + option.Usage()
+	}
 
-  output = output + "\n\n"
+	output = output + "\n\n"
 
-  return
+	return
 }
 
 func (options Options) Help(programName string, description string) (output string) {
-  output = options.Usage(programName)
-  if description != "" {
-    output = output + description + "\n\n"
-  }
+	output = options.Usage(programName)
+	if description != "" {
+		output = output + description + "\n\n"
+	}
 
-  longOptTextLength := 0
+	longOptTextLength := 0
 
-  for _, option := range options {
-    if length := len(option.LongOptString()); length > longOptTextLength {
-      longOptTextLength = length
-    }
-  }
+	for _, option := range options {
+		if length := len(option.LongOptString()); length > longOptTextLength {
+			longOptTextLength = length
+		}
+	}
 
-  longOptTextLength = longOptTextLength + 2
+	longOptTextLength = longOptTextLength + 2
 
-  var argumentsString string
-  var optionsString string
-  var passThroughString string
+	var argumentsString string
+	var optionsString string
+	var passThroughString string
 
-  usageOpt, helpOpt := options.usageHelpOptionNames()
+	usageOpt, helpOpt := options.usageHelpOptionNames()
 
-  for _, option := range options {
-    switch {
-      case option.flags & IsPassThrough > 0:
-        passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
-      case option.flags & IsArg > 0:
-        argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
-      case option.LongOpt() != helpOpt:
-        optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
-    }
-  }
+	for _, option := range options {
+		switch {
+		case option.flags&IsPassThrough > 0:
+			passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
+		case option.flags&IsArg > 0:
+			argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
+		case option.LongOpt() != helpOpt:
+			optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
+		}
+	}
 
-  if optionsString != "" {
-    helpHelp := fmt.Sprintf("usage (-%s) / detailed help text (--%s)", usageOpt, helpOpt)
+	if optionsString != "" {
+		helpHelp := fmt.Sprintf("usage (-%s) / detailed help text (--%s)", usageOpt, helpOpt)
 
-    if option, found := options.FindOption(helpOpt); found {
-      helpHelp = option.description
-    }
+		if option, found := options.FindOption(helpOpt); found {
+			helpHelp = option.description
+		}
 
-    usageHelpOption := Option{fmt.Sprintf("%s|%s", helpOpt, usageOpt),
-                              helpHelp,
-                              Usage | Help | Flag, ""}
-    optionsString = optionsString + usageHelpOption.HelpText(longOptTextLength) + "\n"
-    output = output + "Options:\n" + optionsString + "\n"
-  }
+		usageHelpOption := Option{fmt.Sprintf("%s|%s", helpOpt, usageOpt),
+			helpHelp,
+			Usage | Help | Flag, ""}
+		optionsString = optionsString + usageHelpOption.HelpText(longOptTextLength) + "\n"
+		output = output + "Options:\n" + optionsString + "\n"
+	}
 
-  if argumentsString != "" {
-    output = output + "Arguments:\n" + argumentsString + "\n"
-  }
+	if argumentsString != "" {
+		output = output + "Arguments:\n" + argumentsString + "\n"
+	}
 
-  if passThroughString != "" {
-    output = output + "Pass through arguments:\n" + passThroughString + "\n"
-  }
+	if passThroughString != "" {
+		output = output + "Pass through arguments:\n" + passThroughString + "\n"
+	}
 
-  return
+	return
 }

@@ -4,9 +4,10 @@
 // Source code and contact info at http://github.com/kesselborn/go-getopt
 
 package getopt
+
 import (
-  "strings"
-  "os"
+	"strings"
+	"os"
 )
 
 const InvalidOption = 1
@@ -19,231 +20,225 @@ const UsageOrHelp = 7
 
 const OPTIONS_SEPARATOR = "--"
 
-
 type GetOptError struct {
-  errorCode int
-  message string
+	errorCode int
+	message   string
 }
 
-func mapifyEnviron(environment []string) (envArray map[string] string) {
-  envArray = make(map[string] string)
+func mapifyEnviron(environment []string) (envArray map[string]string) {
+	envArray = make(map[string]string)
 
-  for _, cur := range environment {
-    envVar := strings.Split(cur, "=")
-    if len(envVar) > 1 {
-      envArray[envVar[0]] = envVar[1]
-    }
-  }
+	for _, cur := range environment {
+		envVar := strings.Split(cur, "=")
+		if len(envVar) > 1 {
+			envArray[envVar[0]] = envVar[1]
+		}
+	}
 
-  return
+	return
 }
 
-func (optionsDefinition Options) setOverwrites(options map[string] OptionValue, overwrites []string) (err *GetOptError) {
-  overwritesMap := mapifyEnviron(overwrites)
-  acceptedEnvVars := make(map[string] Option)
+func (optionsDefinition Options) setOverwrites(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
+	overwritesMap := mapifyEnviron(overwrites)
+	acceptedEnvVars := make(map[string]Option)
 
-  for _, opt := range optionsDefinition {
-    if value := opt.EnvVar(); value != "" {
-      acceptedEnvVars[value] = opt
-    }
-  }
+	for _, opt := range optionsDefinition {
+		if value := opt.EnvVar(); value != "" {
+			acceptedEnvVars[value] = opt
+		}
+	}
 
-  for key, acceptedEnvVar := range acceptedEnvVars {
-    if value := overwritesMap[key]; value != "" {
-      options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.defaultValue, value)
-      if err != nil {
-        break
-      }
-    }
-  }
+	for key, acceptedEnvVar := range acceptedEnvVars {
+		if value := overwritesMap[key]; value != "" {
+			options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.defaultValue, value)
+			if err != nil {
+				break
+			}
+		}
+	}
 
-  return
+	return
 }
 
 func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
 
-  for _, option := range optionsDefinition {
-    switch {
-      case option.flags & Optional > 0 && option.flags & Required > 0:
-        err = &GetOptError{ ConsistencyError, "an option can not be Required and Optional" }
-      case option.flags & Flag > 0 && option.flags & ExampleIsDefault > 0:
-        err = &GetOptError{ ConsistencyError, "an option can not be a Flag and have ExampleIsDefault" }
-      case option.flags & Required > 0 && option.flags & ExampleIsDefault > 0:
-        err = &GetOptError{ ConsistencyError, "an option can not be Required and have ExampleIsDefault" }
-      case option.flags & Required > 0 && option.flags & IsArg > 0:
-        err = &GetOptError{ ConsistencyError, "an option can not be Required and be an argument (IsArg)" }
-      case option.flags & NoLongOpt > 0 && !option.HasShortOpt() && option.flags & IsArg == 0 :
-        err = &GetOptError{ ConsistencyError, "an option must have either NoLongOpt or a ShortOption" }
-      case option.flags & Flag > 0 && option.flags & IsArg > 0:
-        err = &GetOptError{ ConsistencyError, "an option can not be a Flag and be an argument (IsArg)" }
-    }
-  }
+	for _, option := range optionsDefinition {
+		switch {
+		case option.flags&Optional > 0 && option.flags&Required > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be Required and Optional"}
+		case option.flags&Flag > 0 && option.flags&ExampleIsDefault > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be a Flag and have ExampleIsDefault"}
+		case option.flags&Required > 0 && option.flags&ExampleIsDefault > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be Required and have ExampleIsDefault"}
+		case option.flags&Required > 0 && option.flags&IsArg > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be Required and be an argument (IsArg)"}
+		case option.flags&NoLongOpt > 0 && !option.HasShortOpt() && option.flags&IsArg == 0:
+			err = &GetOptError{ConsistencyError, "an option must have either NoLongOpt or a ShortOption"}
+		case option.flags&Flag > 0 && option.flags&IsArg > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be a Flag and be an argument (IsArg)"}
+		}
+	}
 
-  return
+	return
 }
 
 func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOpt string) {
-  shortOpt = "h"
-  longOpt = "help"
+	shortOpt = "h"
+	longOpt = "help"
 
-  for _, option := range optionsDefinition {
-    if option.flags & Usage > 0 {
-      shortOpt = option.ShortOpt()
-    }
-    if option.flags & Help > 0 {
-      longOpt = option.LongOpt()
-    }
-  }
+	for _, option := range optionsDefinition {
+		if option.flags&Usage > 0 {
+			shortOpt = option.ShortOpt()
+		}
+		if option.flags&Help > 0 {
+			longOpt = option.LongOpt()
+		}
+	}
 
-  return
+	return
 }
 
 // copied from the os package ... why isn't this exposed :(
 func basename(name string) string {
-  i := len(name) - 1
-  // Remove trailing slashes
-  for ; i > 0 && name[i] == '/'; i-- {
-    name = name[:i]
-  }
-  // Remove leading directory name
-  for i--; i >= 0; i-- {
-    if name[i] == '/' {
-      name = name[i+1:]
-      break
-    }
-  }
+	i := len(name) - 1
+	// Remove trailing slashes
+	for ; i > 0 && name[i] == '/'; i-- {
+		name = name[:i]
+	}
+	// Remove leading directory name
+	for i--; i >= 0; i-- {
+		if name[i] == '/' {
+			name = name[i+1:]
+			break
+		}
+	}
 
-  return name
+	return name
 }
 
 // todo: method signature sucks
 func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string, description string) (err *GetOptError) {
-  for _, arg := range args {
-    switch {
-      case arg == usageString:
-          err = &GetOptError{ UsageOrHelp, optionsDefinition.Usage(basename(os.Args[0]))}
-      case arg == helpString:
-          err = &GetOptError{ UsageOrHelp, optionsDefinition.Help(basename(os.Args[0]), description) }
-    }
-  }
+	for _, arg := range args {
+		switch {
+		case arg == usageString:
+			err = &GetOptError{UsageOrHelp, optionsDefinition.Usage(basename(os.Args[0]))}
+		case arg == helpString:
+			err = &GetOptError{UsageOrHelp, optionsDefinition.Help(basename(os.Args[0]), description)}
+		}
+	}
 
-  return
+	return
 }
 
 func (optionsDefinition Options) parse(args []string,
-                                       defaults []string,
-                                       description string,
-                                       flags int) (
-                                  options map[string] OptionValue,
-                                  arguments []string,
-                                  passThrough []string,
-                                  err *GetOptError) {
+defaults []string,
+description string,
+flags int) (options map[string]OptionValue,
+arguments []string,
+passThrough []string,
+err *GetOptError) {
 
+	if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
+		options = make(map[string]OptionValue)
+		arguments = make([]string, 0)
 
-  if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
-    options = make(map[string] OptionValue)
-    arguments = make([]string, 0)
+		for _, option := range optionsDefinition {
+			switch {
+			case option.flags&Flag != 0: // all flags are false by default
+				options[option.Key()], err = assignValue(false, "false")
+			case option.flags&ExampleIsDefault != 0: // set default
+				options[option.Key()], err = assign(option.defaultValue)
+			}
+		}
 
-    for _, option := range optionsDefinition {
-      switch {
-        case option.flags & Flag != 0:                // all flags are false by default
-          options[option.Key()], err = assignValue(false, "false")
-        case option.flags & ExampleIsDefault != 0:    // set default
-          options[option.Key()], err = assign(option.defaultValue)
-      }
-    }
+		// set overwrites
+		usageString, helpString := optionsDefinition.usageHelpOptionNames()
+		usageString = "-" + usageString
+		helpString = "--" + helpString
+		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
+		if err == nil {
+			err = optionsDefinition.setOverwrites(options, defaults)
 
+			for i := 0; i < len(args) && err == nil; i++ {
 
-    // set overwrites
-    usageString, helpString := optionsDefinition.usageHelpOptionNames()
-    usageString = "-" + usageString
-    helpString = "--" + helpString
-    err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
+				var opt, val string
+				var found bool
 
-    if err == nil {
-      err = optionsDefinition.setOverwrites(options, defaults)
+				token := args[i]
 
-      for i:=0; i < len(args) && err == nil; i++ {
+				if argumentsEnd(token) {
+					passThrough = args[i:]
+					break
+				}
 
-        var opt, val string
-        var found bool
+				if isValue(token) {
+					arguments = append(arguments, token)
+					continue
+				}
 
-        token := args[i]
+				opt, val, found = parseShortOpt(token)
 
-        if argumentsEnd(token) {
-          passThrough = args[i:]
-          break
-        }
+				if found {
+					buffer := token
 
-        if isValue(token) {
-          arguments = append(arguments, token)
-          continue
-        }
+					for found && optionsDefinition.IsFlag(opt) && len(buffer) > 2 {
+						// concatenated options ... continue parsing
+						currentOption, _ := optionsDefinition.FindOption(opt)
+						key := currentOption.Key()
 
-        opt, val, found = parseShortOpt(token)
+						options[key], err = assignValue(currentOption.defaultValue, "true")
 
-        if found {
-          buffer := token
+						// make it look as if we have a normal option with a '-' prefix
+						buffer = "-" + buffer[2:]
+						opt, val, found = parseShortOpt(buffer)
+					}
 
-          for found && optionsDefinition.IsFlag(opt) && len(buffer) > 2 {
-            // concatenated options ... continue parsing
-            currentOption, _ := optionsDefinition.FindOption(opt)
-            key := currentOption.Key()
+				} else {
+					opt, val, found = parseLongOpt(token)
+				}
 
-            options[key], err = assignValue(currentOption.defaultValue, "true")
+				currentOption, found := optionsDefinition.FindOption(opt)
+				key := currentOption.Key()
 
-            // make it look as if we have a normal option with a '-' prefix
-            buffer = "-" + buffer[2:]
-            opt, val, found = parseShortOpt(buffer)
-          }
+				if !found {
+					err = &GetOptError{InvalidOption, "invalid option '" + token + "'"}
+					break
+				}
 
-        } else {
-          opt, val, found = parseLongOpt(token)
-        }
+				if optionsDefinition.IsFlag(opt) {
+					options[key], err = assignValue(true, "true")
+				} else {
+					if val == "" {
+						if len(args) > i+1 && isValue(args[i+1]) {
+							i = i + 1
+							val = args[i]
+						} else {
+							err = &GetOptError{MissingValue, "Option '" + token + "' needs a value"}
+							break
+						}
+					}
 
-        currentOption, found := optionsDefinition.FindOption(opt)
-        key := currentOption.Key()
+					if !isValue(val) {
+						err = &GetOptError{InvalidValue, "Option '" + token + "' got invalid value: '" + val + "'"}
+						break
+					}
 
-        if !found {
-          err = &GetOptError{ InvalidOption, "invalid option '" + token + "'" }
-          break
-        }
+					options[key], err = assignValue(currentOption.defaultValue, val)
+				}
 
-        if optionsDefinition.IsFlag(opt) {
-          options[key], err = assignValue(true, "true")
-        } else {
-          if val == "" {
-            if len(args) > i + 1 && isValue(args[i + 1]) {
-              i = i + 1
-              val = args[i]
-            } else {
-              err = &GetOptError{ MissingValue, "Option '" + token + "' needs a value" }
-              break
-            }
-          }
+			}
+		}
 
+		if err == nil {
+			for _, requiredOption := range optionsDefinition.RequiredOptions() {
+				if options[requiredOption].set == false {
+					err = &GetOptError{MissingOption, "Option '" + requiredOption + "' is missing"}
+					break
+				}
+			}
+		}
+	}
 
-          if !isValue(val) {
-            err = &GetOptError{ InvalidValue, "Option '" + token + "' got invalid value: '" + val + "'" }
-            break
-          }
-
-          options[key], err = assignValue(currentOption.defaultValue, val)
-        }
-
-      }
-    }
-
-    if err == nil {
-      for _, requiredOption := range optionsDefinition.RequiredOptions() {
-        if options[requiredOption].set == false {
-          err = &GetOptError{ MissingOption, "Option '" + requiredOption + "' is missing" }
-          break
-        }
-      }
-    }
-  }
-
-  return
+	return
 }
