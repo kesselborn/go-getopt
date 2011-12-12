@@ -13,7 +13,7 @@ func (option Option) HelpText(longOptLength int) (output string){
 
   if option.description != "" {
     switch {
-      case option.flags & IsArg > 0:
+      case option.flags & IsArg > 0 || option.flags & IsPassTrough > 0:
         output = fmt.Sprintf(fmtArgument, strings.ToUpper(option.Key()), option.Description())
       case option.HasLongOpt() && option.HasShortOpt():
         output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.Description())
@@ -53,6 +53,8 @@ func (option Option) ShortOptString() (shortOptString string) {
 
 func (option Option) Usage() (usageString string) {
   switch {
+    case option.flags & IsPassTrough > 0:
+      usageString = "-- " + strings.ToUpper(option.Key())
     case option.flags & IsArg > 0:
       usageString = strings.ToUpper(option.Key())
     case option.HasShortOpt():
@@ -61,7 +63,9 @@ func (option Option) Usage() (usageString string) {
       usageString = "--" + option.LongOpt()
   }
 
-  if option.flags & Flag == 0 && option.flags & IsArg == 0 && option.flags & Usage == 0 && option.flags & Help == 0  {
+  if option.flags & Flag == 0 && option.flags & IsArg == 0 &&
+     option.flags & IsPassTrough == 0 && option.flags & Usage == 0 &&
+     option.flags & Help == 0  {
     var separator string
     if option.HasShortOpt() {
       separator = " "

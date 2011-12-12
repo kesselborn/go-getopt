@@ -174,3 +174,17 @@ func TestOutputArgument(t *testing.T) {
        t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
   }
 }
+
+func TestOutputPassThrough(t *testing.T) {
+  if got, expected := (Option{"pass through args", "pass through arguments", IsPassTrough, ""}.Usage()),
+                      "-- PASS THROUGH ARGS";
+     got != expected {
+       t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
+  }
+
+  if got, expected := (Option{"pass through args", "pass through arguments", IsPassTrough, ""}.HelpText(20)),
+                      "    PASS THROUGH ARGS          pass through arguments";
+     got != expected {
+       t.Errorf("Error stringifying argument:\ngot:      " + got + "\nexpected: " + expected )
+  }
+}
