@@ -50,7 +50,7 @@ func (optionsDefinition Options) setOverwrites(options map[string]OptionValue, o
 
 	for key, acceptedEnvVar := range acceptedEnvVars {
 		if value := overwritesMap[key]; value != "" {
-			options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.defaultValue, value)
+			options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.DefaultValue, value)
 			if err != nil {
 				break
 			}
@@ -64,17 +64,17 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 
 	for _, option := range optionsDefinition {
 		switch {
-		case option.flags&Optional > 0 && option.flags&Required > 0:
+		case option.Flags&Optional > 0 && option.Flags&Required > 0:
 			err = &GetOptError{ConsistencyError, "an option can not be Required and Optional"}
-		case option.flags&Flag > 0 && option.flags&ExampleIsDefault > 0:
+		case option.Flags&Flag > 0 && option.Flags&ExampleIsDefault > 0:
 			err = &GetOptError{ConsistencyError, "an option can not be a Flag and have ExampleIsDefault"}
-		case option.flags&Required > 0 && option.flags&ExampleIsDefault > 0:
+		case option.Flags&Required > 0 && option.Flags&ExampleIsDefault > 0:
 			err = &GetOptError{ConsistencyError, "an option can not be Required and have ExampleIsDefault"}
-		case option.flags&Required > 0 && option.flags&IsArg > 0:
+		case option.Flags&Required > 0 && option.Flags&IsArg > 0:
 			err = &GetOptError{ConsistencyError, "an option can not be Required and be an argument (IsArg)"}
-		case option.flags&NoLongOpt > 0 && !option.HasShortOpt() && option.flags&IsArg == 0:
+		case option.Flags&NoLongOpt > 0 && !option.HasShortOpt() && option.Flags&IsArg == 0:
 			err = &GetOptError{ConsistencyError, "an option must have either NoLongOpt or a ShortOption"}
-		case option.flags&Flag > 0 && option.flags&IsArg > 0:
+		case option.Flags&Flag > 0 && option.Flags&IsArg > 0:
 			err = &GetOptError{ConsistencyError, "an option can not be a Flag and be an argument (IsArg)"}
 		}
 	}
@@ -87,10 +87,10 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 	longOpt = "help"
 
 	for _, option := range optionsDefinition {
-		if option.flags&Usage > 0 {
+		if option.Flags&Usage > 0 {
 			shortOpt = option.ShortOpt()
 		}
-		if option.flags&Help > 0 {
+		if option.Flags&Help > 0 {
 			longOpt = option.LongOpt()
 		}
 	}
@@ -144,10 +144,10 @@ err *GetOptError) {
 
 		for _, option := range optionsDefinition {
 			switch {
-			case option.flags&Flag != 0: // all flags are false by default
+			case option.Flags&Flag != 0: // all flags are false by default
 				options[option.Key()], err = assignValue(false, "false")
-			case option.flags&ExampleIsDefault != 0: // set default
-				options[option.Key()], err = assign(option.defaultValue)
+			case option.Flags&ExampleIsDefault != 0: // set default
+				options[option.Key()], err = assign(option.DefaultValue)
 			}
 		}
 
@@ -187,7 +187,7 @@ err *GetOptError) {
 						currentOption, _ := optionsDefinition.FindOption(opt)
 						key := currentOption.Key()
 
-						options[key], err = assignValue(currentOption.defaultValue, "true")
+						options[key], err = assignValue(currentOption.DefaultValue, "true")
 
 						// make it look as if we have a normal option with a '-' prefix
 						buffer = "-" + buffer[2:]
@@ -224,7 +224,7 @@ err *GetOptError) {
 						break
 					}
 
-					options[key], err = assignValue(currentOption.defaultValue, val)
+					options[key], err = assignValue(currentOption.DefaultValue, val)
 				}
 
 			}

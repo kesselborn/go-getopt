@@ -19,17 +19,17 @@ const Help = 256
 const IsPassThrough = 512
 
 type Option struct {
-	option_definition string
-	description       string
-	flags             int
-	defaultValue      interface{}
+	OptionDefinition string
+	Description      string
+	Flags            int
+	DefaultValue     interface{}
 }
 
 func (option Option) eq(other Option) bool {
-	return option.option_definition == other.option_definition &&
-		option.description == other.description &&
-		option.flags == other.flags &&
-		option.defaultValue == other.defaultValue
+	return option.OptionDefinition == other.OptionDefinition &&
+		option.Description == other.Description &&
+		option.Flags == other.Flags &&
+		option.DefaultValue == other.DefaultValue
 }
 
 func (option Option) neq(other Option) bool {
@@ -37,11 +37,11 @@ func (option Option) neq(other Option) bool {
 }
 
 func (option Option) Key() (key string) {
-	return strings.Split(option.option_definition, "|")[0]
+	return strings.Split(option.OptionDefinition, "|")[0]
 }
 
 func (option Option) LongOpt() (longOpt string) {
-	if option.flags&NoLongOpt == 0 {
+	if option.Flags&NoLongOpt == 0 {
 		longOpt = option.Key()
 	}
 
@@ -53,7 +53,7 @@ func (option Option) HasLongOpt() (result bool) {
 }
 
 func (option Option) ShortOpt() (shortOpt string) {
-	token := strings.Split(option.option_definition, "|")
+	token := strings.Split(option.OptionDefinition, "|")
 
 	if len(token) > 1 {
 		shortOpt = token[1]
@@ -67,7 +67,7 @@ func (option Option) HasShortOpt() (result bool) {
 }
 
 func (option Option) EnvVar() (envVar string) {
-	token := strings.Split(option.option_definition, "|")
+	token := strings.Split(option.OptionDefinition, "|")
 
 	if len(token) > 2 {
 		envVar = token[2]

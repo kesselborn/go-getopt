@@ -22,7 +22,7 @@ func (options Options) FindOption(optionString string) (option Option, found boo
 }
 
 func (options Options) IsOptional(optionName string) (isRequired bool) {
-	if option, found := options.FindOption(optionName); found && option.flags&Optional != 0 {
+	if option, found := options.FindOption(optionName); found && option.Flags&Optional != 0 {
 		isRequired = true
 	}
 
@@ -30,7 +30,7 @@ func (options Options) IsOptional(optionName string) (isRequired bool) {
 }
 
 func (options Options) IsRequired(optionName string) (isRequired bool) {
-	if option, found := options.FindOption(optionName); found && option.flags&Required != 0 {
+	if option, found := options.FindOption(optionName); found && option.Flags&Required != 0 {
 		isRequired = true
 	}
 
@@ -38,7 +38,7 @@ func (options Options) IsRequired(optionName string) (isRequired bool) {
 }
 
 func (options Options) IsFlag(optionName string) (isFlag bool) {
-	if option, found := options.FindOption(optionName); found && option.flags&Flag != 0 {
+	if option, found := options.FindOption(optionName); found && option.Flags&Flag != 0 {
 		isFlag = true
 	}
 
@@ -48,7 +48,7 @@ func (options Options) IsFlag(optionName string) (isFlag bool) {
 func (options Options) RequiredOptions() (requiredOptions []string) {
 
 	for _, cur := range options {
-		if cur.flags&Required != 0 {
+		if cur.Flags&Required != 0 {
 			requiredOptions = append(requiredOptions, cur.LongOpt())
 		}
 	}
@@ -92,9 +92,9 @@ func (options Options) Help(programName string, description string) (output stri
 
 	for _, option := range options {
 		switch {
-		case option.flags&IsPassThrough > 0:
+		case option.Flags&IsPassThrough > 0:
 			passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
-		case option.flags&IsArg > 0:
+		case option.Flags&IsArg > 0:
 			argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
 		case option.LongOpt() != helpOpt:
 			optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
@@ -105,7 +105,7 @@ func (options Options) Help(programName string, description string) (output stri
 		helpHelp := fmt.Sprintf("usage (-%s) / detailed help text (--%s)", usageOpt, helpOpt)
 
 		if option, found := options.FindOption(helpOpt); found {
-			helpHelp = option.description
+			helpHelp = option.Description
 		}
 
 		usageHelpOption := Option{fmt.Sprintf("%s|%s", helpOpt, usageOpt),

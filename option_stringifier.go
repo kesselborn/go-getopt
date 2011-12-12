@@ -16,16 +16,16 @@ func (option Option) HelpText(longOptLength int) (output string) {
 	fmtStringLong := fmt.Sprintf("        --%%-%ds %%s", longOptLength)             // "port=PORT", "the port that should be used"
 	fmtArgument := fmt.Sprintf("    %%-%ds       %%s", longOptLength)               // "port=PORT", "the port that should be used"
 
-	if option.description != "" {
+	if option.Description != "" {
 		switch {
-		case option.flags&IsArg > 0 || option.flags&IsPassThrough > 0:
-			output = fmt.Sprintf(fmtArgument, strings.ToUpper(option.Key()), option.Description())
+		case option.Flags&IsArg > 0 || option.Flags&IsPassThrough > 0:
+			output = fmt.Sprintf(fmtArgument, strings.ToUpper(option.Key()), option.DescriptionText())
 		case option.HasLongOpt() && option.HasShortOpt():
-			output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.Description())
+			output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.DescriptionText())
 		case option.HasShortOpt():
-			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), strings.ToUpper(option.Key()), option.Description())
+			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), strings.ToUpper(option.Key()), option.DescriptionText())
 		case option.HasLongOpt():
-			output = fmt.Sprintf(fmtStringLong, option.LongOptString(), option.Description())
+			output = fmt.Sprintf(fmtStringLong, option.LongOptString(), option.DescriptionText())
 		}
 	}
 
@@ -36,7 +36,7 @@ func (option Option) LongOptString() (longOptString string) {
 	if option.HasLongOpt() {
 		longOptString = option.LongOpt()
 
-		if option.flags&Flag == 0 && option.flags&Usage == 0 && option.flags&Help == 0 && option.flags&IsPassThrough == 0 {
+		if option.Flags&Flag == 0 && option.Flags&Usage == 0 && option.Flags&Help == 0 && option.Flags&IsPassThrough == 0 {
 			longOptString = longOptString + "=" + strings.ToUpper(option.LongOpt())
 		}
 	}
@@ -48,7 +48,7 @@ func (option Option) ShortOptString() (shortOptString string) {
 	if option.HasShortOpt() {
 		shortOptString = option.ShortOpt()
 
-		if option.flags&Flag == 0 && !option.HasLongOpt() && option.flags&Usage == 0 && option.flags&Help == 0 {
+		if option.Flags&Flag == 0 && !option.HasLongOpt() && option.Flags&Usage == 0 && option.Flags&Help == 0 {
 			shortOptString = shortOptString + " " + strings.ToUpper(option.LongOpt())
 		}
 	}
@@ -58,9 +58,9 @@ func (option Option) ShortOptString() (shortOptString string) {
 
 func (option Option) Usage() (usageString string) {
 	switch {
-	case option.flags&IsPassThrough > 0:
+	case option.Flags&IsPassThrough > 0:
 		usageString = "-- " + strings.ToUpper(option.Key())
-	case option.flags&IsArg > 0:
+	case option.Flags&IsArg > 0:
 		usageString = strings.ToUpper(option.Key())
 	case option.HasShortOpt():
 		usageString = "-" + option.ShortOpt()
@@ -68,9 +68,9 @@ func (option Option) Usage() (usageString string) {
 		usageString = "--" + option.LongOpt()
 	}
 
-	if option.flags&Flag == 0 && option.flags&IsArg == 0 &&
-		option.flags&IsPassThrough == 0 && option.flags&Usage == 0 &&
-		option.flags&Help == 0 {
+	if option.Flags&Flag == 0 && option.Flags&IsArg == 0 &&
+		option.Flags&IsPassThrough == 0 && option.Flags&Usage == 0 &&
+		option.Flags&Help == 0 {
 		var separator string
 		if option.HasShortOpt() {
 			separator = " "
@@ -81,25 +81,25 @@ func (option Option) Usage() (usageString string) {
 		usageString = usageString + separator + strings.ToUpper(option.Key())
 	}
 
-	if option.flags&Optional > 0 || option.flags&Help > 0 || option.flags&Usage > 0 {
+	if option.Flags&Optional > 0 || option.Flags&Help > 0 || option.Flags&Usage > 0 {
 		usageString = "[" + usageString + "]"
 	}
 
 	return
 }
 
-func (option Option) Description() (description string) {
-	description = option.description
+func (option Option) DescriptionText() (description string) {
+	description = option.Description
 
-	defaultValue := fmt.Sprintf("%v", option.defaultValue)
+	defaultValue := fmt.Sprintf("%v", option.DefaultValue)
 	// %v for arrays prints something like [3 4 5] ... let's transform that to 3,4,5:
 	defaultValue = strings.Replace(strings.Replace(strings.Replace(defaultValue, "[", "", -1), "]", "", -1), " ", ",", -1)
 
-	if defaultValue != "" && option.defaultValue != nil {
+	if defaultValue != "" && option.DefaultValue != nil {
 		switch {
-		case option.flags&Optional > 0 && option.flags&ExampleIsDefault > 0:
+		case option.Flags&Optional > 0 && option.Flags&ExampleIsDefault > 0:
 			description = description + " (default: " + defaultValue + ")"
-		case option.flags&Required > 0 || option.flags&Optional > 0 || option.flags&IsArg > 0:
+		case option.Flags&Required > 0 || option.Flags&Optional > 0 || option.Flags&IsArg > 0:
 			description = description + " (e.g. " + defaultValue + ")"
 		}
 	}
