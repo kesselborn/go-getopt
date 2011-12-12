@@ -22,9 +22,7 @@ func TestUsage(t *testing.T) {
 		{"directories", "directories", IsArg | Optional, nil},
 	}
 
-	expected := `
-
-    Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
+	expected := `Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
 
 `
 
@@ -47,9 +45,7 @@ func TestHelp(t *testing.T) {
 		{"pass through args", "arguments for subcommand", IsPassThrough, nil},
 	}
 
-	expected := `
-
-    Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES] -- PASS THROUGH ARGS
+	expected := `Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES] -- PASS THROUGH ARGS
 
 this is not a program
 
@@ -83,9 +79,7 @@ func TestHelpNoOptions(t *testing.T) {
 		{"directories", "directories", IsArg | Optional, nil},
 	}
 
-	expected := `
-
-    Usage: 6.out FILES [DIRECTORIES]
+	expected := `Usage: 6.out FILES [DIRECTORIES]
 
 this is not a program
 
@@ -111,9 +105,7 @@ func TestHelpNoArgs(t *testing.T) {
 		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 	}
 
-	expected := `
-
-    Usage: 6.out -d [-p PORTS] [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE]
+	expected := `Usage: 6.out -d [-p PORTS] [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE]
 
 this is not a program
 
@@ -140,9 +132,7 @@ func TestUsageAndHelpOption(t *testing.T) {
 		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `
-
-    Usage: 6.out -d [-p PORTS]
+	expectedUsage := `Usage: 6.out -d [-p PORTS]
 
 `
 
@@ -150,9 +140,7 @@ func TestUsageAndHelpOption(t *testing.T) {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
-	expectedHelp := `
-
-    Usage: 6.out -d [-p PORTS]
+	expectedHelp := `Usage: 6.out -d [-p PORTS]
 
 Options:
     -d, --debug         debug mode; setable via $DEBUG
@@ -174,9 +162,7 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `
-
-    Usage: 6.out [-c] -d [-p PORTS]
+	expectedUsage := `Usage: 6.out [-c] -d [-p PORTS]
 
 `
 
@@ -184,9 +170,7 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
-	expectedHelp := `
-
-    Usage: 6.out [-c] -d [-p PORTS]
+	expectedHelp := `Usage: 6.out [-c] -d [-p PORTS]
 
 Options:
     -d, --debug         debug mode; setable via $DEBUG

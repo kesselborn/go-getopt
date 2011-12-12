@@ -79,7 +79,7 @@ func basename(name string) string {
 
 func (options Options) Usage() (output string) {
 	programName := basename(os.Args[0])
-	output = "\n\n    Usage: " + programName
+	output = "Usage: " + programName
 
 	for _, option := range options {
 		output = output + " " + option.Usage()
