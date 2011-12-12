@@ -78,15 +78,15 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 }
 
 func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOpt string) {
-  shortOpt = "-h"
-  longOpt = "--help"
+  shortOpt = "h"
+  longOpt = "help"
 
   for _, option := range optionsDefinition {
     if option.flags & Usage > 0 {
-      shortOpt = "-" + option.ShortOpt()
+      shortOpt = option.ShortOpt()
     }
     if option.flags & Help > 0 {
-      longOpt = "--" + option.LongOpt()
+      longOpt = option.LongOpt()
     }
   }
 
@@ -152,6 +152,8 @@ func (optionsDefinition Options) parse(args []string,
 
     // set overwrites
     usageString, helpString := optionsDefinition.usageHelpOptionNames()
+    usageString = "-" + usageString
+    helpString = "--" + helpString
     err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
     if err == nil {

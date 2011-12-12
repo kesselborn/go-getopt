@@ -1,5 +1,7 @@
 package getopt
 
+import "fmt"
+
 type Options []Option;
 
 func (options Options) FindOption(optionString string) (option Option, found bool) {
@@ -80,15 +82,29 @@ func (options Options) Help(programName string, description string) (output stri
   var argumentsString string
   var optionsString string
 
+  usageOpt, helpOpt := options.usageHelpOptionNames()
+
   for _, option := range options {
     if option.flags & IsArg > 0 {
       argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
     } else {
-      optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
+      if option.LongOpt() != helpOpt {
+        optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
+      }
     }
   }
 
   if optionsString != "" {
+    helpHelp := fmt.Sprintf("usage (-%s) / detailed help text (--%s)", usageOpt, helpOpt)
+
+    if option, found := options.FindOption(helpOpt); found {
+      helpHelp = option.description
+    }
+
+    usageHelpOption := Option{fmt.Sprintf("%s|%s", helpOpt, usageOpt),
+                              helpHelp,
+                              Usage | Help | Flag, ""}
+    optionsString = optionsString + usageHelpOption.HelpText(longOptTextLength) + "\n"
     output = output + "\nOptions:\n" + optionsString
   }
 

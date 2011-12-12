@@ -54,6 +54,7 @@ Options:
         --instances=INSTANCES             instances (e.g. 4)
         --lock                            create lock file; setable via $LOCK
         --logfile=LOGFILE                 logfile (default: /var/log/foo.log); setable via $LOGFILE
+    -h, --help                            usage (-h) / detailed help text (--help)
 
 Arguments:
     FILES                                 files that should be read in
@@ -115,6 +116,7 @@ Options:
         --instances=INSTANCES             instances (e.g. 4)
         --lock                            create lock file; setable via $LOCK
         --logfile=LOGFILE                 logfile (default: /var/log/foo.log); setable via $LOGFILE
+    -h, --help                            usage (-h) / detailed help text (--help)
 `
 
   if got := options.Help("testprogram", "this is not a program"); got != expected {
@@ -148,6 +150,7 @@ func TestUsageAndHelpOption(t *testing.T) {
 Options:
     -d, --debug         debug mode; setable via $DEBUG
     -p, --ports=PORTS   ports (default: 3000,3001,3002); setable via $PORTS
+    -h, --help          usage (-h) / detailed help text (--help)
 `
 
   if _, _, _, err := options.parse([]string{"barbaz", "-d", "--help", "-p5000,6000", "foobar"}, []string{}, "", 0);
@@ -181,9 +184,9 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 
 
 Options:
-    -c, --chelp         show usage / help
     -d, --debug         debug mode; setable via $DEBUG
     -p, --ports=PORTS   ports (default: 3000,3001,3002); setable via $PORTS
+    -c, --chelp         show usage / help
 `
 
   if _, _, _, err := options.parse([]string{"barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}, []string{}, "", 0);
