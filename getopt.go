@@ -20,8 +20,8 @@ const UsageOrHelp = 7
 const OPTIONS_SEPARATOR = "--"
 
 type GetOptError struct {
-	errorCode int
-	message   string
+	ErrorCode int
+	Message   string
 }
 
 func mapifyEnviron(environment []string) (envArray map[string]string) {

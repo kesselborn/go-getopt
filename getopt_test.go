@@ -42,15 +42,15 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 		t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"].String + "'")
 	}
 
-	if _, _, _, err := options.Parse([]string{"-m"}, []string{}, "", 0); err == nil || err.errorCode != MissingValue {
+	if _, _, _, err := options.Parse([]string{"-m"}, []string{}, "", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("required option without value did not raise error")
 	}
 
-	if _, _, _, err := options.Parse([]string{"-m", "-x"}, []string{}, "", 0); err == nil || err.errorCode != MissingValue {
+	if _, _, _, err := options.Parse([]string{"-m", "-x"}, []string{}, "", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("required option without value did not raise error")
 	}
 
-	if _, _, _, err := options.Parse([]string{""}, []string{}, "", 0); err == nil || err.errorCode != MissingOption {
+	if _, _, _, err := options.Parse([]string{""}, []string{}, "", 0); err == nil || err.ErrorCode != MissingOption {
 		t.Errorf("required option wasn't set")
 	}
 
@@ -73,15 +73,15 @@ func TestConcatenatedOptionsParsingSimple(t *testing.T) {
 		t.Errorf("did not recognize all flags when concatenation options (3 options)")
 	}
 
-	if _, _, _, err := options.Parse([]string{"-dvD"}, []string{}, "", 0); err == nil || err.errorCode != MissingOption {
+	if _, _, _, err := options.Parse([]string{"-dvD"}, []string{}, "", 0); err == nil || err.ErrorCode != MissingOption {
 		t.Errorf("did not recognize a missing required option in concatenation mode")
 	}
 
-	if _, _, _, err := options.Parse([]string{"-Dl"}, []string{}, "", 0); err == nil || err.errorCode != MissingValue {
+	if _, _, _, err := options.Parse([]string{"-Dl"}, []string{}, "", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("did not realize that I missed a value")
 	}
 
-	if _, _, _, err := options.Parse([]string{"-Dl", "-d"}, []string{}, "", 0); err == nil || err.errorCode != MissingValue {
+	if _, _, _, err := options.Parse([]string{"-Dl", "-d"}, []string{}, "", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("did not realize that I missed a value")
 	}
 
