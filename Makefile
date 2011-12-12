@@ -9,5 +9,7 @@ GOFILES=\
 					option_value.go\
 					option_stringifier.go\
 
+default: all
+	6g -V > TESTED_GO_RELEASE
 
 include $(GOROOT)/src/Make.pkg
