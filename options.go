@@ -5,7 +5,10 @@
 
 package getopt
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 type Options []Option
 
@@ -56,7 +59,26 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 	return requiredOptions
 }
 
-func (options Options) Usage(programName string) (output string) {
+// copied from the os package ... why isn't this exposed :(
+func basename(name string) string {
+	i := len(name) - 1
+	// Remove trailing slashes
+	for ; i > 0 && name[i] == '/'; i-- {
+		name = name[:i]
+	}
+	// Remove leading directory name
+	for i--; i >= 0; i-- {
+		if name[i] == '/' {
+			name = name[i+1:]
+			break
+		}
+	}
+
+	return name
+}
+
+func (options Options) Usage() (output string) {
+	programName := basename(os.Args[0])
 	output = "\n\n    Usage: " + programName
 
 	for _, option := range options {
@@ -68,8 +90,8 @@ func (options Options) Usage(programName string) (output string) {
 	return
 }
 
-func (options Options) Help(programName string, description string) (output string) {
-	output = options.Usage(programName)
+func (options Options) Help(description string) (output string) {
+	output = options.Usage()
 	if description != "" {
 		output = output + description + "\n\n"
 	}

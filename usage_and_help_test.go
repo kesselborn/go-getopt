@@ -24,11 +24,11 @@ func TestUsage(t *testing.T) {
 
 	expected := `
 
-    Usage: testprogram -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
+    Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
 
 `
 
-	if got := options.Usage("testprogram"); got != expected {
+	if got := options.Usage(); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
@@ -49,7 +49,7 @@ func TestHelp(t *testing.T) {
 
 	expected := `
 
-    Usage: testprogram -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES] -- PASS THROUGH ARGS
+    Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES] -- PASS THROUGH ARGS
 
 this is not a program
 
@@ -71,7 +71,7 @@ Pass through arguments:
 
 `
 
-	if got := options.Help("testprogram", "this is not a program"); got != expected {
+	if got := options.Help("this is not a program"); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
@@ -85,7 +85,7 @@ func TestHelpNoOptions(t *testing.T) {
 
 	expected := `
 
-    Usage: testprogram FILES [DIRECTORIES]
+    Usage: 6.out FILES [DIRECTORIES]
 
 this is not a program
 
@@ -95,7 +95,7 @@ Arguments:
 
 `
 
-	if got := options.Help("testprogram", "this is not a program"); got != expected {
+	if got := options.Help("this is not a program"); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
@@ -113,7 +113,7 @@ func TestHelpNoArgs(t *testing.T) {
 
 	expected := `
 
-    Usage: testprogram -d [-p PORTS] [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE]
+    Usage: 6.out -d [-p PORTS] [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE]
 
 this is not a program
 
@@ -128,7 +128,7 @@ Options:
 
 `
 
-	if got := options.Help("testprogram", "this is not a program"); got != expected {
+	if got := options.Help("this is not a program"); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 

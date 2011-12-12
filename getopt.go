@@ -7,7 +7,6 @@ package getopt
 
 import (
 	"strings"
-	"os"
 )
 
 const InvalidOption = 1
@@ -98,32 +97,14 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 	return
 }
 
-// copied from the os package ... why isn't this exposed :(
-func basename(name string) string {
-	i := len(name) - 1
-	// Remove trailing slashes
-	for ; i > 0 && name[i] == '/'; i-- {
-		name = name[:i]
-	}
-	// Remove leading directory name
-	for i--; i >= 0; i-- {
-		if name[i] == '/' {
-			name = name[i+1:]
-			break
-		}
-	}
-
-	return name
-}
-
 // todo: method signature sucks
 func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string, description string) (err *GetOptError) {
 	for _, arg := range args {
 		switch {
 		case arg == usageString:
-			err = &GetOptError{UsageOrHelp, optionsDefinition.Usage(basename(os.Args[0]))}
+			err = &GetOptError{UsageOrHelp, optionsDefinition.Usage()}
 		case arg == helpString:
-			err = &GetOptError{UsageOrHelp, optionsDefinition.Help(basename(os.Args[0]), description)}
+			err = &GetOptError{UsageOrHelp, optionsDefinition.Help(description)}
 		}
 	}
 
