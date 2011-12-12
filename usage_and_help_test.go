@@ -39,11 +39,12 @@ func TestHelp(t *testing.T) {
     {"lock||LOCK", "create lock file", Flag, false},
     {"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
     {"directories", "directories", IsArg | Optional, nil},
+    {"pass through args", "arguments for subcommand", IsPassThrough, nil},
   }
 
   expected := `
 
-    Usage: testprogram -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
+    Usage: testprogram -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES] -- PASS THROUGH ARGS
 
 this is not a program
 
@@ -59,6 +60,9 @@ Options:
 Arguments:
     FILES                                 files that should be read in
     DIRECTORIES                           directories
+
+Pass through arguments:
+    PASS THROUGH ARGS                     arguments for subcommand
 
 `
 
@@ -117,6 +121,7 @@ Options:
         --lock                            create lock file; setable via $LOCK
         --logfile=LOGFILE                 logfile (default: /var/log/foo.log); setable via $LOGFILE
     -h, --help                            usage (-h) / detailed help text (--help)
+
 `
 
   if got := options.Help("testprogram", "this is not a program"); got != expected {
@@ -146,11 +151,11 @@ func TestUsageAndHelpOption(t *testing.T) {
 
     Usage: 6.out -d [-p PORTS]
 
-
 Options:
     -d, --debug         debug mode; setable via $DEBUG
     -p, --ports=PORTS   ports (default: 3000,3001,3002); setable via $PORTS
     -h, --help          usage (-h) / detailed help text (--help)
+
 `
 
   if _, _, _, err := options.parse([]string{"barbaz", "-d", "--help", "-p5000,6000", "foobar"}, []string{}, "", 0);
@@ -182,11 +187,11 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 
     Usage: 6.out [-c] -d [-p PORTS]
 
-
 Options:
     -d, --debug         debug mode; setable via $DEBUG
     -p, --ports=PORTS   ports (default: 3000,3001,3002); setable via $PORTS
     -c, --chelp         show usage / help
+
 `
 
   if _, _, _, err := options.parse([]string{"barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}, []string{}, "", 0);

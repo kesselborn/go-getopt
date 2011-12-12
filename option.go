@@ -10,7 +10,7 @@ const IsArg = 32
 const Argument = 64
 const Usage = 128
 const Help = 256
-const IsPassTrough = 512
+const IsPassThrough = 512
 
 type Option struct {
   option_definition string

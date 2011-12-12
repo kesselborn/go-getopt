@@ -66,7 +66,7 @@ func (options Options) Usage(programName string) (output string) {
 func (options Options) Help(programName string, description string) (output string) {
   output = options.Usage(programName)
   if description != "" {
-    output = output + description + "\n"
+    output = output + description + "\n\n"
   }
 
   longOptTextLength := 0
@@ -81,16 +81,18 @@ func (options Options) Help(programName string, description string) (output stri
 
   var argumentsString string
   var optionsString string
+  var passThroughString string
 
   usageOpt, helpOpt := options.usageHelpOptionNames()
 
   for _, option := range options {
-    if option.flags & IsArg > 0 {
-      argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
-    } else {
-      if option.LongOpt() != helpOpt {
+    switch {
+      case option.flags & IsPassThrough > 0:
+        passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
+      case option.flags & IsArg > 0:
+        argumentsString = argumentsString + option.HelpText(longOptTextLength) + "\n"
+      case option.LongOpt() != helpOpt:
         optionsString = optionsString + option.HelpText(longOptTextLength) + "\n"
-      }
     }
   }
 
@@ -105,11 +107,15 @@ func (options Options) Help(programName string, description string) (output stri
                               helpHelp,
                               Usage | Help | Flag, ""}
     optionsString = optionsString + usageHelpOption.HelpText(longOptTextLength) + "\n"
-    output = output + "\nOptions:\n" + optionsString
+    output = output + "Options:\n" + optionsString + "\n"
   }
 
   if argumentsString != "" {
-    output = output + "\nArguments:\n" + argumentsString + "\n"
+    output = output + "Arguments:\n" + argumentsString + "\n"
+  }
+
+  if passThroughString != "" {
+    output = output + "Pass through arguments:\n" + passThroughString + "\n"
   }
 
   return
