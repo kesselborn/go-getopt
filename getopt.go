@@ -30,7 +30,7 @@ func mapifyEnviron(environment []string) (envArray map[string]string) {
 	for _, cur := range environment {
 		envVar := strings.Split(cur, "=")
 		if len(envVar) > 1 {
-			envArray[envVar[0]] = envVar[1]
+			envArray[strings.TrimSpace(envVar[0])] = strings.TrimSpace(envVar[1])
 		}
 	}
 

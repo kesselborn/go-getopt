@@ -217,6 +217,14 @@ func TestEnvironmentValueParsing(t *testing.T) {
 	if opts, _, _, _ := options.Parse([]string{}, []string{"INSTANCES=13"}, "", 0); opts["instances"].Int != 13 {
 		t.Errorf("did not recognize option set via ENV variable (INSTANCES=13)")
 	}
+
+	if opts, _, _, _ := options.Parse([]string{}, []string{"   LOGFILE   =  /tmp/logfile  "}, "", 0); opts["logfile"].String != "/tmp/logfile" {
+		t.Errorf("did not recognize option set via ENV variable with whitespace (LOGFILE=/tmp/lofile)")
+	}
+
+	if opts, _, _, _ := options.Parse([]string{}, []string{"INSTANCES   =    13   "}, "", 0); opts["instances"].Int != 13 {
+		t.Errorf("did not recognize option set via ENV variable with whitespace (INSTANCES=13)")
+	}
 }
 
 func TestDefaultValueParsing(t *testing.T) {
