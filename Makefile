@@ -1,6 +1,6 @@
 include $(GOROOT)/src/Make.inc
 
-TARG=getopt
+TARG=github.com/kesselborn/go-getopt
 GOFILES=\
 					getopt.go\
 					parsing_helper.go\
