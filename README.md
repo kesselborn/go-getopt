@@ -1,8 +1,12 @@
-gotopt -- getopt for go
-=======================
+getopt for go
+=============
 
-This is a getopt implementation for go that is compatible with the GNU getopt
-implementation
+This is a more powerful getopt implementation for go
+
+Installation
+------------
+
+    goinstall github.com/kesselborn/go-getopt
 
 Usage example
 -------------
