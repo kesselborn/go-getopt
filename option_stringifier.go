@@ -10,6 +10,12 @@ import (
 	"fmt"
 )
 
+func valueIze(originalValue string) (value string) {
+	value = "<" + strings.ToLower(originalValue) + ">"
+
+	return
+}
+
 func (option Option) HelpText(longOptLength int) (output string) {
 	fmtStringLongAndShort := fmt.Sprintf("    -%%-1s, --%%-%ds %%s", longOptLength) // "p", "port=PORT", "the port that should be used"
 	fmtStringShort := fmt.Sprintf("    -%%-1s%%-%ds    %%s", longOptLength)         // "p", "PORT", "the port that should be used"
@@ -19,11 +25,11 @@ func (option Option) HelpText(longOptLength int) (output string) {
 	if option.Description != "" {
 		switch {
 		case option.Flags&IsArg > 0 || option.Flags&IsPassThrough > 0:
-			output = fmt.Sprintf(fmtArgument, strings.ToUpper(option.Key()), option.DescriptionText())
+			output = fmt.Sprintf(fmtArgument, valueIze(option.Key()), option.DescriptionText())
 		case option.HasLongOpt() && option.HasShortOpt():
 			output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.DescriptionText())
 		case option.HasShortOpt():
-			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), strings.ToUpper(option.Key()), option.DescriptionText())
+			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), valueIze(option.Key()), option.DescriptionText())
 		case option.HasLongOpt():
 			output = fmt.Sprintf(fmtStringLong, option.LongOptString(), option.DescriptionText())
 		}
@@ -37,7 +43,7 @@ func (option Option) LongOptString() (longOptString string) {
 		longOptString = option.LongOpt()
 
 		if option.Flags&Flag == 0 && option.Flags&Usage == 0 && option.Flags&Help == 0 && option.Flags&IsPassThrough == 0 {
-			longOptString = longOptString + "=" + strings.ToUpper(option.LongOpt())
+			longOptString = longOptString + "=" + valueIze(option.LongOpt())
 		}
 	}
 
@@ -49,7 +55,7 @@ func (option Option) ShortOptString() (shortOptString string) {
 		shortOptString = option.ShortOpt()
 
 		if option.Flags&Flag == 0 && !option.HasLongOpt() && option.Flags&Usage == 0 && option.Flags&Help == 0 {
-			shortOptString = shortOptString + " " + strings.ToUpper(option.LongOpt())
+			shortOptString = shortOptString + " " + option.LongOpt()
 		}
 	}
 
@@ -59,9 +65,9 @@ func (option Option) ShortOptString() (shortOptString string) {
 func (option Option) Usage() (usageString string) {
 	switch {
 	case option.Flags&IsPassThrough > 0:
-		usageString = "-- " + strings.ToUpper(option.Key())
+		usageString = "-- " + valueIze(option.Key())
 	case option.Flags&IsArg > 0:
-		usageString = strings.ToUpper(option.Key())
+		usageString = valueIze(option.Key())
 	case option.HasShortOpt():
 		usageString = "-" + option.ShortOpt()
 	default:
@@ -78,7 +84,7 @@ func (option Option) Usage() (usageString string) {
 			separator = "="
 		}
 
-		usageString = usageString + separator + strings.ToUpper(option.Key())
+		usageString = usageString + separator + valueIze(option.Key())
 	}
 
 	if option.Flags&Optional > 0 || option.Flags&Help > 0 || option.Flags&Usage > 0 {

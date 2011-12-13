@@ -13,16 +13,16 @@ import (
 func TestUsage(t *testing.T) {
 	options := Options{
 		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 		{"files", "files that should be read in", IsArg, nil},
 		{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
-		{"instances||INSTANCES", "instances", Required, 4},
+		{"instances||INSTANCES", "Instances", Required, 4},
 		{"lock||LOCK", "create lock file", Flag, false},
 		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 		{"directories", "directories", IsArg | Optional, nil},
 	}
 
-	expected := `Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES]
+	expected := `Usage: 6.out -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>]
 
 `
 
@@ -35,35 +35,35 @@ func TestUsage(t *testing.T) {
 func TestHelp(t *testing.T) {
 	options := Options{
 		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
-		{"files", "files that should be read in", IsArg, nil},
-		{"secondaryports|s", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
-		{"instances", "instances", Required, 4},
+		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		{"files", "Files that should be read in", IsArg, nil},
+		{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
+		{"instances", "Instances", Required, 4},
 		{"lock||LOCK", "create lock file", Flag, false},
-		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
-		{"directories", "directories", IsArg | Optional, nil},
+		{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+		{"directories", "Directories", IsArg | Optional, nil},
 		{"pass through args", "arguments for subcommand", IsPassThrough, nil},
 	}
 
-	expected := `Usage: 6.out -d [-p PORTS] FILES [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE] [DIRECTORIES] -- PASS THROUGH ARGS
+	expected := `Usage: 6.out -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>] -- <pass through args>
 
 this is not a program
 
 Options:
-    -d, --debug                           debug mode; setable via $DEBUG
-    -p, --ports=PORTS                     ports (default: 3000,3001,3002); setable via $PORTS
-    -s, --secondaryports=SECONDARYPORTS   secondary ports (default: 5000,5001,5002)
-        --instances=INSTANCES             instances (e.g. 4)
-        --lock                            create lock file; setable via $LOCK
-        --logfile=LOGFILE                 logfile (default: /var/log/foo.log); setable via $LOGFILE
-    -h, --help                            usage (-h) / detailed help text (--help)
+    -d, --debug                             debug mode; setable via $DEBUG
+    -p, --ports=<ports>                     Ports (default: 3000,3001,3002); setable via $PORTS
+    -s, --secondaryports=<secondaryports>   Secondary ports (default: 5000,5001,5002)
+        --instances=<instances>             Instances (e.g. 4)
+        --lock                              create lock file; setable via $LOCK
+        --logfile=<logfile>                 Logfile (default: /var/log/foo.log); setable via $LOGFILE
+    -h, --help                              usage (-h) / detailed help text (--help)
 
 Arguments:
-    FILES                                 files that should be read in
-    DIRECTORIES                           directories
+    <files>                                 Files that should be read in
+    <directories>                           Directories
 
 Pass through arguments:
-    PASS THROUGH ARGS                     arguments for subcommand
+    <pass through args>                     arguments for subcommand
 
 `
 
@@ -75,17 +75,17 @@ Pass through arguments:
 
 func TestHelpNoOptions(t *testing.T) {
 	options := Options{
-		{"files", "files that should be read in", IsArg, nil},
-		{"directories", "directories", IsArg | Optional, nil},
+		{"files", "Files that should be read in", IsArg, nil},
+		{"directories", "Directories", IsArg | Optional, nil},
 	}
 
-	expected := `Usage: 6.out FILES [DIRECTORIES]
+	expected := `Usage: 6.out <files> [<directories>]
 
 this is not a program
 
 Arguments:
-    FILES                           files that should be read in
-    DIRECTORIES                     directories
+    <files>                           Files that should be read in
+    <directories>                     Directories
 
 `
 
@@ -98,25 +98,25 @@ Arguments:
 func TestHelpNoArgs(t *testing.T) {
 	options := Options{
 		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
-		{"secondaryports|s", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
-		{"instances", "instances", Required, 4},
+		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
+		{"instances", "Instances", Required, 4},
 		{"lock||LOCK", "create lock file", Flag, false},
-		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+		{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 	}
 
-	expected := `Usage: 6.out -d [-p PORTS] [-s SECONDARYPORTS] --instances=INSTANCES --lock [--logfile=LOGFILE]
+	expected := `Usage: 6.out -d [-p <ports>] [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>]
 
 this is not a program
 
 Options:
-    -d, --debug                           debug mode; setable via $DEBUG
-    -p, --ports=PORTS                     ports (default: 3000,3001,3002); setable via $PORTS
-    -s, --secondaryports=SECONDARYPORTS   secondary ports (default: 5000,5001,5002)
-        --instances=INSTANCES             instances (e.g. 4)
-        --lock                            create lock file; setable via $LOCK
-        --logfile=LOGFILE                 logfile (default: /var/log/foo.log); setable via $LOGFILE
-    -h, --help                            usage (-h) / detailed help text (--help)
+    -d, --debug                             debug mode; setable via $DEBUG
+    -p, --ports=<ports>                     Ports (default: 3000,3001,3002); setable via $PORTS
+    -s, --secondaryports=<secondaryports>   Secondary ports (default: 5000,5001,5002)
+        --instances=<instances>             Instances (e.g. 4)
+        --lock                              create lock file; setable via $LOCK
+        --logfile=<logfile>                 Logfile (default: /var/log/foo.log); setable via $LOGFILE
+    -h, --help                              usage (-h) / detailed help text (--help)
 
 `
 
@@ -129,10 +129,10 @@ Options:
 func TestUsageAndHelpOption(t *testing.T) {
 	options := Options{
 		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `Usage: 6.out -d [-p PORTS]
+	expectedUsage := `Usage: 6.out -d [-p <ports>]
 
 `
 
@@ -140,12 +140,12 @@ func TestUsageAndHelpOption(t *testing.T) {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
-	expectedHelp := `Usage: 6.out -d [-p PORTS]
+	expectedHelp := `Usage: 6.out -d [-p <ports>]
 
 Options:
-    -d, --debug         debug mode; setable via $DEBUG
-    -p, --ports=PORTS   ports (default: 3000,3001,3002); setable via $PORTS
-    -h, --help          usage (-h) / detailed help text (--help)
+    -d, --debug           debug mode; setable via $DEBUG
+    -p, --ports=<ports>   Ports (default: 3000,3001,3002); setable via $PORTS
+    -h, --help            usage (-h) / detailed help text (--help)
 
 `
 
@@ -159,10 +159,10 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 	options := Options{
 		{"chelp|c", "show usage / help", Usage | Help, nil},
 		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `Usage: 6.out [-c] -d [-p PORTS]
+	expectedUsage := `Usage: 6.out [-c] -d [-p <ports>]
 
 `
 
@@ -170,12 +170,12 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
-	expectedHelp := `Usage: 6.out [-c] -d [-p PORTS]
+	expectedHelp := `Usage: 6.out [-c] -d [-p <ports>]
 
 Options:
-    -d, --debug         debug mode; setable via $DEBUG
-    -p, --ports=PORTS   ports (default: 3000,3001,3002); setable via $PORTS
-    -c, --chelp         show usage / help
+    -d, --debug           debug mode; setable via $DEBUG
+    -p, --ports=<ports>   Ports (default: 3000,3001,3002); setable via $PORTS
+    -c, --chelp           show usage / help
 
 `
 
