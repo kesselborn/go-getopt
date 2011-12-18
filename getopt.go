@@ -7,6 +7,7 @@ package getopt
 
 import (
 	"strings"
+	"os"
 )
 
 const InvalidOption = 1
@@ -111,13 +112,12 @@ func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString 
 	return
 }
 
-func (optionsDefinition Options) Parse(args []string,
-defaults []string,
-description string,
+func (optionsDefinition Options) ParseCommandLine(description string,
 flags int) (options map[string]OptionValue,
 arguments []string,
 passThrough []string,
 err *GetOptError) {
+	args := os.Args[1:]
 
 	if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
 		options = make(map[string]OptionValue)
@@ -139,7 +139,7 @@ err *GetOptError) {
 		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
 		if err == nil {
-			err = optionsDefinition.setOverwrites(options, defaults)
+			err = optionsDefinition.setOverwrites(options, os.Environ())
 
 			for i := 0; i < len(args) && err == nil; i++ {
 

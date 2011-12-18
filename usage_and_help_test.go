@@ -8,6 +8,7 @@ package getopt
 import (
 	"testing"
 	"strings"
+	"os"
 )
 
 func TestUsage(t *testing.T) {
@@ -22,7 +23,7 @@ func TestUsage(t *testing.T) {
 		{"directories", "directories", IsArg | Optional, nil},
 	}
 
-	expected := `Usage: 6.out -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>]
+	expected := `Usage: prog -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>]
 
 `
 
@@ -45,7 +46,7 @@ func TestHelp(t *testing.T) {
 		{"pass through args", "arguments for subcommand", IsPassThrough, nil},
 	}
 
-	expected := `Usage: 6.out -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>] -- <pass through args>
+	expected := `Usage: prog -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>] -- <pass through args>
 
 this is not a program
 
@@ -79,7 +80,7 @@ func TestHelpNoOptions(t *testing.T) {
 		{"directories", "Directories", IsArg | Optional, nil},
 	}
 
-	expected := `Usage: 6.out <files> [<directories>]
+	expected := `Usage: prog <files> [<directories>]
 
 this is not a program
 
@@ -105,7 +106,7 @@ func TestHelpNoArgs(t *testing.T) {
 		{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 	}
 
-	expected := `Usage: 6.out -d [-p <ports>] [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>]
+	expected := `Usage: prog -d [-p <ports>] [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>]
 
 this is not a program
 
@@ -132,15 +133,17 @@ func TestUsageAndHelpOption(t *testing.T) {
 		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `Usage: 6.out -d [-p <ports>]
+	expectedUsage := `Usage: prog -d [-p <ports>]
 
 `
 
-	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "-h", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedUsage {
+	os.Args = []string{"prog", "barbaz", "-d", "-h", "-p5000,6000", "foobar"}
+	os.Envs = []string{}
+	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedUsage {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
-	expectedHelp := `Usage: 6.out -d [-p <ports>]
+	expectedHelp := `Usage: prog -d [-p <ports>]
 
 Options:
     -d, --debug           debug mode; setable via $DEBUG
@@ -149,7 +152,9 @@ Options:
 
 `
 
-	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "--help", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedHelp {
+	os.Args = []string{"prog", "barbaz", "-d", "--help", "-p5000,6000", "foobar"}
+	os.Envs = []string{}
+	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedHelp {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
@@ -162,15 +167,17 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `Usage: 6.out [-c] -d [-p <ports>]
+	expectedUsage := `Usage: prog [-c] -d [-p <ports>]
 
 `
 
-	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "-c", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedUsage {
+	os.Args = []string{"prog", "barbaz", "-d", "-c", "-p5000,6000", "foobar"}
+	os.Envs = []string{}
+	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedUsage {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
-	expectedHelp := `Usage: 6.out [-c] -d [-p <ports>]
+	expectedHelp := `Usage: prog [-c] -d [-p <ports>]
 
 Options:
     -d, --debug           debug mode; setable via $DEBUG
@@ -179,7 +186,9 @@ Options:
 
 `
 
-	if _, _, _, err := options.Parse([]string{"barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}, []string{}, "", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedHelp {
+	os.Args = []string{"prog", "barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}
+	os.Envs = []string{}
+	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedHelp {
 		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
