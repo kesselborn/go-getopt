@@ -38,7 +38,7 @@ func mapifyEnviron(environment []string) (envArray map[string]string) {
 	return
 }
 
-func (optionsDefinition Options) setOverwrites(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
+func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
 	overwritesMap := mapifyEnviron(overwrites)
 	acceptedEnvVars := make(map[string]Option)
 
@@ -132,14 +132,13 @@ err *GetOptError) {
 			}
 		}
 
-		// set overwrites
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
 		usageString = "-" + usageString
 		helpString = "--" + helpString
 		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
 		if err == nil {
-			err = optionsDefinition.setOverwrites(options, os.Environ())
+			err = optionsDefinition.setEnvAndConfigValues(options, os.Environ())
 
 			for i := 0; i < len(args) && err == nil; i++ {
 
