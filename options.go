@@ -8,6 +8,7 @@ package getopt
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 type Options []Option
@@ -59,26 +60,8 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 	return requiredOptions
 }
 
-// copied from the os package ... why isn't this exposed :(
-func basename(name string) string {
-	i := len(name) - 1
-	// Remove trailing slashes
-	for ; i > 0 && name[i] == '/'; i-- {
-		name = name[:i]
-	}
-	// Remove leading directory name
-	for i--; i >= 0; i-- {
-		if name[i] == '/' {
-			name = name[i+1:]
-			break
-		}
-	}
-
-	return name
-}
-
 func (options Options) Usage() (output string) {
-	programName := basename(os.Args[0])
+	programName := filepath.Base(os.Args[0])
 	output = "Usage: " + programName
 
 	for _, option := range options {
