@@ -1,0 +1,6 @@
+#!/bin/sh
+find . -name '*.go' -exec echo gofmt -w '{}' \; -exec gofmt -w '{}' \; \
+      -exec git add '{}' \;
+
+make test
+make clean
