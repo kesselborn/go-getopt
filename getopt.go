@@ -6,7 +6,7 @@
 package getopt
 
 import (
-	"strings"
+	"os"
 )
 
 const InvalidOption = 1
@@ -16,6 +16,7 @@ const MissingOption = 4
 const OptionValueError = 5
 const ConsistencyError = 6
 const UsageOrHelp = 7
+const ConfigFileNotFound = 8
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -24,21 +25,8 @@ type GetOptError struct {
 	Message   string
 }
 
-func mapifyEnviron(environment []string) (envArray map[string]string) {
-	envArray = make(map[string]string)
-
-	for _, cur := range environment {
-		envVar := strings.Split(cur, "=")
-		if len(envVar) > 1 {
-			envArray[strings.TrimSpace(envVar[0])] = strings.TrimSpace(envVar[1])
-		}
-	}
-
-	return
-}
-
-func (optionsDefinition Options) setOverwrites(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
-	overwritesMap := mapifyEnviron(overwrites)
+func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
+	overwritesMap := mapifyConfig(overwrites)
 	acceptedEnvVars := make(map[string]Option)
 
 	for _, opt := range optionsDefinition {
@@ -111,13 +99,12 @@ func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString 
 	return
 }
 
-func (optionsDefinition Options) Parse(args []string,
-defaults []string,
-description string,
+func (optionsDefinition Options) ParseCommandLine(description string,
 flags int) (options map[string]OptionValue,
 arguments []string,
 passThrough []string,
 err *GetOptError) {
+	args := os.Args[1:]
 
 	if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
 		options = make(map[string]OptionValue)
@@ -132,14 +119,13 @@ err *GetOptError) {
 			}
 		}
 
-		// set overwrites
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
 		usageString = "-" + usageString
 		helpString = "--" + helpString
 		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
 		if err == nil {
-			err = optionsDefinition.setOverwrites(options, defaults)
+			err = optionsDefinition.setEnvAndConfigValues(options, os.Environ())
 
 			for i := 0; i < len(args) && err == nil; i++ {
 
@@ -149,7 +135,7 @@ err *GetOptError) {
 				token := args[i]
 
 				if argumentsEnd(token) {
-					passThrough = args[i:]
+					passThrough = args[i+1:]
 					break
 				}
 
