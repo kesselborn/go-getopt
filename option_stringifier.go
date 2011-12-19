@@ -103,7 +103,7 @@ func (option Option) DescriptionText() (description string) {
 
 	if defaultValue != "" && option.DefaultValue != nil {
 		switch {
-		case option.Flags&Optional > 0 && option.Flags&ExampleIsDefault > 0:
+		case option.Flags&(Optional|IsConfigFile) > 0 && option.Flags&ExampleIsDefault > 0:
 			description = description + " (default: " + defaultValue + ")"
 		case option.Flags&Required > 0 || option.Flags&Optional > 0 || option.Flags&IsArg > 0:
 			description = description + " (e.g. " + defaultValue + ")"

@@ -1,4 +1,10 @@
 
+0.2.1 / 2011-12-19
+==================
+
+  * add readme disclaimer
+  * make sure IsConfigFile is an option that has a value
+
 0.2.0 / 2011-12-19
 ==================
 
