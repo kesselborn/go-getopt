@@ -25,7 +25,7 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 
 	for key, acceptedEnvVar := range acceptedEnvVars {
 		if value := overwritesMap[key]; value != "" {
-			options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.DefaultValue, value)
+			options[acceptedEnvVar.Key()], err = assignValue(acceptedEnvVar.DefaultValue, value)
 			if err != nil {
 				break
 			}
@@ -45,8 +45,6 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 			err = &GetOptError{ConsistencyError, "an option can not be a Flag and have ExampleIsDefault"}
 		case option.Flags&Required > 0 && option.Flags&ExampleIsDefault > 0:
 			err = &GetOptError{ConsistencyError, "an option can not be Required and have ExampleIsDefault"}
-		case option.Flags&Required > 0 && option.Flags&IsArg > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be Required and be an argument (IsArg)"}
 		case option.Flags&NoLongOpt > 0 && !option.HasShortOpt() && option.Flags&IsArg == 0:
 			err = &GetOptError{ConsistencyError, "an option must have either NoLongOpt or a ShortOption"}
 		case option.Flags&Flag > 0 && option.Flags&IsArg > 0:

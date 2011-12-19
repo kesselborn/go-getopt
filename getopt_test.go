@@ -222,6 +222,7 @@ func TestEnvironmentValueParsing(t *testing.T) {
 		{"instances||INSTANCES", "instances", Optional, 4},
 		{"keys||KEYS", "keys", Optional, []string{"foo,bar,baz"}},
 		{"logfile||LOGFILE", "ports", Optional | ExampleIsDefault, "/var/log/foo.log"},
+		{"hostname|h|HOSTNAME", "hostname", Optional | ExampleIsDefault | NoLongOpt, "/var/log/foo.log"},
 	}
 
 	os.Args = []string{"prog"}
@@ -276,6 +277,12 @@ func TestEnvironmentValueParsing(t *testing.T) {
 	os.Setenv("INSTANCES", "    13   ")
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["instances"].Int != 13 {
 		t.Errorf("did not recognize option set via ENV variable with whitespace (INSTANCES=13)")
+	}
+
+	os.Args = []string{"prog"}
+	os.Setenv("HOSTNAME", "eberhard")
+	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["hostname"].String != "eberhard" {
+		t.Errorf("did not recognize NoLongOpt option set via ENV variable")
 	}
 }
 

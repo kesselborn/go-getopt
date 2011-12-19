@@ -78,6 +78,19 @@ func TestOptionCascade(t *testing.T) {
 
 }
 
+func TestDefaultConfigFileAndRequiredOption(t *testing.T) {
+	options := Options{
+		{"foo|f|FOO", "bogus var", Required, "yamalla"},
+		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+	}
+
+	os.Args = []string{"prog"}
+	os.Setenv("FOO", "")
+	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+		t.Errorf("did not read required value from default config file, expected: 'bar', got: '" + opts["foo"].String + "'")
+	}
+}
+
 func TestDefaultConfigFile(t *testing.T) {
 	options := Options{
 		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
@@ -88,6 +101,19 @@ func TestDefaultConfigFile(t *testing.T) {
 	os.Setenv("FOO", "")
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
 		t.Errorf("did not read value from default config file, expected: 'bar', got: '" + opts["foo"].String + "'")
+	}
+}
+
+func TestDefaultConfigFileWithNoLongOpt(t *testing.T) {
+	options := Options{
+		{"foo|f|FOO", "bogus var", ExampleIsDefault | NoLongOpt, "yamalla"},
+		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+	}
+
+	os.Args = []string{"prog"}
+	os.Setenv("FOO", "")
+	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+		t.Errorf("did not read value from default config file for NoLongOpt option, expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 }
 
