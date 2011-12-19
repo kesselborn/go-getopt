@@ -51,7 +51,7 @@ func assign(value interface{}) (returnValue OptionValue, err *GetOptError) {
 	}
 
 	if e == nil {
-		returnValue.set = true
+		returnValue.Set = true
 	} else {
 		err = &GetOptError{OptionValueError, "Conversion Error: " + e.String()}
 	}
@@ -88,7 +88,7 @@ func assignValue(referenceValue interface{}, value string) (returnValue OptionVa
 	}
 
 	if e == nil {
-		returnValue.set = true
+		returnValue.Set = true
 	} else {
 		err = &GetOptError{OptionValueError, "Conversion Error: " + e.String()}
 	}

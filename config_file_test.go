@@ -28,13 +28,12 @@ func TestConfigParsing(t *testing.T) {
 
 func TestOptionCascade(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", Required | ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", Required, "/tmp/foo"},
+		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+		{"config|c|CONFIG", "configuration file", Required | IsConfigFile, "/tmp/foo"},
 	}
 
 	os.Args = []string{"prog"}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "yamalla" {
-		fmt.Printf("XXX%#v\n", opts)
 		t.Errorf("did not recognize default value for 'foo', expected: 'yamalla', got: '" + opts["foo"].String + "'")
 	}
 
@@ -65,7 +64,7 @@ func TestOptionCascade(t *testing.T) {
 		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (1), expected: 'bar3', got: '" + opts["foo"].String + "'")
 	}
 
-	os.Args = []string{"prog", "--config=./config_sample.conf", "-f bar3"}
+	os.Args = []string{"prog", "--config=./config_sample.conf", "-f", "bar3"}
 	os.Setenv("FOO", "bar2")
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar3" {
 		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (2), expected: 'bar3', got: '" + opts["foo"].String + "'")
@@ -74,11 +73,39 @@ func TestOptionCascade(t *testing.T) {
 	os.Args = []string{"prog", "--config=./config_sample.conf", "--foo=bar3"}
 	os.Setenv("FOO", "bar2")
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar3" {
-		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (1), expected: 'bar3', got: '" + opts["foo"].String + "'")
+		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (3), expected: 'bar3', got: '" + opts["foo"].String + "'")
 	}
 
 }
 
+func TestDefaultConfigFile(t *testing.T) {
+	options := Options{
+		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+	}
+
+	os.Args = []string{"prog"}
+	os.Setenv("FOO", "")
+	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+		t.Errorf("did not read value from default config file, expected: 'bar', got: '" + opts["foo"].String + "'")
+	}
+}
+
 func TestConfigFileNotFoundErrors(t *testing.T) {
-	t.Errorf("plunk")
+	options := Options{
+		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "/i/dont/exist.conf"},
+	}
+
+	os.Args = []string{"prog"}
+	os.Setenv("FOO", "")
+	if opts, _, _, err := options.ParseCommandLine("", 0); opts["foo"].String != "yamalla" || err != nil {
+		t.Errorf("did fail with non-existant default config file, error message: '" + err.Message + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
+	}
+
+	os.Args = []string{"prog", "-c", "/i/dont/but/was/set/explicitly.conf"}
+	os.Setenv("FOO", "")
+	if opts, _, _, err := options.ParseCommandLine("", 0); opts["foo"].String != "yamalla" || err.ErrorCode != ConfigFileNotFound {
+		t.Errorf("did fail with non-existant set config file, error message: '" + err.Message + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
+	}
 }

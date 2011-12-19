@@ -13,6 +13,50 @@ import (
 
 type Options []Option
 
+func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
+	overwritesMap := mapifyConfig(overwrites)
+	acceptedEnvVars := make(map[string]Option)
+
+	for _, opt := range optionsDefinition {
+		if value := opt.EnvVar(); value != "" {
+			acceptedEnvVars[value] = opt
+		}
+	}
+
+	for key, acceptedEnvVar := range acceptedEnvVars {
+		if value := overwritesMap[key]; value != "" {
+			options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.DefaultValue, value)
+			if err != nil {
+				break
+			}
+		}
+	}
+
+	return
+}
+
+func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
+
+	for _, option := range optionsDefinition {
+		switch {
+		case option.Flags&Optional > 0 && option.Flags&Required > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be Required and Optional"}
+		case option.Flags&Flag > 0 && option.Flags&ExampleIsDefault > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be a Flag and have ExampleIsDefault"}
+		case option.Flags&Required > 0 && option.Flags&ExampleIsDefault > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be Required and have ExampleIsDefault"}
+		case option.Flags&Required > 0 && option.Flags&IsArg > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be Required and be an argument (IsArg)"}
+		case option.Flags&NoLongOpt > 0 && !option.HasShortOpt() && option.Flags&IsArg == 0:
+			err = &GetOptError{ConsistencyError, "an option must have either NoLongOpt or a ShortOption"}
+		case option.Flags&Flag > 0 && option.Flags&IsArg > 0:
+			err = &GetOptError{ConsistencyError, "an option can not be a Flag and be an argument (IsArg)"}
+		}
+	}
+
+	return
+}
+
 func (options Options) FindOption(optionString string) (option Option, found bool) {
 	for _, cur := range options {
 		if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
@@ -47,6 +91,17 @@ func (options Options) IsFlag(optionName string) (isFlag bool) {
 	}
 
 	return isFlag
+}
+
+func (options Options) ConfigOptionKey() (key string) {
+	for _, option := range options {
+		if option.Flags&IsConfigFile > 0 {
+			key = option.Key()
+			break
+		}
+	}
+
+	return
 }
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
