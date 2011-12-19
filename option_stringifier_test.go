@@ -60,6 +60,10 @@ func TestUsageOutput(t *testing.T) {
 		t.Errorf("Error creating usage text (flag, no short):\ngot:      " + got + "\nexpected: " + expected)
 	}
 
+	if got, expected := (Option{"configfile|c", "method", IsConfigFile | ExampleIsDefault, "/etc/cnf.conf"}.Usage()),
+		"-c <configfile>"; got != expected {
+		t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected)
+	}
 }
 
 func TestBasicOutput(t *testing.T) {
@@ -114,6 +118,11 @@ func TestBasicOutputWithExampleHelpTextValue(t *testing.T) {
 func TestBasicOutputWithDefaultHelpText(t *testing.T) {
 	if got, expected := (Option{"method|m", "method", Optional | ExampleIsDefault | NoLongOpt, "heartbeat"}.HelpText(20)),
 		"    -m <method>                method (default: heartbeat)"; got != expected {
+		t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected)
+	}
+
+	if got, expected := (Option{"configfile|c", "method", IsConfigFile | ExampleIsDefault, "/etc/cnf.conf"}.HelpText(20)),
+		"    -c, --configfile=<configfile> method (default: /etc/cnf.conf)"; got != expected {
 		t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected)
 	}
 
