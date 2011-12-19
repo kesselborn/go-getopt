@@ -1,6 +1,8 @@
 getopt for go
 =============
 
+** note: the readme is the artifact of readme-driven-development and is currently not synced with the actual code**
+
 This is a more powerful getopt implementation for go
 
 Installation
