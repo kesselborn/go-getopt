@@ -411,12 +411,14 @@ func TestPassThroughParsing(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "foobar", "--", "barbaz"}
-	if _, _, passThrough, _ := options.ParseCommandLine("", 0); !equalStringArray(passThrough, []string{"foobar"}) {
-		t.Errorf("simple pass through not recognized")
+	expected := []string{"barbaz"}
+	if _, _, passThrough, _ := options.ParseCommandLine("", 0); !equalStringArray(passThrough, expected) {
+		t.Errorf("simple pass through not recognized:\ngot:      |" + fmt.Sprintf("%#v", passThrough) + "|\nexpected: |" + fmt.Sprintf("%#v", expected) + "|\n")
 	}
 
 	os.Args = []string{"prog", "foobar", "--", "ls", "-lah", "/tmp"}
-	if _, _, passThrough, _ := options.ParseCommandLine("", 0); !equalStringArray(passThrough, []string{"ls", "-lah", "/tmp"}) {
-		t.Errorf("pass through not recognized")
+	expected = []string{"ls", "-lah", "/tmp"}
+	if _, _, passThrough, _ := options.ParseCommandLine("", 0); !equalStringArray(passThrough, expected) {
+		t.Errorf("simple pass through not recognized:\ngot:      |" + fmt.Sprintf("%#v", passThrough) + "|\nexpected: |" + fmt.Sprintf("%#v", expected) + "|\n")
 	}
 }

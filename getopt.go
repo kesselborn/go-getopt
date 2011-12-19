@@ -6,7 +6,6 @@
 package getopt
 
 import (
-	"strings"
 	"os"
 )
 
@@ -17,6 +16,7 @@ const MissingOption = 4
 const OptionValueError = 5
 const ConsistencyError = 6
 const UsageOrHelp = 7
+const ConfigFileNotFound = 8
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -25,21 +25,8 @@ type GetOptError struct {
 	Message   string
 }
 
-func mapifyEnviron(environment []string) (envArray map[string]string) {
-	envArray = make(map[string]string)
-
-	for _, cur := range environment {
-		envVar := strings.Split(cur, "=")
-		if len(envVar) > 1 {
-			envArray[strings.TrimSpace(envVar[0])] = strings.TrimSpace(envVar[1])
-		}
-	}
-
-	return
-}
-
 func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
-	overwritesMap := mapifyEnviron(overwrites)
+	overwritesMap := mapifyConfig(overwrites)
 	acceptedEnvVars := make(map[string]Option)
 
 	for _, opt := range optionsDefinition {
@@ -148,7 +135,7 @@ err *GetOptError) {
 				token := args[i]
 
 				if argumentsEnd(token) {
-					passThrough = args[i:]
+					passThrough = args[i+1:]
 					break
 				}
 

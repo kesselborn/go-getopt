@@ -8,15 +8,13 @@ package getopt
 import "testing"
 
 func equalStringArray(array1 []string, array2 []string) (equal bool) {
-	equal = true
-
 	if len(array1) == len(array2) {
 		for i := 0; i < len(array1); i++ {
 			if array1[i] != array2[i] {
-				equal = false
 				break
 			}
 		}
+		equal = true
 	}
 
 	return
