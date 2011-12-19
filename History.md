@@ -1,4 +1,18 @@
 
+0.2.0 / 2011-12-19
+==================
+
+  * Merge branch 'feature/config-file-support' into develop
+  * implement config file functionality
+  * implement config parsing
+  * fix equalStringArray + tests that passed because equalStringArray was buggy
+
+0.1.0 / 2011-12-18
+==================
+
+  * change Parse(args []string, defaults []string, description string, flags int) -> ParseCommandLine(description string, flags int) ... read args and env by os.Args and os.Environ
+  * use path/filepath.Base function
+
 0.0.2 / 2011-12-13
 ==================
 

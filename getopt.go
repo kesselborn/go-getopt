@@ -5,10 +5,7 @@
 
 package getopt
 
-import (
-	"strings"
-	"os"
-)
+import "os"
 
 const InvalidOption = 1
 const MissingValue = 2
@@ -17,69 +14,14 @@ const MissingOption = 4
 const OptionValueError = 5
 const ConsistencyError = 6
 const UsageOrHelp = 7
+const ConfigFileNotFound = 8
+const ConfigParsed = 9
 
 const OPTIONS_SEPARATOR = "--"
 
 type GetOptError struct {
 	ErrorCode int
 	Message   string
-}
-
-func mapifyEnviron(environment []string) (envArray map[string]string) {
-	envArray = make(map[string]string)
-
-	for _, cur := range environment {
-		envVar := strings.Split(cur, "=")
-		if len(envVar) > 1 {
-			envArray[strings.TrimSpace(envVar[0])] = strings.TrimSpace(envVar[1])
-		}
-	}
-
-	return
-}
-
-func (optionsDefinition Options) setOverwrites(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
-	overwritesMap := mapifyEnviron(overwrites)
-	acceptedEnvVars := make(map[string]Option)
-
-	for _, opt := range optionsDefinition {
-		if value := opt.EnvVar(); value != "" {
-			acceptedEnvVars[value] = opt
-		}
-	}
-
-	for key, acceptedEnvVar := range acceptedEnvVars {
-		if value := overwritesMap[key]; value != "" {
-			options[acceptedEnvVar.LongOpt()], err = assignValue(acceptedEnvVar.DefaultValue, value)
-			if err != nil {
-				break
-			}
-		}
-	}
-
-	return
-}
-
-func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
-
-	for _, option := range optionsDefinition {
-		switch {
-		case option.Flags&Optional > 0 && option.Flags&Required > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be Required and Optional"}
-		case option.Flags&Flag > 0 && option.Flags&ExampleIsDefault > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be a Flag and have ExampleIsDefault"}
-		case option.Flags&Required > 0 && option.Flags&ExampleIsDefault > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be Required and have ExampleIsDefault"}
-		case option.Flags&Required > 0 && option.Flags&IsArg > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be Required and be an argument (IsArg)"}
-		case option.Flags&NoLongOpt > 0 && !option.HasShortOpt() && option.Flags&IsArg == 0:
-			err = &GetOptError{ConsistencyError, "an option must have either NoLongOpt or a ShortOption"}
-		case option.Flags&Flag > 0 && option.Flags&IsArg > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be a Flag and be an argument (IsArg)"}
-		}
-	}
-
-	return
 }
 
 func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOpt string) {
@@ -128,18 +70,20 @@ err *GetOptError) {
 			case option.Flags&Flag != 0: // all flags are false by default
 				options[option.Key()], err = assignValue(false, "false")
 			case option.Flags&ExampleIsDefault != 0: // set default
-				options[option.Key()], err = assign(option.DefaultValue)
+				var newOptionValue OptionValue
+				newOptionValue, err = assign(option.DefaultValue)
+				newOptionValue.Set = false
+				options[option.Key()] = newOptionValue
 			}
 		}
 
-		// set overwrites
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
 		usageString = "-" + usageString
 		helpString = "--" + helpString
 		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
 
 		if err == nil {
-			err = optionsDefinition.setOverwrites(options, os.Environ())
+			err = optionsDefinition.setEnvAndConfigValues(options, os.Environ())
 
 			for i := 0; i < len(args) && err == nil; i++ {
 
@@ -149,7 +93,7 @@ err *GetOptError) {
 				token := args[i]
 
 				if argumentsEnd(token) {
-					passThrough = args[i:]
+					passThrough = args[i+1:]
 					break
 				}
 
@@ -211,9 +155,19 @@ err *GetOptError) {
 			}
 		}
 
+		if configKey := optionsDefinition.ConfigOptionKey(); configKey != "" && flags&ConfigParsed == 0 {
+			if option, found := options[configKey]; found {
+				if e := processConfigFile(option.String); e == nil {
+					return optionsDefinition.ParseCommandLine(description, flags|ConfigParsed)
+				} else if option.Set == true { // if config file had a default value, don't freak out
+					err = e
+				}
+			}
+		}
+
 		if err == nil {
 			for _, requiredOption := range optionsDefinition.RequiredOptions() {
-				if options[requiredOption].set == false {
+				if options[requiredOption].Set == false {
 					err = &GetOptError{MissingOption, "Option '" + requiredOption + "' is missing"}
 					break
 				}
