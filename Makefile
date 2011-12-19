@@ -8,6 +8,7 @@ GOFILES=\
 					options.go\
 					option_value.go\
 					option_stringifier.go\
+					config_file.go\
 
 default: all
 	6g -V > TESTED_GO_RELEASE

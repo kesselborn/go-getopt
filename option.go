@@ -17,6 +17,7 @@ const Argument = 64
 const Usage = 128
 const Help = 256
 const IsPassThrough = 512
+const IsConfigFile = 1024
 
 type Option struct {
 	OptionDefinition string
