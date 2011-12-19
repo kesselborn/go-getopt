@@ -18,7 +18,7 @@ type OptionValue struct {
 	Int      int64
 	StrArray []string
 	IntArray []int64
-	set      bool
+	Set      bool
 }
 
 func assign(value interface{}) (returnValue OptionValue, err *GetOptError) {

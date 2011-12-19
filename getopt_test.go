@@ -19,19 +19,16 @@ func TestShortOptionsFlagsParsing(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-d"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true {
 		t.Errorf("debug flag was not set")
 	}
 
 	os.Args = []string{"prog", "-d"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != false {
 		t.Errorf("verbose flag was not set to false by default")
 	}
 
 	os.Args = []string{"prog", "-d", "-v"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true {
 		t.Errorf("did not recognize all flags")
 	}
@@ -44,31 +41,26 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-m", "heartbeat"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["method"].String != "heartbeat" {
 		t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"].String + "'")
 	}
 
 	os.Args = []string{"prog", "-mheartbeat"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["method"].String != "heartbeat" {
 		t.Errorf("method optioned wasn't parsed correctly expected 'heartbeat', was '" + opts["method"].String + "'")
 	}
 
 	os.Args = []string{"prog", "-m"}
-	os.Envs = []string{}
 	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("required option without value did not raise error")
 	}
 
 	os.Args = []string{"prog", "-m", "-x"}
-	os.Envs = []string{}
 	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("required option without value did not raise error")
 	}
 
 	os.Args = []string{"prog", ""}
-	os.Envs = []string{}
 	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != MissingOption {
 		t.Errorf("required option wasn't set")
 	}
@@ -85,31 +77,26 @@ func TestConcatenatedOptionsParsingSimple(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-dv"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true {
 		t.Errorf("did not recognize all flags when concatenation options (2 options)")
 	}
 
 	os.Args = []string{"prog", "-dvD"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true || opts["dryrun"].Bool != true {
 		t.Errorf("did not recognize all flags when concatenation options (3 options)")
 	}
 
 	os.Args = []string{"prog", "-dvD"}
-	os.Envs = []string{}
 	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != MissingOption {
 		t.Errorf("did not recognize a missing required option in concatenation mode")
 	}
 
 	os.Args = []string{"prog", "-Dl"}
-	os.Envs = []string{}
 	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("did not realize that I missed a value")
 	}
 
 	os.Args = []string{"prog", "-Dl", "-d"}
-	os.Envs = []string{}
 	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != MissingValue {
 		t.Errorf("did not realize that I missed a value")
 	}
@@ -126,28 +113,24 @@ func TestConcatenatedOptionsParsingWithStringValueOptionAtTheEnd(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-dvDl/tmp/log.txt"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["logfile"].String != "/tmp/log.txt" {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional)")
 	}
 
 	os.Args = []string{"prog", "-dvDl", "/tmp/log.txt"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["logfile"].String != "/tmp/log.txt" {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional separated by space)")
 	}
 
 	os.Args = []string{"prog", "-dvDmdaemon"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["mode"].String != "daemon" {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required)")
 	}
 
 	os.Args = []string{"prog", "-dvDm", "daemon"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["mode"].String != "daemon" {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required separated by space)")
@@ -165,14 +148,12 @@ func TestConcatenatedOptionsParsingWithIntValueOptionAtTheEnd(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-dvDp3000"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["port"].Int != 3000 {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int)")
 	}
 
 	os.Args = []string{"prog", "-dvDp", "3000"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["port"].Int != 3000 {
 		fmt.Printf("%#v", opts)
@@ -180,21 +161,18 @@ func TestConcatenatedOptionsParsingWithIntValueOptionAtTheEnd(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-dvDp", "3000"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["port"].Int != 3000 {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int separated by space)")
 	}
 
 	os.Args = []string{"prog", "-dvDi4"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["instances"].Int != 4 {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required)")
 	}
 
 	os.Args = []string{"prog", "-dvDi", "4"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || opts["instances"].Int != 4 {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required int separated by space)")
@@ -212,28 +190,24 @@ func TestConcatenatedOptionsParsingWithIntArrayValueOptionAtTheEnd(t *testing.T)
 	}
 
 	os.Args = []string{"prog", "-dvDp5000,5001,5002"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || !equalIntArray(opts["ports"].IntArray, []int64{5000, 5001, 5002}) {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int array)")
 	}
 
 	os.Args = []string{"prog", "-dvDp", "5000,5001,5002"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || !equalIntArray(opts["ports"].IntArray, []int64{5000, 5001, 5002}) {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 optional int array separated by space)")
 	}
 
 	os.Args = []string{"prog", "-dvDt10,20,30"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || !equalIntArray(opts["timeouts"].IntArray, []int64{10, 20, 30}) {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required int array)")
 	}
 
 	os.Args = []string{"prog", "-dvDt", "10,20,30"}
-	os.Envs = []string{}
 	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["debug"].Bool != true || opts["verbose"].Bool != true ||
 		opts["dryrun"].Bool != true || !equalIntArray(opts["timeouts"].IntArray, []int64{10, 20, 30}) {
 		t.Errorf("did not recognize all flags when concatenation options (3 flags + 1 required int array separated by space)")
