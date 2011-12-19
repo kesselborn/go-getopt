@@ -1,4 +1,12 @@
 
+0.2.0 / 2011-12-19
+==================
+
+  * Merge branch 'feature/config-file-support' into develop
+  * implement config file functionality
+  * implement config parsing
+  * fix equalStringArray + tests that passed because equalStringArray was buggy
+
 0.1.0 / 2011-12-18
 ==================
 
