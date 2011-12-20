@@ -13,9 +13,10 @@ const InvalidValue = 3
 const MissingOption = 4
 const OptionValueError = 5
 const ConsistencyError = 6
-const UsageOrHelp = 7
 const ConfigFileNotFound = 8
 const ConfigParsed = 9
+const WantsUsage = 10
+const WantsHelp = 10
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -45,9 +46,9 @@ func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString 
 	for _, arg := range args {
 		switch {
 		case arg == usageString:
-			err = &GetOptError{UsageOrHelp, ""}
+			err = &GetOptError{WantsUsage, ""}
 		case arg == helpString:
-			err = &GetOptError{UsageOrHelp, ""}
+			err = &GetOptError{WantsHelp, ""}
 		}
 	}
 
