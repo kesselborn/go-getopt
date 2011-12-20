@@ -33,46 +33,46 @@ func TestOptionCascade(t *testing.T) {
 	}
 
 	os.Args = []string{"prog"}
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "yamalla" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "yamalla" {
 		t.Errorf("did not recognize default value for 'foo', expected: 'yamalla', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "-c./config_sample.conf"}
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar" {
 		t.Errorf("did not read value for 'foo' from config file (1), expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "-c ./config_sample.conf"}
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar" {
 		t.Errorf("did not read value for 'foo' from config file (2), expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "--config=./config_sample.conf"}
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar" {
 		t.Errorf("did not read value for 'foo' from config file (3), expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "--config=./config_sample.conf"}
 	os.Setenv("FOO", "bar2")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar2" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar2" {
 		t.Errorf("did not recognize value for 'foo' when set via ENV var + config file, expected: 'bar2', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "--config=./config_sample.conf", "-fbar3"}
 	os.Setenv("FOO", "bar2")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar3" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar3" {
 		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (1), expected: 'bar3', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "--config=./config_sample.conf", "-f", "bar3"}
 	os.Setenv("FOO", "bar2")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar3" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar3" {
 		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (2), expected: 'bar3', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "--config=./config_sample.conf", "--foo=bar3"}
 	os.Setenv("FOO", "bar2")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar3" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar3" {
 		t.Errorf("did not recognize value for 'foo' when set via ENV, config file and option (3), expected: 'bar3', got: '" + opts["foo"].String + "'")
 	}
 
@@ -86,7 +86,7 @@ func TestDefaultConfigFileAndRequiredOption(t *testing.T) {
 
 	os.Args = []string{"prog"}
 	os.Setenv("FOO", "")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar" {
 		t.Errorf("did not read required value from default config file, expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 }
@@ -99,7 +99,7 @@ func TestDefaultConfigFile(t *testing.T) {
 
 	os.Args = []string{"prog"}
 	os.Setenv("FOO", "")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar" {
 		t.Errorf("did not read value from default config file, expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 }
@@ -112,7 +112,7 @@ func TestDefaultConfigFileWithNoLongOpt(t *testing.T) {
 
 	os.Args = []string{"prog"}
 	os.Setenv("FOO", "")
-	if opts, _, _, _ := options.ParseCommandLine("", 0); opts["foo"].String != "bar" {
+	if opts, _, _, _ := options.ParseCommandLine(); opts["foo"].String != "bar" {
 		t.Errorf("did not read value from default config file for NoLongOpt option, expected: 'bar', got: '" + opts["foo"].String + "'")
 	}
 }
@@ -125,13 +125,13 @@ func TestConfigFileNotFoundErrors(t *testing.T) {
 
 	os.Args = []string{"prog"}
 	os.Setenv("FOO", "")
-	if opts, _, _, err := options.ParseCommandLine("", 0); opts["foo"].String != "yamalla" || err != nil {
+	if opts, _, _, err := options.ParseCommandLine(); opts["foo"].String != "yamalla" || err != nil {
 		t.Errorf("did fail with non-existant default config file, error message: '" + err.Message + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "-c", "/i/dont/but/was/set/explicitly.conf"}
 	os.Setenv("FOO", "")
-	if opts, _, _, err := options.ParseCommandLine("", 0); opts["foo"].String != "yamalla" || err.ErrorCode != ConfigFileNotFound {
+	if opts, _, _, err := options.ParseCommandLine(); opts["foo"].String != "yamalla" || err.ErrorCode != ConfigFileNotFound {
 		t.Errorf("did fail with non-existant set config file, error message: '" + err.Message + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
 	}
 }
