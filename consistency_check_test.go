@@ -18,9 +18,6 @@ func TestConsistencyChecking(t *testing.T) {
 	if _, _, _, err := (Options{{"verbose", "...", Required | ExampleIsDefault, ""}}.ParseCommandLine("", 0)); err == nil || err.ErrorCode != ConsistencyError {
 		t.Errorf("flags Required & ExampleIsDefault did not raise error!")
 	}
-	if _, _, _, err := (Options{{"verbose", "...", IsArg | Required, ""}}.ParseCommandLine("", 0)); err == nil || err.ErrorCode != ConsistencyError {
-		t.Errorf("flags IsArg & Required did not raise error!")
-	}
 	if _, _, _, err := (Options{{"verbose", "...", NoLongOpt, ""}}.ParseCommandLine("", 0)); err == nil || err.ErrorCode != ConsistencyError {
 		t.Errorf("flags NoLongOpt and without a short opt is not possible")
 	}

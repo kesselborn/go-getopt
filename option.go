@@ -18,6 +18,7 @@ const Usage = 128
 const Help = 256
 const IsPassThrough = 512
 const IsConfigFile = 1024
+const NoEnvHelp = 2048
 
 type Option struct {
 	OptionDefinition string
