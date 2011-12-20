@@ -5,3 +5,4 @@ _obj/
 _test/
 _*.go
 tags
+example/getopt-sample-app

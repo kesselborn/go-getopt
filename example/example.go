@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	getopt "github.com/kesselborn/go-getopt"
 )
 
@@ -19,16 +20,22 @@ func main() {
 		{"pass through", "pass through arguments", getopt.IsPassThrough | getopt.Optional, ""},
 	}
 
-	description := "this is a small sample application for getopt demonstration"
-	options, arguments, passThrough, e := optionDefinition.ParseCommandLine(description, 0)
+	options, arguments, passThrough, e := optionDefinition.ParseCommandLine()
 
 	if e != nil {
-		if e.ErrorCode == getopt.UsageOrHelp {
-			fmt.Print(e.Message)
-		} else {
+		exit_code := 0
+		description := "this is a small sample application for getopt demonstration"
+
+		switch {
+		case e.ErrorCode == getopt.WantsUsage:
+			fmt.Print(optionDefinition.Usage())
+		case e.ErrorCode == getopt.WantsHelp:
+			fmt.Print(optionDefinition.Help(description))
+		default:
 			fmt.Println("**** Error: ", e.Message, "\n", optionDefinition.Help(description))
+			exit_code = e.ErrorCode
 		}
-		return
+		os.Exit(exit_code)
 	}
 
 	fmt.Printf("options:\n")

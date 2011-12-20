@@ -16,7 +16,7 @@ const ConsistencyError = 6
 const ConfigFileNotFound = 8
 const ConfigParsed = 9
 const WantsUsage = 10
-const WantsHelp = 10
+const WantsHelp = 11
 
 const OPTIONS_SEPARATOR = "--"
 
