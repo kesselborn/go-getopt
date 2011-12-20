@@ -142,6 +142,11 @@ func TestOutputWithEnvVar(t *testing.T) {
 		"    -m <method>                method (default: heartbeat); setable via $METHOD"; got != expected {
 		t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected)
 	}
+
+	if got, expected := (Option{"method|m|METHOD", "method", Optional | ExampleIsDefault | NoEnvHelp, "heartbeat"}.HelpText(20)),
+		"    -m, --method=<method>      method (default: heartbeat)"; got != expected {
+		t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected)
+	}
 }
 
 func TestOutputArgument(t *testing.T) {

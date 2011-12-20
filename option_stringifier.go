@@ -110,7 +110,7 @@ func (option Option) DescriptionText() (description string) {
 		}
 	}
 
-	if option.HasEnvVar() {
+	if option.HasEnvVar() && option.Flags&NoEnvHelp == 0 {
 		description = description + "; setable via $" + option.EnvVar()
 	}
 

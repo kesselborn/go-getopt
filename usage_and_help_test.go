@@ -133,29 +133,16 @@ func TestUsageAndHelpOption(t *testing.T) {
 		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `Usage: prog -d [-p <ports>]
-
-`
-
 	os.Args = []string{"prog", "barbaz", "-d", "-h", "-p5000,6000", "foobar"}
 	os.Envs = []string{}
-	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedUsage {
-		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsUsage {
+		t.Errorf("usage call did not return help error")
 	}
-
-	expectedHelp := `Usage: prog -d [-p <ports>]
-
-Options:
-    -d, --debug           debug mode; setable via $DEBUG
-    -p, --ports=<ports>   Ports (default: 3000,3001,3002); setable via $PORTS
-    -h, --help            usage (-h) / detailed help text (--help)
-
-`
 
 	os.Args = []string{"prog", "barbaz", "-d", "--help", "-p5000,6000", "foobar"}
 	os.Envs = []string{}
-	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedHelp {
-		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
+		t.Errorf("help call did not return help error")
 	}
 
 }
@@ -167,29 +154,16 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 	}
 
-	expectedUsage := `Usage: prog [-c] -d [-p <ports>]
-
-`
-
 	os.Args = []string{"prog", "barbaz", "-d", "-c", "-p5000,6000", "foobar"}
 	os.Envs = []string{}
-	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedUsage {
-		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsUsage {
+		t.Errorf("usage call did not return help error with custom '-c' for usage")
 	}
-
-	expectedHelp := `Usage: prog [-c] -d [-p <ports>]
-
-Options:
-    -d, --debug           debug mode; setable via $DEBUG
-    -p, --ports=<ports>   Ports (default: 3000,3001,3002); setable via $PORTS
-    -c, --chelp           show usage / help
-
-`
 
 	os.Args = []string{"prog", "barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}
 	os.Envs = []string{}
-	if _, _, _, err := options.ParseCommandLine("", 0); err == nil || err.ErrorCode != UsageOrHelp || err.Message != expectedHelp {
-		t.Errorf("Usage text wasn't shown with single '-h':\ngot:      |" + strings.Replace(err.Message, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
+		t.Errorf("help call did not return help error with custom '--chelp' for usage")
 	}
 
 }

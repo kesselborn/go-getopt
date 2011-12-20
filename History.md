@@ -1,4 +1,12 @@
 
+0.3.0 / 2011-12-20
+==================
+
+  * split up UsageOrHelp errors in WantsUsage and WantsHelp
+  * change ParseCommandLine(description string, flags int) -> ParseCommandLine()
+  * add example conf files; add NoEnvHelp
+  * fix bug: env var from NoLongOpt option wasn't recognized correctly
+
 0.2.1 / 2011-12-19
 ==================
 

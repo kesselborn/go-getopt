@@ -13,9 +13,10 @@ const InvalidValue = 3
 const MissingOption = 4
 const OptionValueError = 5
 const ConsistencyError = 6
-const UsageOrHelp = 7
 const ConfigFileNotFound = 8
 const ConfigParsed = 9
+const WantsUsage = 10
+const WantsHelp = 11
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -41,24 +42,24 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 }
 
 // todo: method signature sucks
-func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string, description string) (err *GetOptError) {
+func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string) (err *GetOptError) {
 	for _, arg := range args {
 		switch {
 		case arg == usageString:
-			err = &GetOptError{UsageOrHelp, optionsDefinition.Usage()}
+			err = &GetOptError{WantsUsage, ""}
 		case arg == helpString:
-			err = &GetOptError{UsageOrHelp, optionsDefinition.Help(description)}
+			err = &GetOptError{WantsHelp, ""}
 		}
 	}
 
 	return
 }
 
-func (optionsDefinition Options) ParseCommandLine(description string,
-flags int) (options map[string]OptionValue,
-arguments []string,
-passThrough []string,
-err *GetOptError) {
+func (optionsDefinition Options) ParseCommandLine() (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
+	return optionsDefinition.parseCommandLineImpl(0)
+}
+
+func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 	args := os.Args[1:]
 
 	if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
@@ -80,7 +81,7 @@ err *GetOptError) {
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
 		usageString = "-" + usageString
 		helpString = "--" + helpString
-		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString, description)
+		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString)
 
 		if err == nil {
 			err = optionsDefinition.setEnvAndConfigValues(options, os.Environ())
@@ -158,7 +159,7 @@ err *GetOptError) {
 		if configKey := optionsDefinition.ConfigOptionKey(); configKey != "" && flags&ConfigParsed == 0 {
 			if option, found := options[configKey]; found {
 				if e := processConfigFile(option.String); e == nil {
-					return optionsDefinition.ParseCommandLine(description, flags|ConfigParsed)
+					return optionsDefinition.parseCommandLineImpl(flags | ConfigParsed)
 				} else if option.Set == true { // if config file had a default value, don't freak out
 					err = e
 				}
