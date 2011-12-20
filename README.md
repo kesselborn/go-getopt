@@ -20,34 +20,33 @@ The following examle is included in the `example` folder, in order to run it, in
 
     make
 
-
-The examle program is long as it uses every bell and whistle there is:
+### Source code
 
     package main
-    
+
     import (
-    	"fmt"
+      "fmt"
       "os"
-    	getopt "github.com/kesselborn/go-getopt"
+      getopt "github.com/kesselborn/go-getopt"
     )
-    
+
     func main() {
-    	optionDefinition := getopt.Options{
-    		{"debug|d|DEBUG", "debug mode", getopt.Optional | getopt.Flag, false},
-    		{"config|c", "config file", getopt.IsConfigFile | getopt.ExampleIsDefault, "./config_sample.conf"},
-    		{"ports|p|PORTS", "ports", getopt.Optional | getopt.ExampleIsDefault, []int64{3000, 3001, 3002}},
-    		{"sports|s|SECONDARY_PORTS", "secondary ports", getopt.Optional | getopt.NoLongOpt, []int{5000, 5001, 5002}},
-    		{"instances||INSTANCES", "instances", getopt.Required, 4},
-    		{"keys||KEYS", "keys", getopt.Required, []string{"foo", "bar", "baz"}},
-    		{"logfile||LOGFILE", "logfile", getopt.Optional | getopt.NoEnvHelp, "/var/log/foo.log"},
-    		{"file", "files", getopt.IsArg, ""},
-    		{"directories", "directories", getopt.IsArg | getopt.Optional, ""},
-    		{"pass through", "pass through arguments", getopt.IsPassThrough | getopt.Optional, ""},
-    	}
-    
-    	options, arguments, passThrough, e := optionDefinition.ParseCommandLine()
-    
-    	if e != nil {
+      optionDefinition := getopt.Options{
+        {"debug|d|DEBUG",            "debug mode",             getopt.Optional | getopt.Flag,                 false},
+        {"config|c",                 "config file",            getopt.IsConfigFile | getopt.ExampleIsDefault, "./config_sample.conf"},
+        {"ports|p|PORTS",            "ports",                  getopt.Optional | getopt.ExampleIsDefault,     []int64{3000, 3001, 3002}},
+        {"sports|s|SECONDARY_PORTS", "secondary ports",        getopt.Optional | getopt.NoLongOpt,            []int{5000, 5001, 5002}},
+        {"instances||INSTANCES",     "instances",              getopt.Required,                               4}
+        {"keys||KEYS",               "keys",                   getopt.Required,                               []{"foo", "bar", "baz"}},
+        {"logfile||LOGFILE",         "logfile",                getopt.Optional | getopt.NoEnvHelp,            "/var/log/foo.log"},
+        {"file",                     "files",                  getopt.IsArg,                                  ""}
+        {"directories",              "directories",            getopt.IsArg | getopt.Optional,                ""},
+        {"pass through",             "pass through arguments", getopt.IsPassThrough | getopt.Optional,        ""},
+      }
+
+      options, arguments, passThrough, e := optionDefinition.ParseCommandLine()
+
+      if e != nil {
         description := "this is a small sample application for getopt demonstration"
         exit_code := 0
         switch {
@@ -58,23 +57,50 @@ The examle program is long as it uses every bell and whistle there is:
           default:
             fmt.Println("**** Error: ", e.Message, "\n", optionDefinition.Help(description))
             exit_code = e.ErrorCode
-    		}
-    		os.Exit(exit_code)
-    	}
-    
-    	fmt.Printf("options:\n")
-    	fmt.Printf("debug: %#v\n", options["debug"].Bool)
-    	fmt.Printf("config: %#v\n", options["config"].String)
-    	fmt.Printf("ports: %#v\n", options["ports"].IntArray)
-    	fmt.Printf("secondaryports: %#v\n", options["sports"].IntArray)
-    	fmt.Printf("instances: %#v\n", options["instances"].Int)
-    	fmt.Printf("keys: %#v\n", options["keys"].StrArray)
-    	fmt.Printf("logfile: %#v\n", options["logfile"].String)
-    	fmt.Printf("files: %#v\n", options["files"].StrArray)
-    
-    	fmt.Printf("arguments: %#v\n", arguments)
-    	fmt.Printf("passThrough: %#v\n", passThrough)
+        }
+        os.Exit(exit_code)
+      }
+
+      fmt.Printf("options:\n")
+      fmt.Printf("debug: %#v\n",          options["debug"].Bool)
+      fmt.Printf("config: %#v\n",         options["config"].String)
+      fmt.Printf("ports: %#v\n",          options["ports"].IntArray)
+      fmt.Printf("secondaryports: %#v\n", options["sports"].IntArray)
+      fmt.Printf("instances: %#v\n",      options["instances"].Int)
+      fmt.Printf("keys: %#v\n",           options["keys"].StrArray)
+      fmt.Printf("logfile: %#v\n",        options["logfile"].String)
+      fmt.Printf("files: %#v\n",          options["files"].StrArray)
+
+      fmt.Printf("arguments: %#v\n", arguments)
+      fmt.Printf("passThrough: %#v\n", passThrough)
     }
+
+### Help output
+Calling the help of this programs generates the following output:
+
+    $ ./getopt-sample-app --help
+    Usage: getopt-sample-app [-d] -c <config> [-p <ports>] [-s <sports>] --instances=<instances> --keys=<keys> [--logfile=<logfile>] <file> [<directories>] [-- <pass through>]
+    this is a small sample application for getopt demonstration
+
+    Options:
+        -d, --debug                       debug mode (e.g. false); setable via $DEBUG
+        -c, --config=<config>             config file (default: ./config_sample.conf)
+        -p, --ports=<ports>               ports (default: 3000,3001,3002); setable via $PORTS
+        -s <sports>                       secondary ports (e.g. 5000,5001,5002); setable via $SECONDARY_PORTS
+            --instances=<instances>       instances (e.g. 4); setable via $INSTANCES
+            --keys=<keys>                 keys (e.g. foo,bar,baz); setable via $KEYS
+            --logfile=<logfile>           logfile (e.g. /var/log/foo.log)
+        -h, --help                        usage (-h) / detailed help text (--help)
+
+    Arguments:
+        <file>                            files
+        <directories>                     directories
+
+    Pass through arguments:
+        <pass through>                    pass through arguments
+
+play around with the program to see how it behaves with ENV variables and the different included configuration files --
+there should not be any surprises.
 
 Options struct explained
 ------------------------
