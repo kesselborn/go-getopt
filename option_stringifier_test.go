@@ -40,6 +40,16 @@ func TestUsageOutput(t *testing.T) {
 		t.Errorf("Error creating usage text (Optional, no short):\ngot:      " + got + "\nexpected: " + expected)
 	}
 
+	if got, expected := (Option{"method|m", "...", ExampleIsDefault, "defaultValue"}.Usage()),
+		"[-m <method>]"; got != expected {
+		t.Errorf("Error creating usage text (Optional):\ngot:      " + got + "\nexpected: " + expected)
+	}
+
+	if got, expected := (Option{"method", "...", ExampleIsDefault, "defaultValue"}.Usage()),
+		"[--method=<method>]"; got != expected {
+		t.Errorf("Error creating usage text (Optional, no short):\ngot:      " + got + "\nexpected: " + expected)
+	}
+
 	if got, expected := (Option{"method|m", "...", Flag | Optional, ""}.Usage()),
 		"[-m]"; got != expected {
 		t.Errorf("Error creating usage text (optional flag):\ngot:      " + got + "\nexpected: " + expected)
@@ -61,7 +71,7 @@ func TestUsageOutput(t *testing.T) {
 	}
 
 	if got, expected := (Option{"configfile|c", "method", IsConfigFile | ExampleIsDefault, "/etc/cnf.conf"}.Usage()),
-		"-c <configfile>"; got != expected {
+		"[-c <configfile>]"; got != expected {
 		t.Errorf("Error stringifying optional option:\ngot:      " + got + "\nexpected: " + expected)
 	}
 }
