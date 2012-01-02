@@ -1,4 +1,9 @@
 
+0.3.1 / 2012-01-03
+==================
+
+  * if option is ExampleIsDefault, handle it as an Optional option
+
 0.3.0 / 2011-12-20
 ==================
 
