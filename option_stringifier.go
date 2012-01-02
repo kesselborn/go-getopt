@@ -87,7 +87,7 @@ func (option Option) Usage() (usageString string) {
 		usageString = usageString + separator + valueIze(option.Key())
 	}
 
-	if option.Flags&Optional > 0 || option.Flags&Help > 0 || option.Flags&Usage > 0 {
+	if option.Flags&Optional > 0 || option.Flags&Help > 0 || option.Flags&Usage > 0 || option.Flags&ExampleIsDefault > 0 {
 		usageString = "[" + usageString + "]"
 	}
 
