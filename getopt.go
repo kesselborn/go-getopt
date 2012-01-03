@@ -178,7 +178,7 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 				}
 			}
 			if optionsDefinition.NumOfRequiredArguments() > len(arguments) {
-				err = &GetOptError{MissingArgument, fmt.Sprint("Expected at least %d arguments", optionsDefinition.NumOfRequiredArguments())}
+				err = &GetOptError{MissingArgument, fmt.Sprintf("Expected at least %d arguments", optionsDefinition.NumOfRequiredArguments())}
 			}
 		}
 	}
