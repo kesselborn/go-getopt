@@ -5,7 +5,10 @@
 
 package getopt
 
-import "os"
+import (
+	"os"
+	"fmt"
+)
 
 const InvalidOption = 1
 const MissingValue = 2
@@ -17,6 +20,7 @@ const ConfigFileNotFound = 8
 const ConfigParsed = 9
 const WantsUsage = 10
 const WantsHelp = 11
+const MissingArgument = 12
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -172,6 +176,9 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 					err = &GetOptError{MissingOption, "Option '" + requiredOption + "' is missing"}
 					break
 				}
+			}
+			if optionsDefinition.NumOfRequiredArguments() > len(arguments) {
+				err = &GetOptError{MissingArgument, fmt.Sprint("Expected at least %d arguments", optionsDefinition.NumOfRequiredArguments())}
 			}
 		}
 	}
