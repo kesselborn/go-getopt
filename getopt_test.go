@@ -83,7 +83,7 @@ func TestRequiredArgument(t *testing.T) {
 	}
 
 	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Expected at least 1 arguments" {
-    t.Errorf("missing required argument did raise wrong error message: ", err.Message)
+		t.Errorf("missing required argument did raise wrong error message: ", err.Message)
 	}
 
 	os.Args = []string{"prog", "file1"}
