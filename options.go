@@ -36,19 +36,27 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 }
 
 func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
+	consistencyErrorPrefix := "wrong getopt usage: "
 
+	foundOptionalArg := false
 	for _, option := range optionsDefinition {
 		switch {
+		case option.Flags&IsArg > 0 && option.Flags&Required == 0 && option.Flags&Optional == 0:
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an argument must be explicitly set to be Optional or Required"}
+		case option.Flags&IsArg > 0 && option.Flags&Optional > 0:
+			foundOptionalArg = true
+		case option.Flags&IsArg > 0 && option.Flags&Required > 0 && foundOptionalArg:
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "a required argument can't come after an optional argument"}
 		case option.Flags&Optional > 0 && option.Flags&Required > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be Required and Optional"}
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an option can not be Required and Optional"}
 		case option.Flags&Flag > 0 && option.Flags&ExampleIsDefault > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be a Flag and have ExampleIsDefault"}
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an option can not be a Flag and have ExampleIsDefault"}
 		case option.Flags&Required > 0 && option.Flags&ExampleIsDefault > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be Required and have ExampleIsDefault"}
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an option can not be Required and have ExampleIsDefault"}
 		case option.Flags&NoLongOpt > 0 && !option.HasShortOpt() && option.Flags&IsArg == 0:
-			err = &GetOptError{ConsistencyError, "an option must have either NoLongOpt or a ShortOption"}
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an option must have either NoLongOpt or a ShortOption"}
 		case option.Flags&Flag > 0 && option.Flags&IsArg > 0:
-			err = &GetOptError{ConsistencyError, "an option can not be a Flag and be an argument (IsArg)"}
+			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an option can not be a Flag and be an argument (IsArg)"}
 		}
 	}
 
