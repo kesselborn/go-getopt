@@ -1,4 +1,9 @@
 
+0.3.5 / 2012-01-03
+==================
+
+  * make sure that we don't have required arguments after optional arguments
+
 0.3.4 / 2012-01-03
 ==================
 
