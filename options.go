@@ -102,11 +102,10 @@ func (options Options) ConfigOptionKey() (key string) {
 	return
 }
 
-func (options Options) NumOfRequiredArguments() (num int) {
-
+func (options Options) RequiredArguments() (requiredOptions Options) {
 	for _, cur := range options {
 		if cur.Flags&Required != 0 && cur.Flags&IsArg != 0 {
-			num = num + 1
+			requiredOptions = append(requiredOptions, cur)
 		}
 	}
 
@@ -114,7 +113,6 @@ func (options Options) NumOfRequiredArguments() (num int) {
 }
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
-
 	for _, cur := range options {
 		if cur.Flags&Required != 0 && cur.Flags&IsArg == 0 {
 			requiredOptions = append(requiredOptions, cur.LongOpt())

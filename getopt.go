@@ -5,10 +5,7 @@
 
 package getopt
 
-import (
-	"os"
-	"fmt"
-)
+import "os"
 
 const InvalidOption = 1
 const MissingValue = 2
@@ -177,8 +174,12 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 					break
 				}
 			}
-			if optionsDefinition.NumOfRequiredArguments() > len(arguments) {
-				err = &GetOptError{MissingArgument, fmt.Sprintf("Expected at least %d arguments", optionsDefinition.NumOfRequiredArguments())}
+
+			requiredArguments := optionsDefinition.RequiredArguments()
+
+			if numOfRequiredArguments := len(requiredArguments); numOfRequiredArguments > len(arguments) {
+				firstMissingArgumentName := requiredArguments[len(arguments)].Key()
+				err = &GetOptError{MissingArgument, "Missing required argument <" + firstMissingArgumentName + ">"}
 			}
 		}
 	}

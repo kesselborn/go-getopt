@@ -70,7 +70,7 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 func TestRequiredArgument(t *testing.T) {
 	options := Options{
 		{"source", "original file name", Required | IsArg, ""},
-		{"destination", "destination file name", Optional | IsArg, ""},
+		{"destination", "destination file name", Required | IsArg, ""},
 	}
 
 	os.Args = []string{"prog"}
@@ -82,18 +82,18 @@ func TestRequiredArgument(t *testing.T) {
 		t.Errorf("missing required argument did raise wrong error")
 	}
 
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Expected at least 1 arguments" {
-		t.Errorf("missing required argument did raise wrong error message: ", err.Message)
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Missing required argument <source>" {
+		t.Errorf("wrong error message for missing required argument:\n\texpected: %s\n\tgot     : %s", "Missing required argument <source>", err.Message)
 	}
 
 	os.Args = []string{"prog", "file1"}
-	if _, arguments, _, err := options.ParseCommandLine(); err != nil || len(arguments) != 1 || arguments[0] != "file1" {
-		t.Errorf("required argument was not set correctly")
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Missing required argument <destination>" {
+		t.Errorf("wrong error message for missing required argument:\n\texpected: %s\n\tgot     : %s", "Missing required argument <destination>", err.Message)
 	}
 
 	os.Args = []string{"prog", "file1", "file1.bak"}
 	if _, arguments, _, err := options.ParseCommandLine(); err != nil || len(arguments) != 2 || arguments[0] != "file1" || arguments[1] != "file1.bak" {
-		t.Errorf("required argument was not set correctly")
+		t.Errorf("required arguments weren't set correctly (2), got: %#v", arguments)
 	}
 
 }

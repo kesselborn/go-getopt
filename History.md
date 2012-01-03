@@ -1,5 +1,10 @@
 
-0.3.2 / 2012-01-03 
+0.3.4 / 2012-01-03
+==================
+
+  * proper error message when a required argument was not provided
+
+0.3.2 / 2012-01-03
 ==================
 
   * check for error message
