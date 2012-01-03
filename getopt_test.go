@@ -67,6 +67,37 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 
 }
 
+func TestRequiredArgument(t *testing.T) {
+	options := Options{
+		{"source", "original file name", Required | IsArg, ""},
+		{"destination", "destination file name", Optional | IsArg, ""},
+	}
+
+	os.Args = []string{"prog"}
+	if _, _, _, err := options.ParseCommandLine(); err == nil {
+		t.Errorf("missing required argument did not raise an error")
+	}
+
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != MissingArgument {
+		t.Errorf("missing required argument did raise wrong error")
+	}
+
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Expected at least 1 arguments" {
+		t.Errorf("missing required argument did raise wrong error message: ", err.Message)
+	}
+
+	os.Args = []string{"prog", "file1"}
+	if _, arguments, _, err := options.ParseCommandLine(); err != nil || len(arguments) != 1 || arguments[0] != "file1" {
+		t.Errorf("required argument was not set correctly")
+	}
+
+	os.Args = []string{"prog", "file1", "file1.bak"}
+	if _, arguments, _, err := options.ParseCommandLine(); err != nil || len(arguments) != 2 || arguments[0] != "file1" || arguments[1] != "file1.bak" {
+		t.Errorf("required argument was not set correctly")
+	}
+
+}
+
 func TestConcatenatedOptionsParsingSimple(t *testing.T) {
 	options := Options{
 		{"debug|d", "debug mode", Flag, true},
