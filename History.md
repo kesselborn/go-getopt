@@ -1,4 +1,10 @@
 
+0.3.6 / 2012-01-04
+==================
+
+  * add readme with example calls for example program
+  * explain config file support in readme
+
 0.3.5 / 2012-01-03
 ==================
 
