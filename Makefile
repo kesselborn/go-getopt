@@ -11,6 +11,7 @@ GOFILES=\
 					config_file.go\
 
 default: all
+	gofmt -s=true -w *.go
 	6g -V > TESTED_GO_RELEASE
 
 include $(GOROOT)/src/Make.pkg
