@@ -1,5 +1,0 @@
-#!/bin/sh
-find . -name '*.go' -exec echo gofmt -w '{}' \; -exec gofmt -w '{}' \; 
-
-make test
-make clean

@@ -34,6 +34,9 @@ func TestConsistencyChecking(t *testing.T) {
 	if _, _, _, err := (Options{{"arg1", "...", IsArg | Optional, ""}, {"arg1", "...", IsArg | Required, ""}}.ParseCommandLine()); err == nil || err.ErrorCode != ConsistencyError {
 		t.Errorf("required arg following an optional arg did not raise error")
 	}
+	if _, _, _, err := (Options{{"arg1", "...", IsArg | Optional, ""}, {"arg1", "...", IsArg | Required, ""}, {"arg3", "...", IsArg | Optional, ""}}.ParseCommandLine()); err == nil || err.ErrorCode != ConsistencyError {
+		t.Errorf("required arg following an optional arg did not raise error")
+	}
 
 	os.Args = []string{"prog", "lirum", "larum"}
 	if _, _, _, err := (Options{{"arg1", "...", IsArg | Required, ""}, {"arg1", "...", IsArg | Optional, ""}}.ParseCommandLine()); err != nil {
