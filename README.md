@@ -20,6 +20,8 @@ The following examle is included in the `example` folder, in order to run it, in
 
     make
 
+and try out different calls (`make` will give instructions)
+
 ### Source code
 
     package main
@@ -145,6 +147,17 @@ Can be empty strings. For optional options, if a `nil` example is set, the
 `options` map won't contain an entry if this option is not passed in by a user.
 If set to a value different to nil, the `options` map will contain the default value
 if the user does not pass in the option. Types of the values will be saved as stated here.
+
+Configuration File
+------------------
+I you want your program to have a configuration file, you can use the included config file parser.
+Configuration have to be of the form of bash env var definitions -- all other lines are excluded:
+
+    # this line will be ignored as it is not of the form /^[A-z0-9_.,]+=.*$/
+    PORT=8121
+    HOST=zookeeper.apache.org
+
+the option for setting the config file needs to get the `IsConfigFile` flag (see example)
 
 The ParseCommandLine method
 ----------------------------
