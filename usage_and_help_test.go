@@ -21,9 +21,11 @@ func TestUsage(t *testing.T) {
 		{"lock||LOCK", "create lock file", Flag, false},
 		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 		{"directories", "directories", IsArg | Optional, nil},
+		{"command", "command", IsPassThrough | Required, nil},
+		{"args", "command's args", IsPassThrough | Optional, nil},
 	}
 
-	expected := `Usage: prog -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>]
+	expected := `Usage: prog -d [-p <ports>] <files> [-s <secondaryports>] --instances=<instances> --lock [--logfile=<logfile>] [<directories>] -- <command> [<args>]
 
 `
 
