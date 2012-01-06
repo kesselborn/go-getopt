@@ -144,6 +144,25 @@ func TestUsageAndHelpOption(t *testing.T) {
 	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
 		t.Errorf("help call did not return help error")
 	}
+}
+
+func TestUsageAndHelpOptionInPassThrough(t *testing.T) {
+	options := Options{
+		{"debug|d|DEBUG", "debug mode", Flag, true},
+		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+	}
+
+	os.Args = []string{"prog", "barbaz", "--", "-h"}
+	os.Envs = []string{}
+	if _, _, _, err := options.ParseCommandLine(); err != nil {
+		t.Errorf("usage option in pass through triggered WantsUsage")
+	}
+
+	os.Args = []string{"prog", "barbaz", "--", "--help"}
+	os.Envs = []string{}
+	if _, _, _, err := options.ParseCommandLine(); err != nil {
+		t.Errorf("help option in pass through triggered WantsUsage")
+	}
 
 }
 
