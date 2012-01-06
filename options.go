@@ -134,12 +134,12 @@ func (options Options) Usage() (output string) {
 	programName := filepath.Base(os.Args[0])
 	output = "Usage: " + programName
 
-  passThroughSeparatorPrinted := false
+	passThroughSeparatorPrinted := false
 	for _, option := range options {
-    if option.Flags&IsPassThrough > 0 && !passThroughSeparatorPrinted {
-      output = output + " --"
-      passThroughSeparatorPrinted = true
-    }
+		if option.Flags&IsPassThrough > 0 && !passThroughSeparatorPrinted {
+			output = output + " --"
+			passThroughSeparatorPrinted = true
+		}
 
 		output = output + " " + option.Usage()
 	}
