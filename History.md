@@ -1,4 +1,9 @@
 
+0.3.8 / 2012-01-06
+==================
+
+  * make it possible to have more than one passThrough arg in the usage text; don't include the '--' in the brackets if passThrough is optional
+
 0.3.7 / 2012-01-06
 ==================
 

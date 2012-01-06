@@ -64,9 +64,7 @@ func (option Option) ShortOptString() (shortOptString string) {
 
 func (option Option) Usage() (usageString string) {
 	switch {
-	case option.Flags&IsPassThrough > 0:
-		usageString = "-- " + valueIze(option.Key())
-	case option.Flags&IsArg > 0:
+	case option.Flags&IsArg > 0 || option.Flags&IsPassThrough > 0:
 		usageString = valueIze(option.Key())
 	case option.HasShortOpt():
 		usageString = "-" + option.ShortOpt()
