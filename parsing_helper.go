@@ -44,5 +44,5 @@ func isValue(option string) bool {
 }
 
 func argumentsEnd(option string) bool {
-	return option == "--"
+	return option == OPTIONS_SEPARATOR
 }

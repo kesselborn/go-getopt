@@ -420,6 +420,12 @@ func TestPassThroughParsing(t *testing.T) {
 	options := Options{
 		{"debug|d|DEBUG", "debug mode", Flag, true},
 		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		{"command args", "command args", Required | IsPassThrough, "command"},
+	}
+
+	os.Args = []string{"prog"}
+	if _, _, _, err := options.ParseCommandLine(); err != nil {
+		t.Errorf("missing pass through rose error: %#v", err)
 	}
 
 	os.Args = []string{"prog", "foobar", "--", "barbaz"}

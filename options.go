@@ -122,7 +122,7 @@ func (options Options) RequiredArguments() (requiredOptions Options) {
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
 	for _, cur := range options {
-		if cur.Flags&Required != 0 && cur.Flags&IsArg == 0 {
+		if cur.Flags&Required != 0 && cur.Flags&IsArg == 0 && cur.Flags&IsPassThrough == 0 {
 			requiredOptions = append(requiredOptions, cur.LongOpt())
 		}
 	}

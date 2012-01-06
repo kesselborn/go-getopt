@@ -1,4 +1,9 @@
 
+0.3.7 / 2012-01-06
+==================
+
+  * make sure help or usage options in passThrough section are not displaying help or usage
+
 0.3.6 / 2012-01-04
 ==================
 

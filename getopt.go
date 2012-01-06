@@ -45,13 +45,16 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 // todo: method signature sucks
 func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string) (err *GetOptError) {
 	for _, arg := range args {
-		switch {
-		case arg == usageString:
+		switch arg {
+		case usageString:
 			err = &GetOptError{WantsUsage, ""}
-		case arg == helpString:
+		case helpString:
 			err = &GetOptError{WantsHelp, ""}
+		case OPTIONS_SEPARATOR:
+			goto allOptsParsed
 		}
 	}
+allOptsParsed:
 
 	return
 }
