@@ -1,9 +1,9 @@
 package getopt
 
 import (
-	"testing"
 	"fmt"
 	"os"
+	"testing"
 )
 
 func TestConfigParsing(t *testing.T) {

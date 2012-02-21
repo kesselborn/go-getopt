@@ -6,9 +6,9 @@
 package getopt
 
 import (
-	"testing"
 	"fmt"
 	"os"
+	"testing"
 )
 
 func TestShortOptionsFlagsParsing(t *testing.T) {
