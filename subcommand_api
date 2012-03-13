@@ -1,4 +1,34 @@
 optionDefinition := getopt.SubCommandOptions{
+  "*": {
+    {"command", "command to execute", getopt.IsSubcommand, ""}},
+  "list": { },
+  "describe":{
+    {"name|n", "app's name", getopt.IsArg | getopt.Required, ""}},
+  "register": {
+    {"name|n", "app's name", getopt.IsArg | getopt.Required, ""},
+    {"deploytype|t", "deploy type (one of mount, bazapta, lxc)", getopt.Optional | getopt.ExampleIsDefault, "lxc"},
+    {"repourl|r", "repository url of this app", getopt.Optional | getopt.ExampleIsDefault, "http://github.com/soundcloud/<name>"},
+    {"stack|s", "stack version this app should be pinned to -- ommit if you always want the latest stack", getopt.Optional, ""},
+    {"irc|i", "comma separated list of irc channels where a deploy should be announced", getopt.Optional | getopt.ExampleIsDefault, "deploys"}},
+  "unregister": {
+    {"name|n", "app's name", getopt.IsArg | getopt.Required, ""}},
+  "setenv": {
+    {"name", "app's name", getopt.IsArg | getopt.Required, ""},
+    {"key", "environment variable's name", getopt.IsArg | getopt.Required, ""},
+    {"value", "environment variable's value (omit in order to delete variable)", getopt.IsArg | getopt.Optional, ""}},
+  "getenv": {
+    {"name", "app's name", getopt.IsArg | getopt.Required, ""},
+    {"key", "environment variable's name", getopt.IsArg | getopt.Required, ""}},
+  "env": {
+    {"name", "app's name", getopt.IsArg | getopt.Required, ""}}
+  "revisions": {
+    {"name|n", "app's name", getopt.IsArg | getopt.Required, ""}}
+}
+
+
+
+
+optionDefinition := getopt.SubSubCommandOptions{
   "*" : { 
     {"config|c", "config file", getopt.IsConfigFile | getopt.ExampleIsDefault, "/etc/visor.conf"},
     {"server|s", "doozer server", getopt.Required, ""},
