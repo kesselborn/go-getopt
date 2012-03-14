@@ -1,7 +1,6 @@
 package getopt
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -25,7 +24,7 @@ func readConfigFile(path string) (configEntries []string, err *GetOptError) {
 	validConfigEntry := regexp.MustCompile("^[A-z0-9_.,]+=.*$")
 
 	content, ioErr := ioutil.ReadFile(path)
-	contentStringified := fmt.Sprintf("%s", content)
+	contentStringified := string(content)
 
 	if ioErr != nil {
 		err = &GetOptError{ConfigFileNotFound, ioErr.Error()}
