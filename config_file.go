@@ -2,7 +2,6 @@ package getopt
 
 import (
 	"io/ioutil"
-	"os"
 	"regexp"
 	"strings"
 )
@@ -21,7 +20,7 @@ func mapifyEnvironment(environment []string) (envArray map[string]string) {
 }
 
 func readConfigFile(path string) (configEntries []string, err *GetOptError) {
-  // ignore all lines without a '=' and with invalid key names
+	// ignore all lines without a '=' and with invalid key names
 	validConfigEntry := regexp.MustCompile("^[A-z0-9_.,]+=.*$")
 
 	content, ioErr := ioutil.ReadFile(path)
@@ -40,12 +39,15 @@ func readConfigFile(path string) (configEntries []string, err *GetOptError) {
 	return
 }
 
-func processConfigFile(path string) (err *GetOptError) {
-	configEntries, err := readConfigFile(path)
+func processConfigFile(path string, environment map[string]string) (newEnvironment map[string]string, err *GetOptError) {
+	newEnvironment = environment
+
+	configEntries, err := readConfigFile(strings.TrimSpace(path))
+
 	if err == nil {
 		for key, value := range mapifyEnvironment(configEntries) {
-			if os.Getenv(key) == "" {
-				os.Setenv(key, value)
+			if newEnvironment[key] == "" {
+				newEnvironment[key] = value
 			}
 		}
 	}

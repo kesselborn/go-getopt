@@ -19,8 +19,7 @@ type Options struct {
 	definitions Definitions
 }
 
-func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, environment []string) (err *GetOptError) {
-	environmentMap := mapifyEnvironment(environment)
+func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, environment map[string]string) (err *GetOptError) {
 	significantEnvVars := make(map[string]Option)
 
 	for _, opt := range optionsDefinition.definitions {
@@ -30,7 +29,7 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 	}
 
 	for key, significantEnvVar := range significantEnvVars {
-		if value := environmentMap[key]; value != "" {
+		if value := environment[key]; value != "" {
 			options[significantEnvVar.Key()], err = assignValue(significantEnvVar.DefaultValue, value)
 			if err != nil {
 				break
@@ -159,7 +158,7 @@ func (options Options) Usage() (output string) {
 }
 
 func (options Options) Help(description string) (output string) {
-  return options.HelpCustomArg0(description, filepath.Base(os.Args[0]))
+	return options.HelpCustomArg0(description, filepath.Base(os.Args[0]))
 }
 
 func (options Options) HelpCustomArg0(description string, arg0 string) (output string) {
