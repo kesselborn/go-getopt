@@ -136,9 +136,8 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 	return
 }
 
-func (options Options) Usage() (output string) {
-	programName := filepath.Base(os.Args[0])
-	output = "Usage: " + programName
+func (options Options) UsageCustomArg0(arg0 string) (output string) {
+	output = "Usage: " + arg0
 
 	passThroughSeparatorPrinted := false
 	for _, option := range options.definitions {
@@ -155,8 +154,16 @@ func (options Options) Usage() (output string) {
 	return
 }
 
-func (options Options) Help() (output string) {
-	output = options.Usage()
+func (options Options) Usage() (output string) {
+	return options.UsageCustomArg0(filepath.Base(os.Args[0]))
+}
+
+func (options Options) Help(description string) (output string) {
+  return options.HelpCustomArg0(description, filepath.Base(os.Args[0]))
+}
+
+func (options Options) HelpCustomArg0(description string, arg0 string) (output string) {
+	output = options.UsageCustomArg0(arg0)
 	if options.description != "" {
 		output = output + string(options.description) + "\n\n"
 	}
