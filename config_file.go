@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func mapifyConfig(environment []string) (envArray map[string]string) {
+func mapifyEnvironment(environment []string) (envArray map[string]string) {
 	envArray = make(map[string]string)
 
 	for _, cur := range environment {
@@ -21,6 +21,7 @@ func mapifyConfig(environment []string) (envArray map[string]string) {
 }
 
 func readConfigFile(path string) (configEntries []string, err *GetOptError) {
+  // ignore all lines without a '=' and with invalid key names
 	validConfigEntry := regexp.MustCompile("^[A-z0-9_.,]+=.*$")
 
 	content, ioErr := ioutil.ReadFile(path)
@@ -42,7 +43,7 @@ func readConfigFile(path string) (configEntries []string, err *GetOptError) {
 func processConfigFile(path string) (err *GetOptError) {
 	configEntries, err := readConfigFile(path)
 	if err == nil {
-		for key, value := range mapifyConfig(configEntries) {
+		for key, value := range mapifyEnvironment(configEntries) {
 			if os.Getenv(key) == "" {
 				os.Setenv(key, value)
 			}

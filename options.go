@@ -19,19 +19,19 @@ type Options struct {
 	definitions Definitions
 }
 
-func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
-	overwritesMap := mapifyConfig(overwrites)
-	acceptedEnvVars := make(map[string]Option)
+func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, environment []string) (err *GetOptError) {
+	environmentMap := mapifyEnvironment(environment)
+	significantEnvVars := make(map[string]Option)
 
 	for _, opt := range optionsDefinition.definitions {
 		if value := opt.EnvVar(); value != "" {
-			acceptedEnvVars[value] = opt
+			significantEnvVars[value] = opt
 		}
 	}
 
-	for key, acceptedEnvVar := range acceptedEnvVars {
-		if value := overwritesMap[key]; value != "" {
-			options[acceptedEnvVar.Key()], err = assignValue(acceptedEnvVar.DefaultValue, value)
+	for key, significantEnvVar := range significantEnvVars {
+		if value := environmentMap[key]; value != "" {
+			options[significantEnvVar.Key()], err = assignValue(significantEnvVar.DefaultValue, value)
 			if err != nil {
 				break
 			}

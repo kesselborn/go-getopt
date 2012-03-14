@@ -21,7 +21,7 @@ func TestConfigParsing(t *testing.T) {
 	}
 
 	configFile, _ := readConfigFile("./config_sample.conf")
-	if config := mapifyConfig(configFile); config["FOO"] != "bar" || config["BAR"] != "baz" {
+	if config := mapifyEnvironment(configFile); config["FOO"] != "bar" || config["BAR"] != "baz" {
 		t.Errorf("config file was not mapped correctly:\ngot:      |" + fmt.Sprintf("%#v", config) + "\nexpected: |map[string] string{\"BAR\":\"baz\", \"FOO\":\"bar\"}\n")
 	}
 }
