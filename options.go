@@ -135,8 +135,8 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 	return
 }
 
-func (options Options) UsageCustomArg0(arg0 string) (output string) {
-	output = "Usage: " + arg0
+func (options Options) commandDefinition(arg0 string) (output string) {
+  output = arg0
 
 	passThroughSeparatorPrinted := false
 	for _, option := range options.definitions {
@@ -148,9 +148,11 @@ func (options Options) UsageCustomArg0(arg0 string) (output string) {
 		output = output + " " + option.Usage()
 	}
 
-	output = output + "\n\n"
+  return
+}
 
-	return
+func (options Options) UsageCustomArg0(arg0 string) (output string) {
+  return "Usage: " + options.commandDefinition(arg0)  + "\n\n"
 }
 
 func (options Options) Usage() (output string) {
