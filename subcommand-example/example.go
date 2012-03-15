@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	getopt "github.com/kesselborn/go-getopt"
+	"os"
 )
 
 func main() {
@@ -38,7 +38,7 @@ func main() {
 		os.Exit(exit_code)
 	}
 
-  fmt.Printf("scope:\n%s", scope)
+	fmt.Printf("scope:\n%s", scope)
 	fmt.Printf("options:\n%#v", options)
 	fmt.Printf("arguments: %#v\n", arguments)
 	fmt.Printf("passThrough: %#v\n", passThrough)

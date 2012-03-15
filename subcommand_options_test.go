@@ -15,11 +15,12 @@ func equalOptionsArray(array1 Options, array2 Options) (equal bool) {
 	if len(array1) == len(array2) {
 		for i := 0; i < len(array1); i++ {
 			if array1[i] != array2[i] {
-				break
+				goto loopend
 			}
 		}
 		equal = true
 	}
+loopend:
 
 	return
 }

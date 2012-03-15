@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"os"
 	getopt "github.com/kesselborn/go-getopt"
+	"os"
 )
 
 func main() {
