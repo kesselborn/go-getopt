@@ -41,10 +41,42 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 }
 
 func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
-	consistencyErrorPrefix := "wrong getopt usage: "
-
 	foundOptionalArg := false
+	shortOpts := make(map[string]bool, len(optionsDefinition))
+	longOpts := make(map[string]bool, len(optionsDefinition))
+	envVars := make(map[string]bool, len(optionsDefinition))
+
 	for _, option := range optionsDefinition.definitions {
+		optionString := fmt.Sprintf("%#v", option)
+		consistencyErrorPrefix := optionString + " wrong getopt usage: "
+
+		if option.HasLongOpt() {
+			longOpt := option.LongOpt()
+			if _, present := longOpts[longOpt]; present {
+				err = &GetOptError{ConsistencyError, consistencyErrorPrefix + " long opt '" + longOpt + "' already used in other option"}
+			} else {
+				longOpts[longOpt] = true
+			}
+		}
+
+		if option.HasShortOpt() {
+			shortOpt := option.ShortOpt()
+			if _, present := shortOpts[shortOpt]; present {
+				err = &GetOptError{ConsistencyError, consistencyErrorPrefix + " short opt '" + shortOpt + "' already used in other option"}
+			} else {
+				shortOpts[shortOpt] = true
+			}
+		}
+
+		if option.HasEnvVar() {
+			envVar := option.EnvVar()
+			if _, present := envVars[envVar]; present {
+				err = &GetOptError{ConsistencyError, consistencyErrorPrefix + " environment variable '" + envVar + "' already used in other option"}
+			} else {
+				envVars[envVar] = true
+			}
+		}
+
 		switch {
 		case option.Flags&IsArg > 0 && option.Flags&Required == 0 && option.Flags&Optional == 0:
 			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an argument must be explicitly set to be Optional or Required"}
