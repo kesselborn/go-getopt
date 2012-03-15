@@ -7,6 +7,7 @@ package getopt
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -128,4 +129,39 @@ func TestSubcommandOptionsParser(t *testing.T) {
 	if arguments[2] != "bar" {
 		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg2: Expected: bar, Got: " + arguments[2])
 	}
+}
+
+func TestSubCommandHelp(t *testing.T) {
+	sco := SubCommandOptions{
+		"*": {
+			{"foo|f", "some arg", Optional, ""},
+			{"command", "command to execute", IsSubcommand, ""}},
+		"getenv": {
+			{"bar|b", "some arg", Optional, ""},
+			{"name", "app's name", IsArg | Required, ""},
+			{"key", "environment variable's name", IsArg | Required, ""}},
+		"register": {
+			{"name|n", "app's name", IsArg | Required, ""},
+			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"}},
+	}
+
+	os.Args = []string{"prog"}
+	expected := `Usage: prog [-f <foo>] <command>
+
+this is not a program
+
+Options:
+    -f, --foo=<foo>           some arg
+    -h, --help                usage (-h) / detailed help text (--help)
+
+Available commands:
+    getenv
+    register
+
+`
+
+	if got := sco.Help("this is not a program", "*"); got != expected {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
+	}
+
 }

@@ -219,6 +219,8 @@ func (options Options) HelpCustomArg0(description string, arg0 string) (output s
 
 	for _, option := range options.definitions {
 		switch {
+		case option.Flags&IsSubcommand > 0:
+			continue
 		case option.Flags&IsPassThrough > 0:
 			passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
 		case option.Flags&IsArg > 0:

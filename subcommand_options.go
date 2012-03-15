@@ -5,6 +5,10 @@
 
 package getopt
 
+import (
+	"sort"
+)
+
 type SubCommandOptions map[string]Options
 
 func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Options, err *GetOptError) {
@@ -12,9 +16,12 @@ func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Option
 
 	if subCommandOptions, present := sco[subCommand]; present == true {
 
-		for _, option := range genericOptions {
-			options = append(options, option)
+		if subCommand != "*" {
+			for _, option := range genericOptions {
+				options = append(options, option)
+			}
 		}
+
 		for _, option := range subCommandOptions {
 			options = append(options, option)
 		}
@@ -47,6 +54,40 @@ func (sco SubCommandOptions) ParseCommandLine() (options map[string]OptionValue,
 		if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
 			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
 		}
+	}
+
+	return
+}
+
+func (sco SubCommandOptions) Help(description string, scope string) (output string) {
+	subCommand, err := sco.findSubcommand()
+
+	if err != nil {
+		subCommand = "*"
+	}
+
+	if flattenedOptions, err := sco.flattenToOptions(subCommand); err == nil {
+		output = flattenedOptions.Help(description)
+	}
+
+	if subCommand == "*" {
+		output = output + "Available commands:\n"
+
+		keys := make([]string, len(sco))
+		i := 0
+
+		for k := range sco {
+			keys[i] = k
+			i = i + 1
+		}
+		sort.Strings(keys)
+
+		for _, key := range keys {
+			if key != "*" {
+				output = output + "    " + key + "\n"
+			}
+		}
+		output = output + "\n"
 	}
 
 	return
