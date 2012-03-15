@@ -6,6 +6,7 @@
 package getopt
 
 import (
+	"os"
 	"testing"
 )
 
@@ -66,4 +67,30 @@ func TestSubcommandOptionsConverter(t *testing.T) {
 		t.Errorf("non existant sub command didn't throw error")
 	}
 
+}
+
+func TestSubcommandOptionsSubCommandFinder(t *testing.T) {
+	sco := SubCommandOptions{
+		"*": {
+			{"command", "command to execute", IsSubcommand, ""},
+			{"foo|f", "some arg", Optional, ""}},
+		"getenv": {
+			{"name", "app's name", IsArg | Required, ""},
+			{"key", "environment variable's name", IsArg | Required, ""}},
+	}
+
+	os.Args = []string{"prog", "getenv"}
+	if command, _ := sco.findSubcommand(); command != "getenv" {
+		t.Errorf("did not correctly find subcommand getenv")
+	}
+
+	os.Args = []string{"prog", "-f", "bar", "getenv", "name", "key"}
+	if command, _ := sco.findSubcommand(); command != "getenv" {
+		t.Errorf("did not correctly find subcommand getenv")
+	}
+
+	os.Args = []string{"prog"}
+	if _, err := sco.findSubcommand(); err == nil || err.ErrorCode != NoSubcommand {
+		t.Errorf("did not throw error on unknown subcommand")
+	}
 }

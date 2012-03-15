@@ -19,6 +19,7 @@ const (
 	WantsUsage
 	WantsHelp
 	MissingArgument
+	NoSubcommand
 	UnknownSubcommand
 )
 
