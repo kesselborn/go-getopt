@@ -7,17 +7,20 @@ package getopt
 
 import "os"
 
-const InvalidOption = 1
-const MissingValue = 2
-const InvalidValue = 3
-const MissingOption = 4
-const OptionValueError = 5
-const ConsistencyError = 6
-const ConfigFileNotFound = 8
-const ConfigParsed = 9
-const WantsUsage = 10
-const WantsHelp = 11
-const MissingArgument = 12
+const (
+	InvalidOption = iota
+	MissingValue
+	InvalidValue
+	MissingOption
+	OptionValueError
+	ConsistencyError
+	ConfigFileNotFound
+	ConfigParsed
+	WantsUsage
+	WantsHelp
+	MissingArgument
+	UnknownSubcommand
+)
 
 const OPTIONS_SEPARATOR = "--"
 
