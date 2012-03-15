@@ -32,7 +32,7 @@ func main() {
 		case e.ErrorCode == getopt.WantsHelp:
 			fmt.Print(sco.Help(description, scope))
 		default:
-			fmt.Println("**** Error: ", e.Message, "\n", sco.Help(description, scope))
+			fmt.Println(sco.Help(description, scope), "\n", "**** Error: ", e.Message, "\n")
 			exit_code = e.ErrorCode
 		}
 		os.Exit(exit_code)
