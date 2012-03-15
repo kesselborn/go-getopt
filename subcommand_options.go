@@ -36,6 +36,7 @@ func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Option
 
 func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptError) {
 	options := sco["*"]
+	subCommand = "*"
 
 	_, arguments, _, _ := options.ParseCommandLine()
 
@@ -48,8 +49,7 @@ func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptErr
 	return
 }
 
-func (sco SubCommandOptions) ParseCommandLine() (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-	var subCommand string
+func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 
 	if subCommand, err = sco.findSubcommand(); err == nil {
 		var flattenedOptions Options

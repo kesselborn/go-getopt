@@ -108,7 +108,11 @@ func TestSubcommandOptionsParser(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-fbar", "getenv", "--bar=foo", "foo", "bar"}
-	options, arguments, _, _ := sco.ParseCommandLine()
+	scope, options, arguments, _, _ := sco.ParseCommandLine()
+
+	if scope != "getenv" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse scope: Expected: getenv, Got: " + scope)
+	}
 
 	if options["foo"].String != "bar" {
 		t.Errorf("SubCommandOptions parsing: failed to correctly parse option: Expected: bar, Got: " + options["foo"].String)
