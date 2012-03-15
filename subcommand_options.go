@@ -6,6 +6,8 @@
 package getopt
 
 import (
+	"os"
+	"path/filepath"
 	"sort"
 )
 
@@ -60,14 +62,20 @@ func (sco SubCommandOptions) ParseCommandLine() (options map[string]OptionValue,
 }
 
 func (sco SubCommandOptions) Help(description string, scope string) (output string) {
+	return sco.HelpCustomArg0(description, scope, filepath.Base(os.Args[0]))
+}
+
+func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, arg0 string) (output string) {
 	subCommand, err := sco.findSubcommand()
 
 	if err != nil {
 		subCommand = "*"
+	} else {
+		arg0 = arg0 + " " + scope
 	}
 
-	if flattenedOptions, err := sco.flattenToOptions(subCommand); err == nil {
-		output = flattenedOptions.Help(description)
+	if flattenedOptions, present := sco[subCommand]; present {
+		output = flattenedOptions.HelpCustomArg0(description, arg0)
 	}
 
 	if subCommand == "*" {

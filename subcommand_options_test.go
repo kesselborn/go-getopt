@@ -141,8 +141,8 @@ func TestSubCommandHelp(t *testing.T) {
 			{"name", "app's name", IsArg | Required, ""},
 			{"key", "environment variable's name", IsArg | Required, ""}},
 		"register": {
-			{"name|n", "app's name", IsArg | Required, ""},
-			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"}},
+			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", NoLongOpt | Optional | ExampleIsDefault, "lxc"},
+			{"name|n", "app's name", IsArg | Required, ""}},
 	}
 
 	os.Args = []string{"prog"}
@@ -161,6 +161,24 @@ Available commands:
 `
 
 	if got := sco.Help("this is not a program", "*"); got != expected {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
+	}
+
+	os.Args = []string{"prog", "register"}
+	expected = `Usage: prog register [-t <deploytype>] <name>
+
+this is not a program
+
+Options:
+    -t <deploytype>     deploy type (one of mount, bazapta, lxc) (default: lxc)
+    -h, --help          usage (-h) / detailed help text (--help)
+
+Arguments:
+    <name>              app's name
+
+`
+
+	if got := sco.Help("this is not a program", "register"); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
