@@ -55,6 +55,7 @@ func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[
 		var flattenedOptions Options
 		if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
 			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
+      arguments = arguments[1:]
 		}
 	}
 

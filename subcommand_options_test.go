@@ -122,16 +122,16 @@ func TestSubcommandOptionsParser(t *testing.T) {
 		t.Errorf("SubCommandOptions parsing: failed to correctly parse option: Expected:  foo, Got: " + options["foo"].String)
 	}
 
-	if arguments[0] != "getenv" {
-		t.Errorf("SubCommandOptions parsing: failed to correctly parse sub command: Expected: getenv, Got: " + arguments[0])
+	if scope != "getenv" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse sub command: Expected: getenv, Got: " + scope)
 	}
 
-	if arguments[1] != "foo" {
-		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg1: Expected: foo, Got: " + arguments[1])
+	if arguments[0] != "foo" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg1: Expected: foo, Got: " + arguments[0])
 	}
 
-	if arguments[2] != "bar" {
-		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg2: Expected: bar, Got: " + arguments[2])
+	if arguments[1] != "bar" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg2: Expected: bar, Got: " + arguments[1])
 	}
 }
 
