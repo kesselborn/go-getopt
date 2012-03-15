@@ -146,7 +146,7 @@ func TestSubCommandHelp(t *testing.T) {
 	}
 
 	os.Args = []string{"prog"}
-	expected := `Usage: prog [-f <foo>] <command>
+	expectedHelp := `Usage: prog [-f <foo>] <command>
 
 this is not a program
 
@@ -159,13 +159,20 @@ Available commands:
     register
 
 `
+	expectedUsage := `Usage: prog [-f <foo>] <command>
 
-	if got := sco.Help("this is not a program", "*"); got != expected {
-		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
+`
+
+	if got := sco.Help("this is not a program", "*"); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+	if got := sco.Usage("*"); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
 	os.Args = []string{"prog", "register"}
-	expected = `Usage: prog register [-t <deploytype>] <name>
+	expectedHelp = `Usage: prog register [-t <deploytype>] <name>
 
 this is not a program
 
@@ -178,8 +185,16 @@ Arguments:
 
 `
 
-	if got := sco.Help("this is not a program", "register"); got != expected {
-		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
+	expectedUsage = `Usage: prog register [-t <deploytype>] <name>
+
+`
+
+	if got := sco.Help("this is not a program", "register"); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+	if got := sco.Usage("register"); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
 }

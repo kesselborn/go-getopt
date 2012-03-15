@@ -61,6 +61,26 @@ func (sco SubCommandOptions) ParseCommandLine() (options map[string]OptionValue,
 	return
 }
 
+func (sco SubCommandOptions) Usage(scope string) (output string) {
+	return sco.UsageCustomArg0(scope, filepath.Base(os.Args[0]))
+}
+
+func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output string) {
+	subCommand, err := sco.findSubcommand()
+
+	if err != nil {
+		subCommand = "*"
+	} else {
+		arg0 = arg0 + " " + scope
+	}
+
+	if flattenedOptions, present := sco[subCommand]; present {
+		output = flattenedOptions.UsageCustomArg0(arg0)
+	}
+
+	return
+}
+
 func (sco SubCommandOptions) Help(description string, scope string) (output string) {
 	return sco.HelpCustomArg0(description, scope, filepath.Base(os.Args[0]))
 }
