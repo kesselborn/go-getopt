@@ -38,3 +38,16 @@ func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptErr
 
 	return
 }
+
+func (sco SubCommandOptions) ParseCommandLine() (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
+	var subCommand string
+
+	if subCommand, err = sco.findSubcommand(); err == nil {
+		var flattenedOptions Options
+		if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
+			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
+		}
+	}
+
+	return
+}

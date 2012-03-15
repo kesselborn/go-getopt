@@ -94,3 +94,38 @@ func TestSubcommandOptionsSubCommandFinder(t *testing.T) {
 		t.Errorf("did not throw error on unknown subcommand")
 	}
 }
+
+func TestSubcommandOptionsParser(t *testing.T) {
+	sco := SubCommandOptions{
+		"*": {
+			{"command", "command to execute", IsSubcommand, ""},
+			{"foo|f", "some arg", Optional, ""}},
+		"getenv": {
+			{"bar|b", "some arg", Optional, ""},
+			{"name", "app's name", IsArg | Required, ""},
+			{"key", "environment variable's name", IsArg | Required, ""}},
+	}
+
+	os.Args = []string{"prog", "-fbar", "getenv", "--bar=foo", "foo", "bar"}
+	options, arguments, _, _ := sco.ParseCommandLine()
+
+	if options["foo"].String != "bar" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse option: Expected: bar, Got: " + options["foo"].String)
+	}
+
+	if options["bar"].String != "foo" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse option: Expected:  foo, Got: " + options["foo"].String)
+	}
+
+	if arguments[0] != "getenv" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse sub command: Expected: getenv, Got: " + arguments[0])
+	}
+
+	if arguments[1] != "foo" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg1: Expected: foo, Got: " + arguments[1])
+	}
+
+	if arguments[2] != "bar" {
+		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg2: Expected: bar, Got: " + arguments[2])
+	}
+}
