@@ -149,7 +149,7 @@ func (options Options) ConfigOptionKey() (key string) {
 
 func (options Options) RequiredArguments() (requiredOptions Options) {
 	for _, cur := range options.definitions {
-		if cur.Flags&Required != 0 && cur.Flags&IsArg != 0 {
+		if (cur.Flags&Required != 0 && cur.Flags&IsArg != 0) || cur.Flags&IsSubcommand != 0 {
 			requiredOptions.definitions = append(requiredOptions.definitions, cur)
 		}
 	}

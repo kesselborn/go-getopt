@@ -135,6 +135,30 @@ func TestSubcommandOptionsParser(t *testing.T) {
 	}
 }
 
+func TestErrorMessageForMissingArgs(t *testing.T) {
+	sco := SubCommandOptions{
+		"*": {
+			{"foo|f", "some arg", Optional, ""},
+			{"command", "command to execute", IsSubcommand, ""}},
+		"getenv": {
+			{"bar|b", "some arg", Optional, ""},
+			{"name", "app's name", IsArg | Required, ""},
+			{"key", "environment variable's name", IsArg | Required, ""}},
+	}
+
+	os.Args = []string{"prog", "getenv"}
+	_, _, _, _, err := sco.ParseCommandLine()
+
+	if err == nil {
+		t.Errorf("missing arg did not raise error")
+	}
+
+	if expected := "Missing required argument <name>"; err.Message != expected {
+		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
+	}
+
+}
+
 func TestSubCommandHelp(t *testing.T) {
 	sco := SubCommandOptions{
 		"*": {
