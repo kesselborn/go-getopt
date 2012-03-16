@@ -11,12 +11,17 @@ import (
 	"sort"
 )
 
-type SubCommandOptions map[string]Options
+type SubCommands map[string]Options
+
+type SubCommandOptions struct {
+	Global      Options
+	SubCommands SubCommands
+}
 
 func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Options, err *GetOptError) {
-	genericOptions := sco["*"]
+	genericOptions := sco.Global
 
-	if subCommandOptions, present := sco[subCommand]; present == true {
+	if subCommandOptions, present := sco.SubCommands[subCommand]; present == true {
 
 		if subCommand != "*" {
 			for _, option := range genericOptions {
@@ -35,7 +40,7 @@ func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Option
 }
 
 func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptError) {
-	options := sco["*"]
+	options := sco.Global
 	subCommand = "*"
 
 	_, arguments, _, _ := options.ParseCommandLine()
@@ -68,15 +73,12 @@ func (sco SubCommandOptions) Usage(scope string) (output string) {
 
 func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output string) {
 	subCommand, err := sco.findSubcommand()
+	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
-	if err != nil {
-		subCommand = "*"
+	if err != nil || !foundSubCommand {
+		output = sco.Global.UsageCustomArg0(arg0)
 	} else {
-		arg0 = arg0 + " " + scope
-	}
-
-	if flattenedOptions, present := sco[subCommand]; present {
-		output = flattenedOptions.UsageCustomArg0(arg0)
+		output = flattenedOptions.UsageCustomArg0(arg0 + " " + scope)
 	}
 
 	return
@@ -88,33 +90,31 @@ func (sco SubCommandOptions) Help(description string, scope string) (output stri
 
 func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, arg0 string) (output string) {
 	subCommand, err := sco.findSubcommand()
+	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
-	if err != nil {
+	if err != nil || !foundSubCommand {
 		subCommand = "*"
+		flattenedOptions = sco.Global
 	} else {
 		arg0 = arg0 + " " + scope
 	}
 
-	if flattenedOptions, present := sco[subCommand]; present {
-		output = flattenedOptions.HelpCustomArg0(description, arg0)
-	}
+	output = flattenedOptions.HelpCustomArg0(description, arg0)
 
 	if subCommand == "*" {
 		output = output + "Available commands:\n"
 
-		keys := make([]string, len(sco))
+		keys := make([]string, len(sco.SubCommands))
 		i := 0
 
-		for k := range sco {
+		for k := range sco.SubCommands {
 			keys[i] = k
 			i = i + 1
 		}
 		sort.Strings(keys)
 
 		for _, key := range keys {
-			if key != "*" {
-				output = output + "    " + key + "\n"
-			}
+			output = output + "    " + key + "\n"
 		}
 		output = output + "\n"
 	}

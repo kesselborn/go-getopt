@@ -11,10 +11,10 @@ import (
 	"testing"
 )
 
-func equalOptionsArray(array1 Options, array2 Options) (equal bool) {
-	if len(array1) == len(array2) {
-		for i := 0; i < len(array1); i++ {
-			if array1[i] != array2[i] {
+func equalSubCommandOptions(sco1 SubCommandOptions, sco2 SubCommandOptions) (equal bool) {
+	if len(sco1) == len(sco2) {
+		for key := range sco1 {
+			if !equalOptionsArray(sco1[key], sco2[key]) {
 				goto loopend
 			}
 		}
@@ -25,47 +25,67 @@ loopend:
 	return
 }
 
-func TestSubcommandOptionsConverter(t *testing.T) {
-	sco := SubCommandOptions{
-		Options{{"command", "command to execute", IsSubcommand, ""}},
-		SubCommands{
+func TestSubSubcommandOptionsConverter(t *testing.T) {
+	ssco := SubSubCommandOptions{
+		"*": {
+			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+			{"server|s", "doozer server", Optional, ""},
+			{"scope", "scope", IsSubcommand, ""}},
+
+		"app": {
+			"*": {
+				{"command", "command to execute", IsSubcommand, ""},
+				{"foo|f", "a param", Optional, ""}},
 			"getenv": {
 				{"name", "app's name", IsArg | Required, ""},
-				{"key", "environment variable's name", IsArg | Required, ""},
-			},
-			"register": {
-				{"name|n", "app's name", IsArg | Required, ""},
-				{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"},
-			},
+				{"key", "environment variable's name", IsArg | Required, ""}},
+		},
+
+		"revision": {
+			"*": {
+				{"command", "command to execute", IsSubcommand, ""}},
+			"list": {
+				{"app|n", "app's name", IsArg | Required, ""}},
 		},
 	}
 
-	expectedGetenvOptions := Options{
-		{"command", "command to execute", IsSubcommand, ""},
-		{"name", "app's name", IsArg | Required, ""},
-		{"key", "environment variable's name", IsArg | Required, ""},
+	expectedAppSubOptions := SubCommandOptions{
+		"*": {
+			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+			{"server|s", "doozer server", Optional, ""},
+			{"scope", "scope", IsSubcommand, ""},
+			{"command", "command to execute", IsSubcommand, ""}},
+		"describe": {
+			{"name|n", "app's name", IsArg | Required, ""}},
+		"getenv": {
+			{"name", "app's name", IsArg | Required, ""},
+			{"key", "environment variable's name", IsArg | Required, ""}},
 	}
 
-	expectedRegisterOptions := Options{
-		{"command", "command to execute", IsSubcommand, ""},
-		{"name|n", "app's name", IsArg | Required, ""},
-		{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"},
+	expectedRevisionOptions := Options{
+		"*": {
+			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+			{"server|s", "doozer server", Optional, ""},
+			{"scope", "scope", IsSubcommand, ""},
+			{"command", "command to execute", IsSubcommand, ""}},
+		"list": {
+			{"app|n", "app's name", IsArg | Required, ""}},
 	}
 
-	if _, err := sco.flattenToOptions("getenv"); err != nil {
-		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot the following error: %s", err.Message)
+	if _, err := sco.flattenToSubcommandOptions("app"); err != nil {
+		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Message)
 	}
 
-	if options, _ := sco.flattenToOptions("getenv"); equalOptionsArray(options, expectedGetenvOptions) == false {
-		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedGetenvOptions)
+	if options, _ := sco.flattenToSubcommandOptions("app"); equalSubCommandOptions(options, expectedAppSubOptions) == false {
+		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (app); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedAppSubOptions)
 	}
 
-	if _, err := sco.flattenToOptions("register"); err != nil {
-		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot the following error: %s", err.Message)
+	if _, err := sco.flattenToSubcommandOptions("revision"); err != nil {
+		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Message)
 	}
 
-	if options, _ := sco.flattenToOptions("register"); equalOptionsArray(options, expectedRegisterOptions) == false {
-		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedGetenvOptions)
+	if options, _ := sco.flattenToSubcommandOptions("revision"); equalSubCommandOptions(options, expectedRevisionOptions) == false {
+		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (revision); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedRevisionOptions)
 	}
 
 	if _, err := sco.flattenToOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubcommand {
