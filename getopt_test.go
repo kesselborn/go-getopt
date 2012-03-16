@@ -13,9 +13,10 @@ import (
 
 func TestShortOptionsFlagsParsing(t *testing.T) {
 	options := Options{
-		{"debug|d", "debug mode", Flag, ""},
-		{"verbose|v", "verbose mode", Flag, ""},
-		{"dryrun|D", "dry run only", Flag, ""},
+		"",
+		Definitions{{"debug|d", "debug mode", Flag, ""},
+			{"verbose|v", "verbose mode", Flag, ""},
+			{"dryrun|D", "dry run only", Flag, ""}},
 	}
 
 	os.Args = []string{"prog", "-d"}
@@ -36,9 +37,7 @@ func TestShortOptionsFlagsParsing(t *testing.T) {
 }
 
 func TestShortOptionRequiredParsing(t *testing.T) {
-	options := Options{
-		{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""},
-	}
+	options := Options{"", Definitions{{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""}}}
 
 	os.Args = []string{"prog", "-m", "heartbeat"}
 	if opts, _, _, _ := options.ParseCommandLine(); opts["method"].String != "heartbeat" {
@@ -69,8 +68,9 @@ func TestShortOptionRequiredParsing(t *testing.T) {
 
 func TestRequiredArgument(t *testing.T) {
 	options := Options{
-		{"source", "original file name", Required | IsArg, ""},
-		{"destination", "destination file name", Required | IsArg, ""},
+		"",
+		Definitions{{"source", "original file name", Required | IsArg, ""},
+			{"destination", "destination file name", Required | IsArg, ""}},
 	}
 
 	os.Args = []string{"prog"}
@@ -100,11 +100,12 @@ func TestRequiredArgument(t *testing.T) {
 
 func TestConcatenatedOptionsParsingSimple(t *testing.T) {
 	options := Options{
-		{"debug|d", "debug mode", Flag, true},
-		{"verbose|v", "verbose mode", Flag, true},
-		{"dryrun|D", "dry run only", Flag, true},
-		{"logfile|l", "log file", Optional, ""},
-		{"mode|m", "operating mode", Required, ""},
+		"",
+		Definitions{{"debug|d", "debug mode", Flag, true},
+			{"verbose|v", "verbose mode", Flag, true},
+			{"dryrun|D", "dry run only", Flag, true},
+			{"logfile|l", "log file", Optional, ""},
+			{"mode|m", "operating mode", Required, ""}},
 	}
 
 	os.Args = []string{"prog", "-dv"}
@@ -136,11 +137,12 @@ func TestConcatenatedOptionsParsingSimple(t *testing.T) {
 
 func TestConcatenatedOptionsParsingWithStringValueOptionAtTheEnd(t *testing.T) {
 	options := Options{
-		{"debug|d", "debug mode", Flag, true},
-		{"verbose|v", "verbose mode", Flag, true},
-		{"dryrun|D", "dry run only", Flag, true},
-		{"logfile|l", "log file", Optional, ""},
-		{"mode|m", "operating mode", Required, ""},
+		"",
+		Definitions{{"debug|d", "debug mode", Flag, true},
+			{"verbose|v", "verbose mode", Flag, true},
+			{"dryrun|D", "dry run only", Flag, true},
+			{"logfile|l", "log file", Optional, ""},
+			{"mode|m", "operating mode", Required, ""}},
 	}
 
 	os.Args = []string{"prog", "-dvDl/tmp/log.txt"}
@@ -171,11 +173,12 @@ func TestConcatenatedOptionsParsingWithStringValueOptionAtTheEnd(t *testing.T) {
 
 func TestConcatenatedOptionsParsingWithIntValueOptionAtTheEnd(t *testing.T) {
 	options := Options{
-		{"debug|d", "debug mode", Flag, true},
-		{"verbose|v", "verbose mode", Flag, true},
-		{"dryrun|D", "dry run only", Flag, true},
-		{"port|p", "port", Optional, 3000},
-		{"instances|i", "instances", Required, 1},
+		"",
+		Definitions{{"debug|d", "debug mode", Flag, true},
+			{"verbose|v", "verbose mode", Flag, true},
+			{"dryrun|D", "dry run only", Flag, true},
+			{"port|p", "port", Optional, 3000},
+			{"instances|i", "instances", Required, 1}},
 	}
 
 	os.Args = []string{"prog", "-dvDp3000"}
@@ -213,11 +216,12 @@ func TestConcatenatedOptionsParsingWithIntValueOptionAtTheEnd(t *testing.T) {
 
 func TestConcatenatedOptionsParsingWithIntArrayValueOptionAtTheEnd(t *testing.T) {
 	options := Options{
-		{"debug|d", "debug mode", Flag, true},
-		{"verbose|v", "verbose mode", Flag, true},
-		{"dryrun|D", "dry run only", Flag, true},
-		{"ports|p", "ports", Optional, []int{3000, 3001, 3002}},
-		{"timeouts|t", "timeouts", Required, []int{1, 2, 4, 10, 30}},
+		"",
+		Definitions{{"debug|d", "debug mode", Flag, true},
+			{"verbose|v", "verbose mode", Flag, true},
+			{"dryrun|D", "dry run only", Flag, true},
+			{"ports|p", "ports", Optional, []int{3000, 3001, 3002}},
+			{"timeouts|t", "timeouts", Required, []int{1, 2, 4, 10, 30}}},
 	}
 
 	os.Args = []string{"prog", "-dvDp5000,5001,5002"}
@@ -248,12 +252,13 @@ func TestConcatenatedOptionsParsingWithIntArrayValueOptionAtTheEnd(t *testing.T)
 
 func TestEnvironmentValueParsing(t *testing.T) {
 	options := Options{
-		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Required, []int{3000, 3001, 3002}},
-		{"instances||INSTANCES", "instances", Optional, 4},
-		{"keys||KEYS", "keys", Optional, []string{"foo,bar,baz"}},
-		{"logfile||LOGFILE", "ports", Optional | ExampleIsDefault, "/var/log/foo.log"},
-		{"hostname|h|HOSTNAME", "hostname", Optional | ExampleIsDefault | NoLongOpt, "/var/log/foo.log"},
+		"",
+		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "ports", Required, []int{3000, 3001, 3002}},
+			{"instances||INSTANCES", "instances", Optional, 4},
+			{"keys||KEYS", "keys", Optional, []string{"foo,bar,baz"}},
+			{"logfile||LOGFILE", "ports", Optional | ExampleIsDefault, "/var/log/foo.log"},
+			{"hostname|h|HOSTNAME", "hostname", Optional | ExampleIsDefault | NoLongOpt, "/var/log/foo.log"}},
 	}
 
 	os.Args = []string{"prog"}
@@ -319,12 +324,13 @@ func TestEnvironmentValueParsing(t *testing.T) {
 
 func TestDefaultValueParsing(t *testing.T) {
 	options := Options{
-		{"debug|d|DEBUG", "debug mode", Optional | ExampleIsDefault, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
-		{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
-		{"instances||INSTANCES", "instances", Optional | ExampleIsDefault, 4},
-		{"keys||KEYS", "keys", Optional | ExampleIsDefault, []string{"foo", "bar", "baz"}},
-		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+		"",
+		Definitions{{"debug|d|DEBUG", "debug mode", Optional | ExampleIsDefault, true},
+			{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+			{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
+			{"instances||INSTANCES", "instances", Optional | ExampleIsDefault, 4},
+			{"keys||KEYS", "keys", Optional | ExampleIsDefault, []string{"foo", "bar", "baz"}},
+			{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"}},
 	}
 	os.Args = []string{"prog"}
 	os.Setenv("INSTANCES", "")
@@ -359,8 +365,9 @@ func TestDefaultValueParsing(t *testing.T) {
 
 func TestArgumentsParsing(t *testing.T) {
 	options := Options{
-		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		"",
+		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}}},
 	}
 
 	os.Args = []string{"prog", "-d", "foobar", "barbaz"}
@@ -418,9 +425,10 @@ func TestArgumentsParsing(t *testing.T) {
 
 func TestPassThroughParsing(t *testing.T) {
 	options := Options{
-		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
-		{"command args", "command args", Required | IsPassThrough, "command"},
+		"",
+		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+			{"command args", "command args", Required | IsPassThrough, "command"}},
 	}
 
 	os.Args = []string{"prog"}

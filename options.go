@@ -11,13 +11,19 @@ import (
 	"path/filepath"
 )
 
-type Options []Option
+type Definitions []Option
+type Description string
+
+type Options struct {
+	description Description
+	definitions Definitions
+}
 
 func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
 	overwritesMap := mapifyConfig(overwrites)
 	acceptedEnvVars := make(map[string]Option)
 
-	for _, opt := range optionsDefinition {
+	for _, opt := range optionsDefinition.definitions {
 		if value := opt.EnvVar(); value != "" {
 			acceptedEnvVars[value] = opt
 		}
@@ -39,7 +45,7 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 	consistencyErrorPrefix := "wrong getopt usage: "
 
 	foundOptionalArg := false
-	for _, option := range optionsDefinition {
+	for _, option := range optionsDefinition.definitions {
 		switch {
 		case option.Flags&IsArg > 0 && option.Flags&Required == 0 && option.Flags&Optional == 0:
 			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an argument must be explicitly set to be Optional or Required"}
@@ -64,7 +70,7 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 }
 
 func (options Options) FindOption(optionString string) (option Option, found bool) {
-	for _, cur := range options {
+	for _, cur := range options.definitions {
 		if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
 			option = cur
 			found = true
@@ -100,7 +106,7 @@ func (options Options) IsFlag(optionName string) (isFlag bool) {
 }
 
 func (options Options) ConfigOptionKey() (key string) {
-	for _, option := range options {
+	for _, option := range options.definitions {
 		if option.Flags&IsConfigFile > 0 {
 			key = option.Key()
 			break
@@ -111,9 +117,9 @@ func (options Options) ConfigOptionKey() (key string) {
 }
 
 func (options Options) RequiredArguments() (requiredOptions Options) {
-	for _, cur := range options {
+	for _, cur := range options.definitions {
 		if cur.Flags&Required != 0 && cur.Flags&IsArg != 0 {
-			requiredOptions = append(requiredOptions, cur)
+			requiredOptions.definitions = append(requiredOptions.definitions, cur)
 		}
 	}
 
@@ -121,7 +127,7 @@ func (options Options) RequiredArguments() (requiredOptions Options) {
 }
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
-	for _, cur := range options {
+	for _, cur := range options.definitions {
 		if cur.Flags&Required != 0 && cur.Flags&IsArg == 0 && cur.Flags&IsPassThrough == 0 {
 			requiredOptions = append(requiredOptions, cur.LongOpt())
 		}
@@ -135,7 +141,7 @@ func (options Options) Usage() (output string) {
 	output = "Usage: " + programName
 
 	passThroughSeparatorPrinted := false
-	for _, option := range options {
+	for _, option := range options.definitions {
 		if option.Flags&IsPassThrough > 0 && !passThroughSeparatorPrinted {
 			output = output + " --"
 			passThroughSeparatorPrinted = true
@@ -157,7 +163,7 @@ func (options Options) Help(description string) (output string) {
 
 	longOptTextLength := 0
 
-	for _, option := range options {
+	for _, option := range options.definitions {
 		if length := len(option.LongOptString()); length > longOptTextLength {
 			longOptTextLength = length
 		}
@@ -171,7 +177,7 @@ func (options Options) Help(description string) (output string) {
 
 	usageOpt, helpOpt := options.usageHelpOptionNames()
 
-	for _, option := range options {
+	for _, option := range options.definitions {
 		switch {
 		case option.Flags&IsPassThrough > 0:
 			passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
