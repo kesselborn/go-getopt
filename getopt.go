@@ -30,7 +30,7 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 	shortOpt = "h"
 	longOpt = "help"
 
-	for _, option := range optionsDefinition {
+	for _, option := range optionsDefinition.definitions {
 		if option.Flags&Usage > 0 {
 			shortOpt = option.ShortOpt()
 		}
@@ -70,7 +70,7 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 		options = make(map[string]OptionValue)
 		arguments = make([]string, 0)
 
-		for _, option := range optionsDefinition {
+		for _, option := range optionsDefinition.definitions {
 			switch {
 			case option.Flags&Flag != 0: // all flags are false by default
 				options[option.Key()], err = assignValue(false, "false")
@@ -180,8 +180,8 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 
 			requiredArguments := optionsDefinition.RequiredArguments()
 
-			if numOfRequiredArguments := len(requiredArguments); numOfRequiredArguments > len(arguments) {
-				firstMissingArgumentName := requiredArguments[len(arguments)].Key()
+			if numOfRequiredArguments := len(requiredArguments.definitions); numOfRequiredArguments > len(arguments) {
+				firstMissingArgumentName := requiredArguments.definitions[len(arguments)].Key()
 				err = &GetOptError{MissingArgument, "Missing required argument <" + firstMissingArgumentName + ">"}
 			}
 		}

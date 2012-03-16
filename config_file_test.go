@@ -28,8 +28,9 @@ func TestConfigParsing(t *testing.T) {
 
 func TestOptionCascade(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", Required | IsConfigFile, "/tmp/foo"},
+		"",
+		Definitions{{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+			{"config|c|CONFIG", "configuration file", Required | IsConfigFile, "/tmp/foo"}},
 	}
 
 	os.Args = []string{"prog"}
@@ -80,8 +81,9 @@ func TestOptionCascade(t *testing.T) {
 
 func TestDefaultConfigFileAndRequiredOption(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", Required, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		"",
+		Definitions{{"foo|f|FOO", "bogus var", Required, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"}},
 	}
 
 	os.Args = []string{"prog"}
@@ -93,8 +95,9 @@ func TestDefaultConfigFileAndRequiredOption(t *testing.T) {
 
 func TestDefaultConfigFile(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		"",
+		Definitions{{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"}},
 	}
 
 	os.Args = []string{"prog"}
@@ -106,8 +109,9 @@ func TestDefaultConfigFile(t *testing.T) {
 
 func TestDefaultConfigFileWithNoLongOpt(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault | NoLongOpt, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		"",
+		Definitions{{"foo|f|FOO", "bogus var", ExampleIsDefault | NoLongOpt, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"}},
 	}
 
 	os.Args = []string{"prog"}
@@ -119,8 +123,9 @@ func TestDefaultConfigFileWithNoLongOpt(t *testing.T) {
 
 func TestConfigFileNotFoundErrors(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "/i/dont/exist.conf"},
+		"",
+		Definitions{{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "/i/dont/exist.conf"}},
 	}
 
 	os.Args = []string{"prog"}
