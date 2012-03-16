@@ -9,18 +9,30 @@ import (
 	//"os"
 	//"path/filepath"
 	//"sort"
-	"fmt"
+	//"fmt"
 )
 
-type SubSubCommandOptions map[string]SubCommandOptions
+type Scopes map[string]SubCommandOptions
 
-func (ssco SubCommandOptions) flattenToSubcommandOptions(subCommand string) (sco SubCommandOptions, err *GetOptError) {
-	genericOptions := ssco["*"]
+type SubSubCommandOptions struct{
+  Global Option
+  Scopes Scopes
+}
 
-	if subCommandOptions, present := ssco[subCommand]; present == true {
+func (ssco SubSubCommandOptions) flattenToSubcommandOptions(subCommand string) (sco SubCommandOptions, err *GetOptError) {
+	genericOptions := ssco.Global
+
+	if subSubCommandOptions, present := ssco.Scopes[subCommand]; present == true {
+
 		if subCommand != "*" {
-			fmt.Printf("%#v", subCommandOptions)
-			//subCommandOptions["*"] = append(subCommandOptions["*"], ssco["*"]...)
+			for _, option := range genericOptions.Definitions {
+				options.Definitions = append(options.Definitions, option)
+			}
+		}
+
+		for _, option := range subCommandOptions.Definitions {
+			options.Definitions = append(options.Definitions, option)
+			options.Description = subCommandOptions.Description
 		}
 	} else {
 		err = &GetOptError{UnknownSubcommand, "Unknown command: " + subCommand}
@@ -28,7 +40,6 @@ func (ssco SubCommandOptions) flattenToSubcommandOptions(subCommand string) (sco
 
 	return
 }
-
 //func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptError) {
 //	options := sco["*"]
 //	subCommand = "*"
