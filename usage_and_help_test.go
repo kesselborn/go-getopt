@@ -6,9 +6,10 @@
 package getopt
 
 import (
-	"testing"
-	"strings"
 	"os"
+	"strings"
+	"syscall"
+	"testing"
 )
 
 func TestUsage(t *testing.T) {
@@ -136,13 +137,13 @@ func TestUsageAndHelpOption(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "-h", "-p5000,6000", "foobar"}
-	os.Envs = []string{}
+	syscall.Clearenv()
 	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsUsage {
 		t.Errorf("usage call did not return help error")
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "--help", "-p5000,6000", "foobar"}
-	os.Envs = []string{}
+	syscall.Clearenv()
 	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
 		t.Errorf("help call did not return help error")
 	}
@@ -155,13 +156,13 @@ func TestUsageAndHelpOptionInPassThrough(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "barbaz", "--", "-h"}
-	os.Envs = []string{}
+	syscall.Clearenv()
 	if _, _, _, err := options.ParseCommandLine(); err != nil {
 		t.Errorf("usage option in pass through triggered WantsUsage")
 	}
 
 	os.Args = []string{"prog", "barbaz", "--", "--help"}
-	os.Envs = []string{}
+	syscall.Clearenv()
 	if _, _, _, err := options.ParseCommandLine(); err != nil {
 		t.Errorf("help option in pass through triggered WantsUsage")
 	}
@@ -176,13 +177,13 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "-c", "-p5000,6000", "foobar"}
-	os.Envs = []string{}
+	syscall.Clearenv()
 	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsUsage {
 		t.Errorf("usage call did not return help error with custom '-c' for usage")
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}
-	os.Envs = []string{}
+	syscall.Clearenv()
 	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
 		t.Errorf("help call did not return help error with custom '--chelp' for usage")
 	}

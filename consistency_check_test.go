@@ -3,12 +3,11 @@
 // license that can be found in the LICENSE file.
 // Source code and contact info at http://github.com/kesselborn/go-getopt
 
-
 package getopt
 
 import (
-	"testing"
 	"os"
+	"testing"
 )
 
 func TestConsistencyChecking(t *testing.T) {

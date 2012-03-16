@@ -1,10 +1,5 @@
-include $(GOROOT)/src/Make.inc
+build:
+	go build
 
-TARG=getopt-sample-app
-GOFILES=\
-					example.go\
-
-default: all
-	cat README
-
-include $(GOROOT)/src/Make.cmd
+run:
+	go run example.go

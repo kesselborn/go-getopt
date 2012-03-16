@@ -6,7 +6,7 @@
 package getopt
 
 import (
-	"os"
+	"errors"
 	"reflect"
 	"strconv"
 	"strings"
@@ -23,7 +23,7 @@ type OptionValue struct {
 
 func assign(value interface{}) (returnValue OptionValue, err *GetOptError) {
 	valType := reflect.TypeOf(value).String()
-	var e os.Error
+	var e error
 
 	// mmm ...there should be an easier way
 	switch valType {
@@ -47,13 +47,13 @@ func assign(value interface{}) (returnValue OptionValue, err *GetOptError) {
 	case "[]int64":
 		returnValue.IntArray = value.([]int64)
 	default:
-		e = os.NewError("Couldn't assign value of type '" + valType + "'")
+		e = errors.New("Couldn't assign value of type '" + valType + "'")
 	}
 
 	if e == nil {
 		returnValue.Set = true
 	} else {
-		err = &GetOptError{OptionValueError, "Conversion Error: " + e.String()}
+		err = &GetOptError{OptionValueError, "Conversion Error: " + e.Error()}
 	}
 
 	return
@@ -62,17 +62,17 @@ func assign(value interface{}) (returnValue OptionValue, err *GetOptError) {
 
 func assignValue(referenceValue interface{}, value string) (returnValue OptionValue, err *GetOptError) {
 	valType := reflect.TypeOf(referenceValue).String()
-	var e os.Error
+	var e error
 
 	switch valType {
 	case "string":
 		returnValue.String = value
 	case "bool":
-		returnValue.Bool, e = strconv.Atob(value)
+		returnValue.Bool, e = strconv.ParseBool(value)
 	case "int":
 		fallthrough
 	case "int64":
-		returnValue.Int, e = strconv.Atoi64(value)
+		returnValue.Int, e = strconv.ParseInt(value, 10, 64)
 	case "[]string":
 		returnValue.StrArray = strings.Split(value, ",")
 	case "[]int":
@@ -81,16 +81,16 @@ func assignValue(referenceValue interface{}, value string) (returnValue OptionVa
 		stringArray := strings.Split(value, ",")
 		returnValue.IntArray = make([]int64, len(stringArray))
 		for i, value := range stringArray {
-			returnValue.IntArray[i], e = strconv.Atoi64(value)
+			returnValue.IntArray[i], e = strconv.ParseInt(value, 10, 64)
 		}
 	default:
-		e = os.NewError("Couldn't convert '" + value + "' to type '" + valType + "'")
+		e = errors.New("Couldn't convert '" + value + "' to type '" + valType + "'")
 	}
 
 	if e == nil {
 		returnValue.Set = true
 	} else {
-		err = &GetOptError{OptionValueError, "Conversion Error: " + e.String()}
+		err = &GetOptError{OptionValueError, "Conversion Error: " + e.Error()}
 	}
 
 	return

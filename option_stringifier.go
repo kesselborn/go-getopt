@@ -6,8 +6,8 @@
 package getopt
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 func valueIze(originalValue string) (value string) {

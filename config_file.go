@@ -1,11 +1,11 @@
 package getopt
 
 import (
-	"io/ioutil"
-	"strings"
 	"fmt"
-	"regexp"
+	"io/ioutil"
 	"os"
+	"regexp"
+	"strings"
 )
 
 func mapifyConfig(environment []string) (envArray map[string]string) {
@@ -28,7 +28,7 @@ func readConfigFile(path string) (configEntries []string, err *GetOptError) {
 	contentStringified := fmt.Sprintf("%s", content)
 
 	if ioErr != nil {
-		err = &GetOptError{ConfigFileNotFound, ioErr.String()}
+		err = &GetOptError{ConfigFileNotFound, ioErr.Error()}
 	} else {
 		for _, line := range strings.Split(contentStringified, "\n") {
 			if validConfigEntry.MatchString(line) {
