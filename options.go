@@ -15,14 +15,14 @@ type Definitions []Option
 type Description string
 
 type Options struct {
-	description Description
-	definitions Definitions
+	Description Description
+	Definitions Definitions
 }
 
 func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, environment map[string]string) (err *GetOptError) {
 	significantEnvVars := make(map[string]Option)
 
-	for _, opt := range optionsDefinition.definitions {
+	for _, opt := range optionsDefinition.Definitions {
 		if value := opt.EnvVar(); value != "" {
 			significantEnvVars[value] = opt
 		}
@@ -42,11 +42,11 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 
 func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
 	foundOptionalArg := false
-	shortOpts := make(map[string]bool, len(optionsDefinition.definitions))
-	longOpts := make(map[string]bool, len(optionsDefinition.definitions))
-	envVars := make(map[string]bool, len(optionsDefinition.definitions))
+	shortOpts := make(map[string]bool, len(optionsDefinition.Definitions))
+	longOpts := make(map[string]bool, len(optionsDefinition.Definitions))
+	envVars := make(map[string]bool, len(optionsDefinition.Definitions))
 
-	for _, option := range optionsDefinition.definitions {
+	for _, option := range optionsDefinition.Definitions {
 		optionString := fmt.Sprintf("%#v", option)
 		consistencyErrorPrefix := optionString + " wrong getopt usage: "
 
@@ -101,7 +101,7 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 }
 
 func (options Options) FindOption(optionString string) (option Option, found bool) {
-	for _, cur := range options.definitions {
+	for _, cur := range options.Definitions {
 		if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
 			option = cur
 			found = true
@@ -137,7 +137,7 @@ func (options Options) IsFlag(optionName string) (isFlag bool) {
 }
 
 func (options Options) ConfigOptionKey() (key string) {
-	for _, option := range options.definitions {
+	for _, option := range options.Definitions {
 		if option.Flags&IsConfigFile > 0 {
 			key = option.Key()
 			break
@@ -148,9 +148,9 @@ func (options Options) ConfigOptionKey() (key string) {
 }
 
 func (options Options) RequiredArguments() (requiredOptions Options) {
-	for _, cur := range options.definitions {
+	for _, cur := range options.Definitions {
 		if (cur.Flags&Required != 0 && cur.Flags&IsArg != 0) || cur.Flags&IsSubcommand != 0 {
-			requiredOptions.definitions = append(requiredOptions.definitions, cur)
+			requiredOptions.Definitions = append(requiredOptions.Definitions, cur)
 		}
 	}
 
@@ -158,7 +158,7 @@ func (options Options) RequiredArguments() (requiredOptions Options) {
 }
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
-	for _, cur := range options.definitions {
+	for _, cur := range options.Definitions {
 		if cur.Flags&Required != 0 && cur.Flags&IsArg == 0 && cur.Flags&IsPassThrough == 0 {
 			requiredOptions = append(requiredOptions, cur.LongOpt())
 		}
@@ -171,7 +171,7 @@ func (options Options) commandDefinition(arg0 string) (output string) {
 	output = arg0
 
 	passThroughSeparatorPrinted := false
-	for _, option := range options.definitions {
+	for _, option := range options.Definitions {
 		if option.Flags&IsPassThrough > 0 && !passThroughSeparatorPrinted {
 			output = output + " --"
 			passThroughSeparatorPrinted = true
@@ -196,7 +196,7 @@ func (options Options) Help() (output string) {
 }
 
 func (options Options) calculateLongOptTextLenght() (length int) {
-	for _, option := range options.definitions {
+	for _, option := range options.Definitions {
 		if curLength := len(option.LongOptString()); curLength > length {
 			length = curLength
 		}
@@ -209,8 +209,8 @@ func (options Options) calculateLongOptTextLenght() (length int) {
 
 func (options Options) HelpCustomArg0(arg0 string) (output string) {
 	output = options.UsageCustomArg0(arg0)
-	if options.description != "" {
-		output = output + string(options.description) + "\n\n"
+	if options.Description != "" {
+		output = output + string(options.Description) + "\n\n"
 	}
 
 	longOptTextLength := options.calculateLongOptTextLenght()
@@ -221,7 +221,7 @@ func (options Options) HelpCustomArg0(arg0 string) (output string) {
 
 	usageOpt, helpOpt := options.usageHelpOptionNames()
 
-	for _, option := range options.definitions {
+	for _, option := range options.Definitions {
 		switch {
 		case option.Flags&IsSubcommand > 0:
 			continue

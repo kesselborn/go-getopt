@@ -12,9 +12,9 @@ import (
 )
 
 func equalOptions(options1 Options, options2 Options) (equal bool) {
-	if len(options1.definitions) == len(options2.definitions) && options1.description == options2.description {
-		for i := 0; i < len(options1.definitions); i++ {
-			if options1.definitions[i] != options2.definitions[i] {
+	if len(options1.Definitions) == len(options2.Definitions) && options1.Description == options2.Description {
+		for i := 0; i < len(options1.Definitions); i++ {
+			if options1.Definitions[i] != options2.Definitions[i] {
 				goto loopend
 			}
 		}
