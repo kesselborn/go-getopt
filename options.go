@@ -155,10 +155,10 @@ func (options Options) Usage() (output string) {
 	return
 }
 
-func (options Options) Help(description string) (output string) {
+func (options Options) Help() (output string) {
 	output = options.Usage()
-	if description != "" {
-		output = output + description + "\n\n"
+	if options.description != "" {
+		output = output + string(options.description) + "\n\n"
 	}
 
 	longOptTextLength := 0

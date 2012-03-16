@@ -39,7 +39,7 @@ func TestUsage(t *testing.T) {
 
 func TestHelp(t *testing.T) {
 	options := Options{
-		"",
+		"this is not a program",
 		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"files", "Files that should be read in", IsArg, nil},
@@ -73,7 +73,7 @@ Pass through arguments:
 
 `
 
-	if got := options.Help("this is not a program"); got != expected {
+	if got := options.Help(); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
@@ -81,7 +81,7 @@ Pass through arguments:
 
 func TestHelpNoOptions(t *testing.T) {
 	options := Options{
-		"",
+		"this is not a program",
 		Definitions{{"files", "Files that should be read in", IsArg, nil},
 			{"directories", "Directories", IsArg | Optional, nil}},
 	}
@@ -96,7 +96,7 @@ Arguments:
 
 `
 
-	if got := options.Help("this is not a program"); got != expected {
+	if got := options.Help(); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
@@ -104,7 +104,7 @@ Arguments:
 
 func TestHelpNoArgs(t *testing.T) {
 	options := Options{
-		"",
+		"this is not a program",
 		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
@@ -128,7 +128,7 @@ Options:
 
 `
 
-	if got := options.Help("this is not a program"); got != expected {
+	if got := options.Help(); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 
