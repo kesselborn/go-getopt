@@ -195,21 +195,25 @@ func (options Options) Help() (output string) {
 	return options.HelpCustomArg0(filepath.Base(os.Args[0]))
 }
 
+func (options Options) calculateLongOptTextLenght() (length int) {
+	for _, option := range options.definitions {
+		if curLength := len(option.LongOptString()); curLength > length {
+			length = curLength
+		}
+	}
+
+	length = length + 2
+
+	return
+}
+
 func (options Options) HelpCustomArg0(arg0 string) (output string) {
 	output = options.UsageCustomArg0(arg0)
 	if options.description != "" {
 		output = output + string(options.description) + "\n\n"
 	}
 
-	longOptTextLength := 0
-
-	for _, option := range options.definitions {
-		if length := len(option.LongOptString()); length > longOptTextLength {
-			longOptTextLength = length
-		}
-	}
-
-	longOptTextLength = longOptTextLength + 2
+	longOptTextLength := options.calculateLongOptTextLenght()
 
 	var argumentsString string
 	var optionsString string

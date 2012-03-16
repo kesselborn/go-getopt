@@ -6,6 +6,7 @@
 package getopt
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
@@ -85,11 +86,11 @@ func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output 
 	return
 }
 
-func (sco SubCommandOptions) Help(description string, scope string) (output string) {
-	return sco.HelpCustomArg0(description, scope, filepath.Base(os.Args[0]))
+func (sco SubCommandOptions) Help(scope string) (output string) {
+	return sco.HelpCustomArg0(scope, filepath.Base(os.Args[0]))
 }
 
-func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, arg0 string) (output string) {
+func (sco SubCommandOptions) HelpCustomArg0(scope string, arg0 string) (output string) {
 	subCommand, err := sco.findSubcommand()
 	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
@@ -103,6 +104,9 @@ func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, ar
 	output = flattenedOptions.HelpCustomArg0(arg0)
 
 	if subCommand == "*" {
+		// TODO: centralize format strings
+		fmtStr := fmt.Sprintf("    %%-%ds       %%s\n", flattenedOptions.calculateLongOptTextLenght())
+
 		output = output + "Available commands:\n"
 
 		keys := make([]string, len(sco.SubCommands))
@@ -115,7 +119,7 @@ func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, ar
 		sort.Strings(keys)
 
 		for _, key := range keys {
-			output = output + "    " + key + "\n"
+			output = output + fmt.Sprintf(fmtStr, key, sco.SubCommands[key].description)
 		}
 		output = output + "\n"
 	}
