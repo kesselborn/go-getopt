@@ -40,16 +40,17 @@ func TestUsage(t *testing.T) {
 
 func TestUsageWithDifferentProgname(t *testing.T) {
 	options := Options{
-		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
-		{"files", "files that should be read in", IsArg, nil},
-		{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
-		{"instances||INSTANCES", "Instances", Required, 4},
-		{"lock||LOCK", "create lock file", Flag, false},
-		{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
-		{"directories", "directories", IsArg | Optional, nil},
-		{"command", "command", IsPassThrough | Required, nil},
-		{"args", "command's args", IsPassThrough | Optional, nil},
+		"",
+		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+			{"files", "files that should be read in", IsArg, nil},
+			{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
+			{"instances||INSTANCES", "Instances", Required, 4},
+			{"lock||LOCK", "create lock file", Flag, false},
+			{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+			{"directories", "directories", IsArg | Optional, nil},
+			{"command", "command", IsPassThrough | Required, nil},
+			{"args", "command's args", IsPassThrough | Optional, nil}},
 	}
 
 	os.Args = []string{"prog"}
@@ -65,15 +66,16 @@ func TestUsageWithDifferentProgname(t *testing.T) {
 
 func TestHelpWithDifferentProgname(t *testing.T) {
 	options := Options{
-		{"debug|d|DEBUG", "debug mode", Flag, true},
-		{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
-		{"files", "Files that should be read in", IsArg, nil},
-		{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
-		{"instances", "Instances", Required, 4},
-		{"lock||LOCK", "create lock file", Flag, false},
-		{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
-		{"directories", "Directories", IsArg | Optional, nil},
-		{"pass through args", "arguments for subcommand", IsPassThrough, nil},
+		"this is not a program",
+		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+			{"files", "Files that should be read in", IsArg, nil},
+			{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
+			{"instances", "Instances", Required, 4},
+			{"lock||LOCK", "create lock file", Flag, false},
+			{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+			{"directories", "Directories", IsArg | Optional, nil},
+			{"pass through args", "arguments for subcommand", IsPassThrough, nil}},
 	}
 
 	os.Args = []string{"prog"}
@@ -99,7 +101,7 @@ Pass through arguments:
 
 `
 
-	if got := options.HelpCustomArg0("this is not a program", "otherprogname"); got != expected {
+	if got := options.HelpCustomArg0("otherprogname"); got != expected {
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expected, " ", "_", -1) + "|\n")
 	}
 

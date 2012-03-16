@@ -24,13 +24,14 @@ func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Option
 	if subCommandOptions, present := sco.SubCommands[subCommand]; present == true {
 
 		if subCommand != "*" {
-			for _, option := range genericOptions {
-				options = append(options, option)
+			for _, option := range genericOptions.definitions {
+				options.definitions = append(options.definitions, option)
 			}
 		}
 
-		for _, option := range subCommandOptions {
-			options = append(options, option)
+		for _, option := range subCommandOptions.definitions {
+			options.definitions = append(options.definitions, option)
+			options.description = subCommandOptions.description
 		}
 	} else {
 		err = &GetOptError{UnknownSubcommand, "Unknown command: " + subCommand}
@@ -99,7 +100,7 @@ func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, ar
 		arg0 = arg0 + " " + scope
 	}
 
-	output = flattenedOptions.HelpCustomArg0(description, arg0)
+	output = flattenedOptions.HelpCustomArg0(arg0)
 
 	if subCommand == "*" {
 		output = output + "Available commands:\n"

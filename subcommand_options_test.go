@@ -11,10 +11,10 @@ import (
 	"testing"
 )
 
-func equalOptionsArray(array1 Options, array2 Options) (equal bool) {
-	if len(array1) == len(array2) {
-		for i := 0; i < len(array1); i++ {
-			if array1[i] != array2[i] {
+func equalOptions(options1 Options, options2 Options) (equal bool) {
+	if len(options1.definitions) == len(options2.definitions) && options1.description == options2.description {
+		for i := 0; i < len(options1.definitions); i++ {
+			if options1.definitions[i] != options2.definitions[i] {
 				goto loopend
 			}
 		}
@@ -27,36 +27,40 @@ loopend:
 
 func TestSubcommandOptionsConverter(t *testing.T) {
 	sco := SubCommandOptions{
-		Options{{"command", "command to execute", IsSubcommand, ""}},
+		Options{"global description", Definitions{{"command", "command to execute", IsSubcommand, ""}}},
 		SubCommands{
 			"getenv": {
-				{"name", "app's name", IsArg | Required, ""},
-				{"key", "environment variable's name", IsArg | Required, ""},
+				"getenv description",
+				Definitions{{"name", "app's name", IsArg | Required, ""},
+					{"key", "environment variable's name", IsArg | Required, ""}},
 			},
 			"register": {
-				{"name|n", "app's name", IsArg | Required, ""},
-				{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"},
+				"register description",
+				Definitions{{"name|n", "app's name", IsArg | Required, ""},
+					{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"}},
 			},
 		},
 	}
 
 	expectedGetenvOptions := Options{
-		{"command", "command to execute", IsSubcommand, ""},
-		{"name", "app's name", IsArg | Required, ""},
-		{"key", "environment variable's name", IsArg | Required, ""},
+		"getenv description",
+		Definitions{{"command", "command to execute", IsSubcommand, ""},
+			{"name", "app's name", IsArg | Required, ""},
+			{"key", "environment variable's name", IsArg | Required, ""}},
 	}
 
 	expectedRegisterOptions := Options{
-		{"command", "command to execute", IsSubcommand, ""},
-		{"name|n", "app's name", IsArg | Required, ""},
-		{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"},
+		"register description",
+		Definitions{{"command", "command to execute", IsSubcommand, ""},
+			{"name|n", "app's name", IsArg | Required, ""},
+			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"}},
 	}
 
 	if _, err := sco.flattenToOptions("getenv"); err != nil {
 		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot the following error: %s", err.Message)
 	}
 
-	if options, _ := sco.flattenToOptions("getenv"); equalOptionsArray(options, expectedGetenvOptions) == false {
+	if options, _ := sco.flattenToOptions("getenv"); equalOptions(options, expectedGetenvOptions) == false {
 		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedGetenvOptions)
 	}
 
@@ -64,7 +68,7 @@ func TestSubcommandOptionsConverter(t *testing.T) {
 		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot the following error: %s", err.Message)
 	}
 
-	if options, _ := sco.flattenToOptions("register"); equalOptionsArray(options, expectedRegisterOptions) == false {
+	if options, _ := sco.flattenToOptions("register"); equalOptions(options, expectedRegisterOptions) == false {
 		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedGetenvOptions)
 	}
 

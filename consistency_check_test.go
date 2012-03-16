@@ -42,15 +42,15 @@ func TestConsistencyChecking(t *testing.T) {
 		t.Errorf("required arg followed by an optional arg did raise error: %#v", err)
 	}
 
-	if _, _, _, err := (Options{{"a", "...", Flag, ""}, {"a", "...", Flag, ""}}).ParseCommandLine(); err == nil || err.ErrorCode != ConsistencyError {
+	if _, _, _, err := (Options{"", Definitions{{"a", "...", Flag, ""}, {"a", "...", Flag, ""}}}).ParseCommandLine(); err == nil || err.ErrorCode != ConsistencyError {
 		t.Errorf("double usage of short opt not detected")
 	}
 
-	if _, _, _, err := (Options{{"a|arg1", "...", Flag, ""}, {"b|arg1", "...", Flag, ""}}).ParseCommandLine(); err == nil || err.ErrorCode != ConsistencyError {
+	if _, _, _, err := (Options{"", Definitions{{"a|arg1", "...", Flag, ""}, {"b|arg1", "...", Flag, ""}}}).ParseCommandLine(); err == nil || err.ErrorCode != ConsistencyError {
 		t.Errorf("double usage of long opt not detected")
 	}
 
-	if _, _, _, err := (Options{{"a|arg1|FOO", "...", Flag, ""}, {"b|arg2|FOO", "...", Flag, ""}}).ParseCommandLine(); err == nil || err.ErrorCode != ConsistencyError {
+	if _, _, _, err := (Options{"", Definitions{{"a|arg1|FOO", "...", Flag, ""}, {"b|arg2|FOO", "...", Flag, ""}}}).ParseCommandLine(); err == nil || err.ErrorCode != ConsistencyError {
 		t.Errorf("double usage of env var not detected")
 	}
 }

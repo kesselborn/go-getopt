@@ -42,9 +42,9 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 
 func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
 	foundOptionalArg := false
-	shortOpts := make(map[string]bool, len(optionsDefinition))
-	longOpts := make(map[string]bool, len(optionsDefinition))
-	envVars := make(map[string]bool, len(optionsDefinition))
+	shortOpts := make(map[string]bool, len(optionsDefinition.definitions))
+	longOpts := make(map[string]bool, len(optionsDefinition.definitions))
+	envVars := make(map[string]bool, len(optionsDefinition.definitions))
 
 	for _, option := range optionsDefinition.definitions {
 		optionString := fmt.Sprintf("%#v", option)
@@ -191,11 +191,11 @@ func (options Options) Usage() (output string) {
 	return options.UsageCustomArg0(filepath.Base(os.Args[0]))
 }
 
-func (options Options) Help(description string) (output string) {
-	return options.HelpCustomArg0(description, filepath.Base(os.Args[0]))
+func (options Options) Help() (output string) {
+	return options.HelpCustomArg0(filepath.Base(os.Args[0]))
 }
 
-func (options Options) HelpCustomArg0(description string, arg0 string) (output string) {
+func (options Options) HelpCustomArg0(arg0 string) (output string) {
 	output = options.UsageCustomArg0(arg0)
 	if options.description != "" {
 		output = output + string(options.description) + "\n\n"
