@@ -53,16 +53,20 @@ func TestSubcommandOptionsConverter(t *testing.T) {
 
 	expectedGetenvOptions := Options{
 		"getenv description",
-		Definitions{{"command", "command to execute", IsSubcommand, ""},
+		Definitions{
+			{"command", "command to execute", IsSubcommand, ""},
 			{"name", "app's name", IsArg | Required, ""},
-			{"key", "environment variable's name", IsArg | Required, ""}},
+			{"key", "environment variable's name", IsArg | Required, ""},
+		},
 	}
 
 	expectedRegisterOptions := Options{
 		"register description",
-		Definitions{{"command", "command to execute", IsSubcommand, ""},
+		Definitions{
+			{"command", "command to execute", IsSubcommand, ""},
 			{"name|n", "app's name", IsArg | Required, ""},
-			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"}},
+			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"},
+		},
 	}
 
 	if _, err := sco.flattenToOptions("getenv"); err != nil {

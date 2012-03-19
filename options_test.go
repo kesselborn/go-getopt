@@ -10,9 +10,11 @@ import "testing"
 func TestIsOptionalOption(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"verbose", "show verbose output", Optional, ""},
+		Definitions{
+			{"verbose", "show verbose output", Optional, ""},
 			{"logfile|l", "log to file <logfile>", Optional | NoLongOpt, ""},
-			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""}},
+			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+		},
 	}
 
 	if options.IsOptional("verbose") != true {
@@ -37,9 +39,11 @@ func TestIsOptionalOption(t *testing.T) {
 func TestIsRequiredOption(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"verbose", "show verbose output", Required, ""},
+		Definitions{
+			{"verbose", "show verbose output", Required, ""},
 			{"logfile|l", "log to file <logfile>", Required | NoLongOpt, ""},
-			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""}},
+			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+		},
 	}
 
 	if options.IsRequired("verbose") != true {
@@ -64,9 +68,11 @@ func TestIsRequiredOption(t *testing.T) {
 func TestIsFlagOption(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"verbose", "show verbose output", Flag, ""},
+		Definitions{
+			{"verbose", "show verbose output", Flag, ""},
 			{"logfile|l", "log to file <logfile>", Flag | Optional | NoLongOpt, ""},
-			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""}},
+			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""},
+		},
 	}
 
 	if options.IsFlag("verbose") != true {

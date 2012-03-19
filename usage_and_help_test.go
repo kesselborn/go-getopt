@@ -15,7 +15,8 @@ import (
 func TestUsage(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"files", "files that should be read in", IsArg, nil},
 			{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
@@ -24,7 +25,8 @@ func TestUsage(t *testing.T) {
 			{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 			{"directories", "directories", IsArg | Optional, nil},
 			{"command", "command", IsPassThrough | Required, nil},
-			{"args", "command's args", IsPassThrough | Optional, nil}},
+			{"args", "command's args", IsPassThrough | Optional, nil},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -41,7 +43,8 @@ func TestUsage(t *testing.T) {
 func TestUsageWithDifferentProgname(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"files", "files that should be read in", IsArg, nil},
 			{"secondaryports|s|SECONDARY_PORTS", "secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
@@ -50,7 +53,8 @@ func TestUsageWithDifferentProgname(t *testing.T) {
 			{"logfile||LOGFILE", "logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 			{"directories", "directories", IsArg | Optional, nil},
 			{"command", "command", IsPassThrough | Required, nil},
-			{"args", "command's args", IsPassThrough | Optional, nil}},
+			{"args", "command's args", IsPassThrough | Optional, nil},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -67,7 +71,8 @@ func TestUsageWithDifferentProgname(t *testing.T) {
 func TestHelpWithDifferentProgname(t *testing.T) {
 	options := Options{
 		"this is not a program",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"files", "Files that should be read in", IsArg, nil},
 			{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
@@ -75,7 +80,8 @@ func TestHelpWithDifferentProgname(t *testing.T) {
 			{"lock||LOCK", "create lock file", Flag, false},
 			{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 			{"directories", "Directories", IsArg | Optional, nil},
-			{"pass through args", "arguments for subcommand", IsPassThrough, nil}},
+			{"pass through args", "arguments for subcommand", IsPassThrough, nil},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -110,7 +116,8 @@ Pass through arguments:
 func TestHelp(t *testing.T) {
 	options := Options{
 		"this is not a program",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"files", "Files that should be read in", IsArg, nil},
 			{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
@@ -118,7 +125,8 @@ func TestHelp(t *testing.T) {
 			{"lock||LOCK", "create lock file", Flag, false},
 			{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
 			{"directories", "Directories", IsArg | Optional, nil},
-			{"pass through args", "arguments for subcommand", IsPassThrough, nil}},
+			{"pass through args", "arguments for subcommand", IsPassThrough, nil},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -153,8 +161,10 @@ Pass through arguments:
 func TestHelpNoOptions(t *testing.T) {
 	options := Options{
 		"this is not a program",
-		Definitions{{"files", "Files that should be read in", IsArg, nil},
-			{"directories", "Directories", IsArg | Optional, nil}},
+		Definitions{
+			{"files", "Files that should be read in", IsArg, nil},
+			{"directories", "Directories", IsArg | Optional, nil},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -177,12 +187,14 @@ Arguments:
 func TestHelpNoArgs(t *testing.T) {
 	options := Options{
 		"this is not a program",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
 			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
 			{"secondaryports|s", "Secondary ports", Optional | ExampleIsDefault, []int{5000, 5001, 5002}},
 			{"instances", "Instances", Required, 4},
 			{"lock||LOCK", "create lock file", Flag, false},
-			{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"}},
+			{"logfile||LOGFILE", "Logfile", Optional | ExampleIsDefault, "/var/log/foo.log"},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -210,8 +222,10 @@ Options:
 func TestUsageAndHelpOption(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
-			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}}},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		},
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "-h", "-p5000,6000", "foobar"}
@@ -230,8 +244,10 @@ func TestUsageAndHelpOption(t *testing.T) {
 func TestUsageAndHelpOptionInPassThrough(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"debug|d|DEBUG", "debug mode", Flag, true},
-			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}}},
+		Definitions{
+			{"debug|d|DEBUG", "debug mode", Flag, true},
+			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		},
 	}
 
 	os.Args = []string{"prog", "barbaz", "--", "-h"}
@@ -251,9 +267,11 @@ func TestUsageAndHelpOptionInPassThrough(t *testing.T) {
 func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 	options := Options{
 		"",
-		Definitions{{"chelp|c", "show usage / help", Usage | Help, nil},
+		Definitions{
+			{"chelp|c", "show usage / help", Usage | Help, nil},
 			{"debug|d|DEBUG", "debug mode", Flag, true},
-			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}}},
+			{"ports|p|PORTS", "Ports", Optional | ExampleIsDefault, []int64{3000, 3001, 3002}},
+		},
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "-c", "-p5000,6000", "foobar"}
