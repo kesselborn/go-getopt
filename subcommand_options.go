@@ -57,13 +57,19 @@ func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptErr
 }
 
 func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-
 	if subCommand, err = sco.findSubcommand(); err == nil {
-		var flattenedOptions Options
-		if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
-			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
-			arguments = arguments[1:]
-		}
+		options, arguments, passThrough, err = sco.parseCommandLineImpl(subCommand, os.Args[1:], mapifyEnvironment(os.Environ()), 0)
+	}
+
+	return
+}
+
+func (sco SubCommandOptions) parseCommandLineImpl(subCommand string, args []string, environment map[string]string, flags int) (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
+
+	var flattenedOptions Options
+	if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
+		options, arguments, passThrough, err = flattenedOptions.parseCommandLineImpl(args, environment, flags)
+		arguments = arguments[1:]
 	}
 
 	return

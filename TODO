@@ -14,6 +14,7 @@ Subcommands:
 
   * create new type `SubSubCommandOptions`
   * ...
+  * check: subcommand: command has to be first options
 
   * convert new types to Options
 

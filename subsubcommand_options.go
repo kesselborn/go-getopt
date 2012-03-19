@@ -25,7 +25,7 @@ func (ssco SubSubCommandOptions) flattenToSubcommandOptions(scope string) (sco S
 	var present bool
 
 	if sco, present = ssco.Scopes[scope]; present == true {
-		//print("\n======= " + scope + "========\n"); print(strings.Replace(fmt.Sprintf("%#v", scope.SubCommands),  "getopt", "\n", -1)); print("\n================")
+		//print("\n======= " + scope + "========\n"); print(strings.Replace(fmt.Sprintf("%#v", sco.SubCommands),  "getopt", "\n", -1)); print("\n================")
 		sco.Global.Definitions = append(globalCommand.Definitions, sco.Global.Definitions...)
 	} else {
 		err = &GetOptError{UnknownSubcommand, "Unknown scope: " + scope}
@@ -42,21 +42,38 @@ func (ssco SubSubCommandOptions) flattenToOptions(scope string, subCommand strin
 	return
 }
 
-//func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptError) {
-//	options := sco["*"]
-//	subCommand = "*"
-//
-//	_, arguments, _, _ := options.ParseCommandLine()
-//
-//	if len(arguments) < 1 {
-//		err = &GetOptError{NoSubcommand, "Couldn't find sub command"}
-//	} else {
-//		subCommand = arguments[0]
-//	}
-//
-//	return
-//}
-//
+func (ssco SubSubCommandOptions) findScope() (scope string, err *GetOptError) {
+	options := ssco.Global
+	scope = "*"
+
+	_, arguments, _, _ := options.ParseCommandLine()
+
+	if len(arguments) < 1 {
+		err = &GetOptError{NoScope, "Couldn't find scope"}
+	} else {
+		scope = arguments[0]
+	}
+
+	return
+}
+
+func (ssco SubSubCommandOptions) findScopeAndSubcommand() (scope string, subCommand string, err *GetOptError) {
+	if scope, err = ssco.findScope(); err == nil {
+		var sco SubCommandOptions
+
+		if sco, err = ssco.flattenToSubcommandOptions(scope); err == nil {
+			var arguments []string
+			if _, arguments, _, err = sco.Global.ParseCommandLine(); len(arguments) > 1 {
+				subCommand = arguments[1]
+			} else {
+				err = &GetOptError{NoSubcommand, "Couldn't find sub command"}
+			}
+		}
+	}
+
+	return
+}
+
 //func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 //
 //	if subCommand, err = sco.findSubcommand(); err == nil {

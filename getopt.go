@@ -20,6 +20,7 @@ const (
 	WantsHelp
 	MissingArgument
 	NoSubcommand
+	NoScope
 	UnknownSubcommand
 )
 
@@ -64,11 +65,10 @@ allOptsParsed:
 }
 
 func (optionsDefinition Options) ParseCommandLine() (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-	return optionsDefinition.parseCommandLineImpl(mapifyEnvironment(os.Environ()), 0)
+	return optionsDefinition.parseCommandLineImpl(os.Args[1:], mapifyEnvironment(os.Environ()), 0)
 }
 
-func (optionsDefinition Options) parseCommandLineImpl(environment map[string]string, flags int) (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-	args := os.Args[1:]
+func (optionsDefinition Options) parseCommandLineImpl(args []string, environment map[string]string, flags int) (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 
 	if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
 		options = make(map[string]OptionValue)
@@ -167,7 +167,7 @@ func (optionsDefinition Options) parseCommandLineImpl(environment map[string]str
 		if configKey := optionsDefinition.ConfigOptionKey(); configKey != "" && flags&ConfigParsed == 0 {
 			if option, found := options[configKey]; found {
 				if environment, e := processConfigFile(option.String, environment); e == nil {
-					return optionsDefinition.parseCommandLineImpl(environment, flags|ConfigParsed)
+					return optionsDefinition.parseCommandLineImpl(args, environment, flags|ConfigParsed)
 				} else if option.Set == true { // if config file had a default value, don't freak out
 					err = e
 				}

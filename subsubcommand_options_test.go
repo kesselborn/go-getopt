@@ -6,13 +6,13 @@
 package getopt
 
 import (
-	//"os"
+	"os"
 	//"strings"
 	"testing"
 )
 
-func TestSubSubcommandOptionsConverter(t *testing.T) {
-	ssco := SubSubCommandOptions{
+func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
+	ssco = SubSubCommandOptions{
 		Options{
 			"global description",
 			Definitions{
@@ -65,6 +65,12 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 			},
 		},
 	}
+
+	return
+}
+
+func TestSubSubcommandOptionsConverter(t *testing.T) {
+	ssco := testingSubSubDefinitions()
 
 	expectedAppSubOptions := SubCommandOptions{
 		Options{
@@ -157,31 +163,53 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 
 }
 
-//func TestSubcommandOptionsSubCommandFinder(t *testing.T) {
-//	sco := SubCommandOptions{
-//		"*": {
-//			{"command", "command to execute", IsSubcommand, ""},
-//			{"foo|f", "some arg", Optional, ""}},
-//		"getenv": {
-//			{"name", "app's name", IsArg | Required, ""},
-//			{"key", "environment variable's name", IsArg | Required, ""}},
-//	}
-//
-//	os.Args = []string{"prog", "getenv"}
-//	if command, _ := sco.findSubcommand(); command != "getenv" {
-//		t.Errorf("did not correctly find subcommand getenv")
-//	}
-//
-//	os.Args = []string{"prog", "-f", "bar", "getenv", "name", "key"}
-//	if command, _ := sco.findSubcommand(); command != "getenv" {
-//		t.Errorf("did not correctly find subcommand getenv")
-//	}
-//
-//	os.Args = []string{"prog"}
-//	if _, err := sco.findSubcommand(); err == nil || err.ErrorCode != NoSubcommand {
-//		t.Errorf("did not throw error on unknown subcommand")
-//	}
-//}
+func TestSubSubCommandScopeFinder(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+
+	os.Args = []string{"prog", "app"}
+	if command, _ := ssco.findScope(); command != "app" {
+		t.Errorf("did not correctly find subcommand app")
+	}
+
+	os.Args = []string{"prog", "-s", "10.20.30.40", "app", "getenv", "key"}
+	if command, _ := ssco.findScope(); command != "app" {
+		t.Errorf("did not correctly find subcommand app (w/ other options)")
+	}
+
+	os.Args = []string{"prog"}
+	if _, err := ssco.findScope(); err == nil || err.ErrorCode != NoScope {
+		t.Errorf("did not throw error on unknown subcommand")
+	}
+}
+
+func TestSubSubCommandSubCommand(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+
+	os.Args = []string{"prog", "app", "getenv"}
+	if scope, command, _ := ssco.findScopeAndSubcommand(); scope != "app" || command != "getenv" {
+		t.Errorf("did not correctly find subcommand app / getenv (got: " + scope + " / " + command + ")")
+	}
+
+	os.Args = []string{"prog", "-s", "10.20.30.40", "app", "-ffoo", "getenv", "key"}
+	if _, _, err := ssco.findScopeAndSubcommand(); err != nil {
+		t.Errorf("did not correctly find subcommand app / getenv; Error message: " + err.Message)
+	}
+
+	if scope, command, _ := ssco.findScopeAndSubcommand(); scope != "app" || command != "getenv" {
+		t.Errorf("did not correctly find subcommand app / getenv (got: " + scope + " / " + command + ")")
+	}
+
+	os.Args = []string{"prog"}
+	if _, _, err := ssco.findScopeAndSubcommand(); err == nil || err.ErrorCode != NoScope {
+		t.Errorf("did not throw error on unknown scope")
+	}
+
+	os.Args = []string{"prog", "app"}
+	if _, _, err := ssco.findScopeAndSubcommand(); err == nil || err.ErrorCode != NoSubcommand {
+		t.Errorf("did not throw error on unknown subcommand")
+	}
+}
+
 //
 //func TestSubcommandOptionsParser(t *testing.T) {
 //	sco := SubCommandOptions{
