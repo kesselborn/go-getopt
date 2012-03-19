@@ -26,41 +26,67 @@ loopend:
 }
 
 func TestSubSubcommandOptionsConverter(t *testing.T) {
-	ssco := SubSubCommandOptions{
-		"*": {
-			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
-			{"server|s", "doozer server", Optional, ""},
-			{"scope", "scope", IsSubcommand, ""}},
+  ssco := SubSubCommandOptions{
+    Global{
+      "global description",
+      Definitions{
+        {"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+        {"server|s", "doozer server", Optional, ""},
+        {"scope", "scope", IsSubcommand, ""},
+      },
+    },
+    Scopes{
+      "app": {
+        Global{
+          "app description",
+          {"command", "command to execute", IsSubcommand, ""},
+          {"foo|f", "a param", Optional, ""},
+        },
+        SubCommands{
+          "getenv": {
+            "app getenv description",
+            Definitions{
+              {"name", "app's name", IsArg | Required, ""},
+              {"key", "environment variable's name", IsArg | Required, ""},
+            },
+          },
+          "revision": {
+            "app revision description",
+            Definitions{
+              {"rev|r", "revision", IsArg | Required, ""},
+            },
+          },
+        },
+      },
+    },
+  }
 
-		"app": {
-			"*": {
-				{"command", "command to execute", IsSubcommand, ""},
-				{"foo|f", "a param", Optional, ""}},
-			"getenv": {
-				{"name", "app's name", IsArg | Required, ""},
-				{"key", "environment variable's name", IsArg | Required, ""}},
-		},
-
-		"revision": {
-			"*": {
-				{"command", "command to execute", IsSubcommand, ""}},
-			"list": {
-				{"app|n", "app's name", IsArg | Required, ""}},
-		},
-	}
-
-	expectedAppSubOptions := SubCommandOptions{
-		"*": {
-			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
-			{"server|s", "doozer server", Optional, ""},
-			{"scope", "scope", IsSubcommand, ""},
-			{"command", "command to execute", IsSubcommand, ""}},
-		"describe": {
-			{"name|n", "app's name", IsArg | Required, ""}},
-		"getenv": {
-			{"name", "app's name", IsArg | Required, ""},
-			{"key", "environment variable's name", IsArg | Required, ""}},
-	}
+  expectedAppSubOptions := SubCommandOptions{
+    Global{
+      "app description",
+      Definitions{
+        {"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+        {"server|s", "doozer server", Optional, ""},
+        {"scope", "scope", IsSubcommand, ""},
+        {"command", "command to execute", IsSubcommand, ""},
+      },
+    },
+    SubCommands{
+      "getenv": {
+        "app getenv description",
+        Definitions{
+          {"name", "app's name", IsArg | Required, ""},
+          {"key", "environment variable's name", IsArg | Required, ""},
+        },
+      },
+      "revision": {
+        "app revision description",
+        Definitions{
+          {"rev|r", "revision", IsArg | Required, ""},
+        },
+      },
+    },
+  }
 
 	expectedRevisionOptions := Options{
 		"*": {
