@@ -11,8 +11,22 @@ import (
 	"testing"
 )
 
+func equalSubCommandOptions(sco1 SubCommandOptions, sco2 SubCommandOptions) (equal bool) {
+	if equalOptions(sco1.Global, sco2.Global) && len(sco1.SubCommands) == len(sco2.SubCommands) {
+		for key, options := range sco1.SubCommands {
+			if !equalOptions(options, sco2.SubCommands[key]) {
+				goto loopend
+			}
+		}
+		equal = true
+	}
+loopend:
+
+	return
+}
+
 func equalOptions(options1 Options, options2 Options) (equal bool) {
-	if len(options1.Definitions) == len(options2.Definitions) && options1.Description == options2.Description {
+	if options1.Description == options2.Description && len(options1.Definitions) == len(options2.Definitions) {
 		for i := 0; i < len(options1.Definitions); i++ {
 			if options1.Definitions[i] != options2.Definitions[i] {
 				goto loopend

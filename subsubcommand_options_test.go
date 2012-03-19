@@ -11,111 +11,148 @@ import (
 	"testing"
 )
 
-func equalSubCommandOptions(sco1 SubCommandOptions, sco2 SubCommandOptions) (equal bool) {
-	if len(sco1) == len(sco2) {
-		for key := range sco1 {
-			if !equalOptionsArray(sco1[key], sco2[key]) {
-				goto loopend
-			}
-		}
-		equal = true
-	}
-loopend:
-
-	return
-}
-
 func TestSubSubcommandOptionsConverter(t *testing.T) {
-  ssco := SubSubCommandOptions{
-    Global{
-      "global description",
-      Definitions{
-        {"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
-        {"server|s", "doozer server", Optional, ""},
-        {"scope", "scope", IsSubcommand, ""},
-      },
-    },
-    Scopes{
-      "app": {
-        Global{
-          "app description",
-          {"command", "command to execute", IsSubcommand, ""},
-          {"foo|f", "a param", Optional, ""},
-        },
-        SubCommands{
-          "getenv": {
-            "app getenv description",
-            Definitions{
-              {"name", "app's name", IsArg | Required, ""},
-              {"key", "environment variable's name", IsArg | Required, ""},
-            },
-          },
-          "revision": {
-            "app revision description",
-            Definitions{
-              {"rev|r", "revision", IsArg | Required, ""},
-            },
-          },
-        },
-      },
-    },
-  }
-
-  expectedAppSubOptions := SubCommandOptions{
-    Global{
-      "app description",
-      Definitions{
-        {"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
-        {"server|s", "doozer server", Optional, ""},
-        {"scope", "scope", IsSubcommand, ""},
-        {"command", "command to execute", IsSubcommand, ""},
-      },
-    },
-    SubCommands{
-      "getenv": {
-        "app getenv description",
-        Definitions{
-          {"name", "app's name", IsArg | Required, ""},
-          {"key", "environment variable's name", IsArg | Required, ""},
-        },
-      },
-      "revision": {
-        "app revision description",
-        Definitions{
-          {"rev|r", "revision", IsArg | Required, ""},
-        },
-      },
-    },
-  }
-
-	expectedRevisionOptions := Options{
-		"*": {
-			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
-			{"server|s", "doozer server", Optional, ""},
-			{"scope", "scope", IsSubcommand, ""},
-			{"command", "command to execute", IsSubcommand, ""}},
-		"list": {
-			{"app|n", "app's name", IsArg | Required, ""}},
+	ssco := SubSubCommandOptions{
+		Options{
+			"global description",
+			Definitions{
+				{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+				{"server|s", "doozer server", Optional, ""},
+				{"scope", "scope", IsSubcommand, ""},
+			},
+		},
+		Scopes{
+			"app": {
+				Options{
+					"app description",
+					Definitions{
+						{"foo|f", "a param", Optional, ""},
+						{"command", "command to execute", IsSubcommand, ""},
+					},
+				},
+				SubCommands{
+					"getenv": {
+						"app getenv description",
+						Definitions{
+							{"key", "environment variable's name", IsArg | Required, ""},
+						},
+					},
+					"setenv": {
+						"app setenv description",
+						Definitions{
+							{"name", "app's name", IsArg | Required, ""},
+							{"key", "environment variable's name", IsArg | Required, ""},
+						},
+					},
+				},
+			},
+			"revision": {
+				Options{
+					"app revision description",
+					Definitions{
+						{"rev|r", "revision", IsArg | Required, ""},
+						{"command", "command to execute", IsSubcommand, ""},
+					},
+				},
+				SubCommands{
+					"list": {
+						"list revisions",
+						Definitions{
+							{"all|a", "long list output", Flag, ""},
+						},
+					},
+				},
+			},
+		},
 	}
 
-	if _, err := sco.flattenToSubcommandOptions("app"); err != nil {
+	expectedAppSubOptions := SubCommandOptions{
+		Options{
+			"app description",
+			Definitions{
+				{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+				{"server|s", "doozer server", Optional, ""},
+				{"scope", "scope", IsSubcommand, ""},
+				{"foo|f", "a param", Optional, ""},
+				{"command", "command to execute", IsSubcommand, ""},
+			},
+		},
+		SubCommands{
+			"getenv": {
+				"app getenv description",
+				Definitions{
+					{"key", "environment variable's name", IsArg | Required, ""},
+				},
+			},
+			"setenv": {
+				"app setenv description",
+				Definitions{
+					{"name", "app's name", IsArg | Required, ""},
+					{"key", "environment variable's name", IsArg | Required, ""},
+				},
+			},
+		},
+	}
+
+	expectedRevisionOptions := SubCommandOptions{
+		Options{
+			"app revision description",
+			Definitions{
+				{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+				{"server|s", "doozer server", Optional, ""},
+				{"scope", "scope", IsSubcommand, ""},
+				{"rev|r", "revision", IsArg | Required, ""},
+				{"command", "command to execute", IsSubcommand, ""},
+			},
+		},
+		SubCommands{
+			"list": {
+				"list revisions",
+				Definitions{
+					{"all|a", "long list output", Flag, ""},
+				},
+			},
+		},
+	}
+
+	if _, err := ssco.flattenToSubcommandOptions("app"); err != nil {
 		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Message)
 	}
 
-	if options, _ := sco.flattenToSubcommandOptions("app"); equalSubCommandOptions(options, expectedAppSubOptions) == false {
-		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (app); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedAppSubOptions)
+	if sco, _ := ssco.flattenToSubcommandOptions("app"); equalSubCommandOptions(sco, expectedAppSubOptions) == false {
+		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (app); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", sco, expectedAppSubOptions)
 	}
 
-	if _, err := sco.flattenToSubcommandOptions("revision"); err != nil {
+	if _, err := ssco.flattenToSubcommandOptions("revision"); err != nil {
 		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Message)
 	}
 
-	if options, _ := sco.flattenToSubcommandOptions("revision"); equalSubCommandOptions(options, expectedRevisionOptions) == false {
-		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (revision); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedRevisionOptions)
+	if sco, _ := ssco.flattenToSubcommandOptions("revision"); equalSubCommandOptions(sco, expectedRevisionOptions) == false {
+		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (revision); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", sco, expectedRevisionOptions)
 	}
 
-	if _, err := sco.flattenToOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubcommand {
+	if _, err := ssco.flattenToSubcommandOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubcommand {
 		t.Errorf("non existant sub command didn't throw error")
+	}
+
+	expectedAppGetEnvOptions := Options{
+		"app getenv description",
+		Definitions{
+			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
+			{"server|s", "doozer server", Optional, ""},
+			{"scope", "scope", IsSubcommand, ""},
+			{"foo|f", "a param", Optional, ""},
+			{"command", "command to execute", IsSubcommand, ""},
+			{"key", "environment variable's name", IsArg | Required, ""},
+		},
+	}
+
+	if _, err := ssco.flattenToOptions("app", "getenv"); err != nil {
+		t.Errorf("conversion SubSubCommandOptions -> Options failed (app/getenv); \nGot the following error: %s", err.Message)
+	}
+
+	if options, _ := ssco.flattenToOptions("app", "getenv"); equalOptions(options, expectedAppGetEnvOptions) == false {
+		t.Errorf("conversion SubCommandOptions -> Options failed (app/getenv); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedAppGetEnvOptions)
 	}
 
 }
