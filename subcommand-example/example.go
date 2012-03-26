@@ -12,7 +12,7 @@ func main() {
       "global description",
       getopt.Definitions{
         {"foo|f", "some arg", getopt.Optional, ""},
-        {"command", "command to execute", getopt.IsSubcommand, ""},
+        {"command", "command to execute", getopt.IsSubCommand, ""},
       },
     },
     getopt.SubCommands{
@@ -41,11 +41,11 @@ func main() {
 
     switch {
     case e.ErrorCode == getopt.WantsUsage:
-      fmt.Print(sco.Usage(scope))
+      fmt.Print(sco.Usage())
     case e.ErrorCode == getopt.WantsHelp:
-      fmt.Print(sco.Help(scope))
+      fmt.Print(sco.Help())
     default:
-      fmt.Println(sco.Help(scope), "\n", "**** Error: ", e.Message, "\n")
+      fmt.Println(sco.Help(), "\n", "**** Error: ", e.Message, "\n")
       exit_code = e.ErrorCode
     }
     os.Exit(exit_code)
