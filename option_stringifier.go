@@ -24,10 +24,12 @@ func (option Option) HelpText(longOptLength int) (output string) {
 
 	if option.Description != "" {
 		switch {
-		case option.Flags&IsArg > 0 || option.Flags&IsPassThrough > 0:
+		case option.Flags&(IsArg|IsPassThrough) > 0:
 			output = fmt.Sprintf(fmtArgument, valueIze(option.Key()), option.DescriptionText())
 		case option.HasLongOpt() && option.HasShortOpt():
 			output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.DescriptionText())
+		case option.HasShortOpt() && option.Flags&Flag > 0:
+			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), "", option.DescriptionText())
 		case option.HasShortOpt():
 			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), valueIze(option.Key()), option.DescriptionText())
 		case option.HasLongOpt():
@@ -42,7 +44,7 @@ func (option Option) LongOptString() (longOptString string) {
 	if option.HasLongOpt() {
 		longOptString = option.LongOpt()
 
-		if option.Flags&Flag == 0 && option.Flags&Usage == 0 && option.Flags&Help == 0 && option.Flags&IsPassThrough == 0 {
+		if option.Flags&(Flag|Usage|Help|IsPassThrough) == 0 {
 			longOptString = longOptString + "=" + valueIze(option.LongOpt())
 		}
 	}
