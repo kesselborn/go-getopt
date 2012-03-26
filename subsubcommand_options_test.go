@@ -7,7 +7,7 @@ package getopt
 
 import (
 	"os"
-	//"strings"
+	"strings"
 	"testing"
 )
 
@@ -266,95 +266,76 @@ func TestSubSubCommandOptionsParser(t *testing.T) {
 	}
 }
 
-//
-//func TestErrorMessageForMissingArgs(t *testing.T) {
-//	sco := SubCommandOptions{
-//		"*": {
-//			{"foo|f", "some arg", Optional, ""},
-//			{"command", "command to execute", IsSubCommand, ""}},
-//		"getenv": {
-//			{"bar|b", "some arg", Optional, ""},
-//			{"name", "app's name", IsArg | Required, ""},
-//			{"key", "environment variable's name", IsArg | Required, ""}},
-//	}
-//
-//	os.Args = []string{"prog", "getenv"}
-//	_, _, _, _, err := sco.ParseCommandLine()
-//
-//	if err == nil {
-//		t.Errorf("missing arg did not raise error")
-//	}
-//
-//	if expected := "Missing required argument <name>"; err.Message != expected {
-//		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
-//	}
-//
-//}
-//
-//func TestSubCommandHelp(t *testing.T) {
-//	sco := SubCommandOptions{
-//		"*": {
-//			{"foo|f", "some arg", Optional, ""},
-//			{"command", "command to execute", IsSubCommand, ""}},
-//		"getenv": {
-//			{"bar|b", "some arg", Optional, ""},
-//			{"name", "app's name", IsArg | Required, ""},
-//			{"key", "environment variable's name", IsArg | Required, ""}},
-//		"register": {
-//			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", NoLongOpt | Optional | ExampleIsDefault, "lxc"},
-//			{"name|n", "app's name", IsArg | Required, ""}},
-//	}
-//
-//	os.Args = []string{"prog"}
-//	expectedHelp := `Usage: prog [-f <foo>] <command>
-//
-//this is not a program
-//
-//Options:
-//    -f, --foo=<foo>           some arg
-//    -h, --help                usage (-h) / detailed help text (--help)
-//
-//Available commands:
-//    getenv
-//    register
-//
-//`
-//	expectedUsage := `Usage: prog [-f <foo>] <command>
-//
-//`
-//
-//	if got := sco.Help("this is not a program", "*"); got != expectedHelp {
-//		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
-//	}
-//
-//	if got := sco.Usage("*"); got != expectedUsage {
-//		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
-//	}
-//
-//	os.Args = []string{"prog", "register"}
-//	expectedHelp = `Usage: prog register [-t <deploytype>] <name>
-//
-//this is not a program
-//
-//Options:
-//    -t <deploytype>     deploy type (one of mount, bazapta, lxc) (default: lxc)
-//    -h, --help          usage (-h) / detailed help text (--help)
-//
-//Arguments:
-//    <name>              app's name
-//
-//`
-//
-//	expectedUsage = `Usage: prog register [-t <deploytype>] <name>
-//
-//`
-//
-//	if got := sco.Help("this is not a program", "register"); got != expectedHelp {
-//		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
-//	}
-//
-//	if got := sco.Usage("register"); got != expectedUsage {
-//		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
-//	}
-//
-//}
+func TestErrorMessageForMissingArgsInSsco(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+
+	os.Args = []string{"prog", "-sfoo.com", "app", "-ffoo", "setenv"}
+	_, _, _, _, _, err := ssco.ParseCommandLine()
+
+	if err == nil {
+		t.Errorf("missing arg did not raise error")
+	}
+
+	if expected := "Missing required argument <name>"; err.Message != expected {
+		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
+	}
+
+}
+
+func TestSubSubCommandHelpForGlobalCommand(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+
+	os.Args = []string{"prog"}
+
+	expectedUsage := `Usage: prog [-c <config>] [-s <server>] <scope>
+
+`
+	expectedHelp := expectedUsage + `global description
+
+Options:
+    -c, --config=<config>   config file (default: /etc/visor.conf)
+    -s, --server=<server>   doozer server
+    -h, --help              usage (-h) / detailed help text (--help)
+
+Available scopes:
+    app                     app description
+    revision                app revision description
+
+`
+
+	if got := ssco.Usage(); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
+	}
+
+	if got := ssco.Help(); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+}
+
+func TestSubSubCommandHelpForSubCommand(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+	os.Args = []string{"prog", "app"}
+
+	expectedUsage := `Usage: prog app [-f <foo>] <command>
+`
+	expectedHelp := expectedUsage + `app description
+
+Options:
+    -f, --foo=<foo>           a param
+    -h, --help                usage (-h) / detailed help text (--help)
+
+Available commands:
+    getenv                    app getenv description
+    setenv                    app setenv description
+
+`
+
+	if got := ssco.Help(); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+	if got := ssco.Usage(); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+}

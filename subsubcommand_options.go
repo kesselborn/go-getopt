@@ -6,11 +6,10 @@
 package getopt
 
 import (
-//"os"
-//"path/filepath"
-//"sort"
-//"strings"
-//"fmt"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sort"
 )
 
 type Scopes map[string]SubCommandOptions
@@ -93,63 +92,65 @@ func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand st
 	return
 }
 
-//
-//func (sco SubCommandOptions) Usage(scope string) (output string) {
-//	return sco.UsageCustomArg0(scope, filepath.Base(os.Args[0]))
-//}
-//
-//func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output string) {
-//	subCommand, err := sco.findSubCommand()
-//
-//	if err != nil {
-//		subCommand = "*"
-//	} else {
-//		arg0 = arg0 + " " + scope
-//	}
-//
-//	if flattenedOptions, present := sco[subCommand]; present {
-//		output = flattenedOptions.UsageCustomArg0(arg0)
-//	}
-//
-//	return
-//}
-//
-//func (sco SubCommandOptions) Help(description string, scope string) (output string) {
-//	return sco.HelpCustomArg0(description, scope, filepath.Base(os.Args[0]))
-//}
-//
-//func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, arg0 string) (output string) {
-//	subCommand, err := sco.findSubCommand()
-//
-//	if err != nil {
-//		subCommand = "*"
-//	} else {
-//		arg0 = arg0 + " " + scope
-//	}
-//
-//	if flattenedOptions, present := sco[subCommand]; present {
-//		output = flattenedOptions.HelpCustomArg0(description, arg0)
-//	}
-//
-//	if subCommand == "*" {
-//		output = output + "Available commands:\n"
-//
-//		keys := make([]string, len(sco))
-//		i := 0
-//
-//		for k := range sco {
-//			keys[i] = k
-//			i = i + 1
-//		}
-//		sort.Strings(keys)
-//
-//		for _, key := range keys {
-//			if key != "*" {
-//				output = output + "    " + key + "\n"
-//			}
-//		}
-//		output = output + "\n"
-//	}
-//
-//	return
-//}
+func (ssco SubSubCommandOptions) Usage() (output string) {
+	return ssco.UsageCustomArg0(filepath.Base(os.Args[0]))
+}
+
+func (ssco SubSubCommandOptions) UsageCustomArg0(arg0 string) (output string) {
+	scope, subCommand, err := ssco.findScopeAndSubCommand()
+	givenScope, foundScope := ssco.Scopes[scope]
+
+	if (err != nil && (err.ErrorCode == UnknownScope || err.ErrorCode == NoScope)) || !foundScope {
+		output = ssco.Global.UsageCustomArg0(arg0)
+	} else {
+		givenCommand, foundCommand := givenScope.SubCommands[subCommand]
+		arg0 = arg0 + " " + scope
+
+		if (err != nil && (err.ErrorCode == UnknownSubCommand || err.ErrorCode == NoSubCommand)) || !foundCommand {
+			output = givenScope.Global.UsageCustomArg0(arg0)
+		} else {
+			output = givenCommand.UsageCustomArg0(arg0 + " " + subCommand)
+		}
+	}
+
+	return
+}
+
+func (ssco SubSubCommandOptions) formatScopesHelp(formatLength int) (output string) {
+	// TODO: centralize format strings
+	fmtStr := fmt.Sprintf("    %%-%ds       %%s\n", formatLength)
+
+	keys := make([]string, len(ssco.Scopes))
+	i := 0
+
+	for k := range ssco.Scopes {
+		keys[i] = k
+		i = i + 1
+	}
+	sort.Strings(keys)
+
+	for _, key := range keys {
+		output = output + fmt.Sprintf(fmtStr, key, ssco.Scopes[key].Global.Description)
+	}
+	output = output + "\n"
+
+	return
+}
+
+func (ssco SubSubCommandOptions) Help() (output string) {
+	return ssco.HelpCustomArg0(filepath.Base(os.Args[0]))
+}
+
+func (ssco SubSubCommandOptions) HelpCustomArg0(arg0 string) (output string) {
+	scope, err := ssco.findScope()
+	givenScope, foundScope := ssco.Scopes[scope]
+
+	if (err != nil && (err.ErrorCode == UnknownScope || err.ErrorCode == NoScope)) || !foundScope {
+		output = ssco.Global.HelpCustomArg0(arg0)
+		output = output + "Available scopes:\n" + ssco.formatScopesHelp(ssco.Global.calculateLongOptTextLenght())
+	} else {
+		output = givenScope.HelpCustomArg0(arg0 + " " + scope)
+	}
+
+	return
+}
