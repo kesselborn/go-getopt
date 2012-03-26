@@ -80,15 +80,18 @@ func (ssco SubSubCommandOptions) findScopeAndSubCommand() (scope string, subComm
 }
 
 func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
+	var scopeScError *GetOptError
 
-	if scope, subCommand, _ = ssco.findScopeAndSubCommand(); err == nil {
-		var flattenedOptions Options
-		if flattenedOptions, _ = ssco.flattenToOptions(scope, subCommand); err == nil {
-			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
-			if len(arguments) > 2 {
-				arguments = arguments[2:]
-			}
-		}
+	scope, subCommand, scopeScError = ssco.findScopeAndSubCommand()
+	flattenedOptions, _ := ssco.flattenToOptions(scope, subCommand)
+	options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
+
+	if len(arguments) > 2 {
+		arguments = arguments[2:]
+	}
+
+	if scopeScError != nil && ((err != nil && err.ErrorCode != WantsUsage && err.ErrorCode != WantsHelp) || err == nil) {
+		err = scopeScError
 	}
 
 	return
