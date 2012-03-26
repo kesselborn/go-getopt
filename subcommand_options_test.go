@@ -188,6 +188,29 @@ func TestSubCommandOptionsParser(t *testing.T) {
 	if arguments[1] != "bar" {
 		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg2: Expected: bar, Got: " + arguments[1])
 	}
+
+	os.Args = []string{"prog", "-h"}
+	_, _, _, _, err := sco.ParseCommandLine()
+
+	if err == nil {
+		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
+	}
+
+	if err.ErrorCode != WantsUsage {
+		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	}
+
+	os.Args = []string{"prog", "--help"}
+	_, _, _, _, err = sco.ParseCommandLine()
+
+	if err == nil {
+		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	}
+
+	if err.ErrorCode != WantsHelp {
+		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	}
+
 }
 
 func TestErrorMessageForMissingArgs(t *testing.T) {

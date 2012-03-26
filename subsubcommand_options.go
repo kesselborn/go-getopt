@@ -83,7 +83,7 @@ func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand st
 
 	if scope, subCommand, _ = ssco.findScopeAndSubCommand(); err == nil {
 		var flattenedOptions Options
-		if flattenedOptions, err = ssco.flattenToOptions(scope, subCommand); err == nil {
+		if flattenedOptions, _ = ssco.flattenToOptions(scope, subCommand); err == nil {
 			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
 			if len(arguments) > 2 {
 				arguments = arguments[2:]

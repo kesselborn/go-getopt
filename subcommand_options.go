@@ -59,6 +59,8 @@ func (sco SubCommandOptions) findSubCommand() (subCommand string, err *GetOptErr
 func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 	if subCommand, err = sco.findSubCommand(); err == nil {
 		options, arguments, passThrough, err = sco.parseCommandLineImpl(subCommand, os.Args[1:], mapifyEnvironment(os.Environ()), 0)
+	} else {
+		options, arguments, passThrough, err = sco.Global.parseCommandLineImpl(os.Args[1:], mapifyEnvironment(os.Environ()), 0)
 	}
 
 	return
