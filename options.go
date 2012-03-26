@@ -149,7 +149,7 @@ func (options Options) ConfigOptionKey() (key string) {
 
 func (options Options) RequiredArguments() (requiredOptions Options) {
 	for _, cur := range options.Definitions {
-		if (cur.Flags&Required != 0 && cur.Flags&IsArg != 0) || cur.Flags&IsSubcommand != 0 {
+		if (cur.Flags&Required != 0 && cur.Flags&IsArg != 0) || cur.Flags&IsSubCommand != 0 {
 			requiredOptions.Definitions = append(requiredOptions.Definitions, cur)
 		}
 	}
@@ -223,7 +223,7 @@ func (options Options) HelpCustomArg0(arg0 string) (output string) {
 
 	for _, option := range options.Definitions {
 		switch {
-		case option.Flags&IsSubcommand > 0:
+		case option.Flags&IsSubCommand > 0:
 			continue
 		case option.Flags&IsPassThrough > 0:
 			passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"

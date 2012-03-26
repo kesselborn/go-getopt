@@ -35,20 +35,20 @@ func (sco SubCommandOptions) flattenToOptions(subCommand string) (options Option
 			options.Description = subCommandOptions.Description
 		}
 	} else {
-		err = &GetOptError{UnknownSubcommand, "Unknown command: " + subCommand}
+		err = &GetOptError{UnknownSubCommand, "Unknown command: " + subCommand}
 	}
 
 	return
 }
 
-func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptError) {
+func (sco SubCommandOptions) findSubCommand() (subCommand string, err *GetOptError) {
 	options := sco.Global
 	subCommand = "*"
 
 	_, arguments, _, _ := options.ParseCommandLine()
 
 	if len(arguments) < 1 {
-		err = &GetOptError{NoSubcommand, "Couldn't find sub command"}
+		err = &GetOptError{NoSubCommand, "Couldn't find sub command"}
 	} else {
 		subCommand = arguments[0]
 	}
@@ -57,7 +57,7 @@ func (sco SubCommandOptions) findSubcommand() (subCommand string, err *GetOptErr
 }
 
 func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-	if subCommand, err = sco.findSubcommand(); err == nil {
+	if subCommand, err = sco.findSubCommand(); err == nil {
 		options, arguments, passThrough, err = sco.parseCommandLineImpl(subCommand, os.Args[1:], mapifyEnvironment(os.Environ()), 0)
 	}
 
@@ -80,7 +80,7 @@ func (sco SubCommandOptions) Usage(scope string) (output string) {
 }
 
 func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output string) {
-	subCommand, err := sco.findSubcommand()
+	subCommand, err := sco.findSubCommand()
 	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
 	if err != nil || !foundSubCommand {
@@ -97,7 +97,7 @@ func (sco SubCommandOptions) Help(scope string) (output string) {
 }
 
 func (sco SubCommandOptions) HelpCustomArg0(scope string, arg0 string) (output string) {
-	subCommand, err := sco.findSubcommand()
+	subCommand, err := sco.findSubCommand()
 	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
 	if err != nil || !foundSubCommand {

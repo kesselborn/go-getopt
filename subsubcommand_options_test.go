@@ -18,7 +18,7 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 			Definitions{
 				{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
 				{"server|s", "doozer server", Optional, ""},
-				{"scope", "scope", IsSubcommand, ""},
+				{"scope", "scope", IsSubCommand, ""},
 			},
 		},
 		Scopes{
@@ -27,7 +27,7 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 					"app description",
 					Definitions{
 						{"foo|f", "a param", Optional, ""},
-						{"command", "command to execute", IsSubcommand, ""},
+						{"command", "command to execute", IsSubCommand, ""},
 					},
 				},
 				SubCommands{
@@ -51,7 +51,7 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 					"app revision description",
 					Definitions{
 						{"rev|r", "revision", IsArg | Required, ""},
-						{"command", "command to execute", IsSubcommand, ""},
+						{"command", "command to execute", IsSubCommand, ""},
 					},
 				},
 				SubCommands{
@@ -68,8 +68,7 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 
 	return
 }
-
-func TestSubSubcommandOptionsConverter(t *testing.T) {
+func TestSubSubCommandOptionsConverter(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 
 	expectedAppSubOptions := SubCommandOptions{
@@ -78,9 +77,9 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 			Definitions{
 				{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
 				{"server|s", "doozer server", Optional, ""},
-				{"scope", "scope", IsSubcommand, ""},
+				{"scope", "scope", IsSubCommand, ""},
 				{"foo|f", "a param", Optional, ""},
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 			},
 		},
 		SubCommands{
@@ -106,9 +105,9 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 			Definitions{
 				{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
 				{"server|s", "doozer server", Optional, ""},
-				{"scope", "scope", IsSubcommand, ""},
+				{"scope", "scope", IsSubCommand, ""},
 				{"rev|r", "revision", IsArg | Required, ""},
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 			},
 		},
 		SubCommands{
@@ -121,23 +120,23 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 		},
 	}
 
-	if _, err := ssco.flattenToSubcommandOptions("app"); err != nil {
+	if _, err := ssco.flattenToSubCommandOptions("app"); err != nil {
 		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Message)
 	}
 
-	if sco, _ := ssco.flattenToSubcommandOptions("app"); equalSubCommandOptions(sco, expectedAppSubOptions) == false {
+	if sco, _ := ssco.flattenToSubCommandOptions("app"); equalSubCommandOptions(sco, expectedAppSubOptions) == false {
 		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (app); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", sco, expectedAppSubOptions)
 	}
 
-	if _, err := ssco.flattenToSubcommandOptions("revision"); err != nil {
+	if _, err := ssco.flattenToSubCommandOptions("revision"); err != nil {
 		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Message)
 	}
 
-	if sco, _ := ssco.flattenToSubcommandOptions("revision"); equalSubCommandOptions(sco, expectedRevisionOptions) == false {
+	if sco, _ := ssco.flattenToSubCommandOptions("revision"); equalSubCommandOptions(sco, expectedRevisionOptions) == false {
 		t.Errorf("conversion SubSubCommandOptions -> SubCommandOptions failed (revision); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", sco, expectedRevisionOptions)
 	}
 
-	if _, err := ssco.flattenToSubcommandOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubcommand {
+	if _, err := ssco.flattenToSubCommandOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubCommand {
 		t.Errorf("non existant sub command didn't throw error")
 	}
 
@@ -146,9 +145,9 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 		Definitions{
 			{"config|c", "config file", IsConfigFile | ExampleIsDefault, "/etc/visor.conf"},
 			{"server|s", "doozer server", Optional, ""},
-			{"scope", "scope", IsSubcommand, ""},
+			{"scope", "scope", IsSubCommand, ""},
 			{"foo|f", "a param", Optional, ""},
-			{"command", "command to execute", IsSubcommand, ""},
+			{"command", "command to execute", IsSubCommand, ""},
 			{"key", "environment variable's name", IsArg | Required, ""},
 		},
 	}
@@ -162,7 +161,6 @@ func TestSubSubcommandOptionsConverter(t *testing.T) {
 	}
 
 }
-
 func TestSubSubCommandScopeFinder(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 
@@ -186,22 +184,22 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 
 	os.Args = []string{"prog", "app", "getenv"}
-	if scope, command, _ := ssco.findScopeAndSubcommand(); scope != "app" || command != "getenv" {
+	if scope, command, _ := ssco.findScopeAndSubCommand(); scope != "app" || command != "getenv" {
 		t.Errorf("did not correctly find subcommand app / getenv (got: " + scope + " / " + command + ")")
 	}
 
 	os.Args = []string{"prog", "-s", "10.20.30.40", "app", "-ffoo", "getenv", "key"}
-	if _, _, err := ssco.findScopeAndSubcommand(); err != nil {
+	if _, _, err := ssco.findScopeAndSubCommand(); err != nil {
 		t.Errorf("did not correctly find subcommand app / getenv; Error message: " + err.Message)
 	}
 
-	if scope, command, _ := ssco.findScopeAndSubcommand(); scope != "app" || command != "getenv" {
+	if scope, command, _ := ssco.findScopeAndSubCommand(); scope != "app" || command != "getenv" {
 		t.Errorf("did not correctly find subcommand app / getenv (got: " + scope + " / " + command + ")")
 	}
 
 	os.Args = []string{"prog"}
-	if _, _, err := ssco.findScopeAndSubcommand(); err == nil || err.ErrorCode != NoScope {
-		t.Errorf("did not throw error on unknown scope")
+	if _, _, err := ssco.findScopeAndSubCommand(); err == nil || err.ErrorCode != NoScope {
+		t.Errorf("did not throw error on missing scope")
 	}
 
 	os.Args = []string{"prog", "app"}
@@ -210,6 +208,8 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 	}
 }
 
+//func TestSubSubCommandOptionsParser(t *testing.T) {
+//	ssco := testingSubSubDefinitions()
 //
 //func TestSubcommandOptionsParser(t *testing.T) {
 //	sco := SubCommandOptions{
@@ -254,7 +254,7 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 //	sco := SubCommandOptions{
 //		"*": {
 //			{"foo|f", "some arg", Optional, ""},
-//			{"command", "command to execute", IsSubcommand, ""}},
+//			{"command", "command to execute", IsSubCommand, ""}},
 //		"getenv": {
 //			{"bar|b", "some arg", Optional, ""},
 //			{"name", "app's name", IsArg | Required, ""},
@@ -278,7 +278,7 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 //	sco := SubCommandOptions{
 //		"*": {
 //			{"foo|f", "some arg", Optional, ""},
-//			{"command", "command to execute", IsSubcommand, ""}},
+//			{"command", "command to execute", IsSubCommand, ""}},
 //		"getenv": {
 //			{"bar|b", "some arg", Optional, ""},
 //			{"name", "app's name", IsArg | Required, ""},

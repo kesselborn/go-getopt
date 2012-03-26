@@ -39,12 +39,12 @@ loopend:
 	return
 }
 
-func TestSubcommandOptionsConverter(t *testing.T) {
+func TestSubCommandOptionsConverter(t *testing.T) {
 	sco := SubCommandOptions{
 		Options{
 			"global description",
 			Definitions{
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 			},
 		},
 		SubCommands{
@@ -68,7 +68,7 @@ func TestSubcommandOptionsConverter(t *testing.T) {
 	expectedGetenvOptions := Options{
 		"getenv description",
 		Definitions{
-			{"command", "command to execute", IsSubcommand, ""},
+			{"command", "command to execute", IsSubCommand, ""},
 			{"name", "app's name", IsArg | Required, ""},
 			{"key", "environment variable's name", IsArg | Required, ""},
 		},
@@ -77,7 +77,7 @@ func TestSubcommandOptionsConverter(t *testing.T) {
 	expectedRegisterOptions := Options{
 		"register description",
 		Definitions{
-			{"command", "command to execute", IsSubcommand, ""},
+			{"command", "command to execute", IsSubCommand, ""},
 			{"name|n", "app's name", IsArg | Required, ""},
 			{"deploytype|t", "deploy type (one of mount, bazapta, lxc)", Optional | ExampleIsDefault, "lxc"},
 		},
@@ -99,18 +99,18 @@ func TestSubcommandOptionsConverter(t *testing.T) {
 		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot\n\t#%#v#\nExpected:\n\t#%#v#\n", options, expectedGetenvOptions)
 	}
 
-	if _, err := sco.flattenToOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubcommand {
+	if _, err := sco.flattenToOptions("nonexistantsubcommand"); err.ErrorCode != UnknownSubCommand {
 		t.Errorf("non existant sub command didn't throw error")
 	}
 
 }
 
-func TestSubcommandOptionsSubCommandFinder(t *testing.T) {
+func TestSubCommandOptionsSubCommandFinder(t *testing.T) {
 	sco := SubCommandOptions{
 		Options{
 			"global description",
 			Definitions{
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 				{"foo|f", "some arg", Optional, ""},
 			},
 		},
@@ -126,27 +126,27 @@ func TestSubcommandOptionsSubCommandFinder(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "getenv"}
-	if command, _ := sco.findSubcommand(); command != "getenv" {
+	if command, _ := sco.findSubCommand(); command != "getenv" {
 		t.Errorf("did not correctly find subcommand getenv")
 	}
 
 	os.Args = []string{"prog", "-f", "bar", "getenv", "name", "key"}
-	if command, _ := sco.findSubcommand(); command != "getenv" {
+	if command, _ := sco.findSubCommand(); command != "getenv" {
 		t.Errorf("did not correctly find subcommand getenv")
 	}
 
 	os.Args = []string{"prog"}
-	if _, err := sco.findSubcommand(); err == nil || err.ErrorCode != NoSubcommand {
+	if _, err := sco.findSubCommand(); err == nil || err.ErrorCode != NoSubCommand {
 		t.Errorf("did not throw error on unknown subcommand")
 	}
 }
 
-func TestSubcommandOptionsParser(t *testing.T) {
+func TestSubCommandOptionsParser(t *testing.T) {
 	sco := SubCommandOptions{
 		Options{
 			"global description",
 			Definitions{
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 				{"foo|f", "some arg", Optional, ""},
 			},
 		},
@@ -196,7 +196,7 @@ func TestErrorMessageForMissingArgs(t *testing.T) {
 			"global description",
 			Definitions{
 				{"foo|f", "some arg", Optional, ""},
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 			},
 		},
 		SubCommands{
@@ -230,7 +230,7 @@ func TestSubCommandHelp(t *testing.T) {
 			"global description",
 			Definitions{
 				{"foo|f", "some arg", Optional, ""},
-				{"command", "command to execute", IsSubcommand, ""},
+				{"command", "command to execute", IsSubCommand, ""},
 			},
 		},
 		SubCommands{

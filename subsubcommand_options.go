@@ -20,7 +20,7 @@ type SubSubCommandOptions struct {
 	Scopes Scopes
 }
 
-func (ssco SubSubCommandOptions) flattenToSubcommandOptions(scope string) (sco SubCommandOptions, err *GetOptError) {
+func (ssco SubSubCommandOptions) flattenToSubCommandOptions(scope string) (sco SubCommandOptions, err *GetOptError) {
 	globalCommand := ssco.Global
 	var present bool
 
@@ -28,14 +28,14 @@ func (ssco SubSubCommandOptions) flattenToSubcommandOptions(scope string) (sco S
 		//print("\n======= " + scope + "========\n"); print(strings.Replace(fmt.Sprintf("%#v", sco.SubCommands),  "getopt", "\n", -1)); print("\n================")
 		sco.Global.Definitions = append(globalCommand.Definitions, sco.Global.Definitions...)
 	} else {
-		err = &GetOptError{UnknownSubcommand, "Unknown scope: " + scope}
+		err = &GetOptError{UnknownSubCommand, "Unknown scope: " + scope}
 	}
 
 	return
 }
 
 func (ssco SubSubCommandOptions) flattenToOptions(scope string, subCommand string) (options Options, err *GetOptError) {
-	if sco, err := ssco.flattenToSubcommandOptions(scope); err == nil {
+	if sco, err := ssco.flattenToSubCommandOptions(scope); err == nil {
 		options, err = sco.flattenToOptions(subCommand)
 	}
 
@@ -52,21 +52,27 @@ func (ssco SubSubCommandOptions) findScope() (scope string, err *GetOptError) {
 		err = &GetOptError{NoScope, "Couldn't find scope"}
 	} else {
 		scope = arguments[0]
+		if _, present := ssco.Scopes[scope]; present != true {
+			err = &GetOptError{UnknownScope, "Given scope '" + scope + "' not defined"}
+		}
 	}
 
 	return
 }
 
-func (ssco SubSubCommandOptions) findScopeAndSubcommand() (scope string, subCommand string, err *GetOptError) {
+func (ssco SubSubCommandOptions) findScopeAndSubCommand() (scope string, subCommand string, err *GetOptError) {
 	if scope, err = ssco.findScope(); err == nil {
 		var sco SubCommandOptions
 
-		if sco, err = ssco.flattenToSubcommandOptions(scope); err == nil {
+		if sco, err = ssco.flattenToSubCommandOptions(scope); err == nil {
 			var arguments []string
 			if _, arguments, _, err = sco.Global.ParseCommandLine(); len(arguments) > 1 {
 				subCommand = arguments[1]
+				if _, present := sco.SubCommands[subCommand]; present != true {
+					err = &GetOptError{UnknownSubCommand, "Given sub command '" + subCommand + "' not defined"}
+				}
 			} else {
-				err = &GetOptError{NoSubcommand, "Couldn't find sub command"}
+				err = &GetOptError{NoSubCommand, "Couldn't find sub command"}
 			}
 		}
 	}
@@ -75,8 +81,9 @@ func (ssco SubSubCommandOptions) findScopeAndSubcommand() (scope string, subComm
 }
 
 //func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
+//func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 //
-//	if subCommand, err = sco.findSubcommand(); err == nil {
+//	if subCommand, err = sco.findSubCommand(); err == nil {
 //		var flattenedOptions Options
 //		if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
 //			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
@@ -92,7 +99,7 @@ func (ssco SubSubCommandOptions) findScopeAndSubcommand() (scope string, subComm
 //}
 //
 //func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output string) {
-//	subCommand, err := sco.findSubcommand()
+//	subCommand, err := sco.findSubCommand()
 //
 //	if err != nil {
 //		subCommand = "*"
@@ -112,7 +119,7 @@ func (ssco SubSubCommandOptions) findScopeAndSubcommand() (scope string, subComm
 //}
 //
 //func (sco SubCommandOptions) HelpCustomArg0(description string, scope string, arg0 string) (output string) {
-//	subCommand, err := sco.findSubcommand()
+//	subCommand, err := sco.findSubCommand()
 //
 //	if err != nil {
 //		subCommand = "*"

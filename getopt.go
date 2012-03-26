@@ -19,9 +19,10 @@ const (
 	WantsUsage
 	WantsHelp
 	MissingArgument
-	NoSubcommand
+	NoSubCommand
 	NoScope
-	UnknownSubcommand
+	UnknownSubCommand
+	UnknownScope
 )
 
 const OPTIONS_SEPARATOR = "--"

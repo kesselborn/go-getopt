@@ -20,7 +20,7 @@ const (
 	IsPassThrough
 	IsConfigFile
 	NoEnvHelp
-	IsSubcommand
+	IsSubCommand
 )
 
 type Option struct {
