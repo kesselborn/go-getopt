@@ -293,6 +293,28 @@ func TestWantsHelpAndUsage(t *testing.T) {
 		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
 	}
 
+	os.Args = []string{"prog", "app", "-h"}
+	_, _, _, _, _, err = ssco.ParseCommandLine()
+
+	if err == nil {
+		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
+	}
+
+	if err.ErrorCode != WantsUsage {
+		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	}
+
+	os.Args = []string{"prog", "app", "--help"}
+	_, _, _, _, _, err = ssco.ParseCommandLine()
+
+	if err == nil {
+		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	}
+
+	if err.ErrorCode != WantsHelp {
+		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	}
+
 }
 
 func TestErrorMessageForMissingArgsInSsco(t *testing.T) {
