@@ -142,14 +142,18 @@ func (ssco SubSubCommandOptions) Help() (output string) {
 }
 
 func (ssco SubSubCommandOptions) HelpCustomArg0(arg0 string) (output string) {
-	scope, err := ssco.findScope()
+	scope, subCommand, err := ssco.findScopeAndSubCommand()
 	givenScope, foundScope := ssco.Scopes[scope]
 
 	if (err != nil && (err.ErrorCode == UnknownScope || err.ErrorCode == NoScope)) || !foundScope {
 		output = ssco.Global.HelpCustomArg0(arg0)
 		output = output + "Available scopes:\n" + ssco.formatScopesHelp(ssco.Global.calculateLongOptTextLenght())
 	} else {
-		output = givenScope.HelpCustomArg0(arg0 + " " + scope)
+		if (err != nil && (err.ErrorCode == UnknownSubCommand || err.ErrorCode == NoSubCommand)) || !foundScope {
+			output = givenScope.HelpCustomArg0(arg0 + " " + scope)
+		} else {
+			output = givenScope.SubCommands[subCommand].HelpCustomArg0(arg0 + " " + scope + " " + subCommand)
+		}
 	}
 
 	return

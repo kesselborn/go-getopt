@@ -28,7 +28,7 @@ func (option Option) HelpText(longOptLength int) (output string) {
 			output = fmt.Sprintf(fmtArgument, valueIze(option.Key()), option.DescriptionText())
 		case option.HasLongOpt() && option.HasShortOpt():
 			output = fmt.Sprintf(fmtStringLongAndShort, option.ShortOptString(), option.LongOptString(), option.DescriptionText())
-		case option.HasShortOpt() && option.Flags&Flag > 0:
+		case !option.HasLongOpt() && option.HasShortOpt() && option.Flags&Flag > 0:
 			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), "", option.DescriptionText())
 		case option.HasShortOpt():
 			output = fmt.Sprintf(fmtStringShort, option.ShortOptString(), valueIze(option.Key()), option.DescriptionText())
@@ -56,8 +56,12 @@ func (option Option) ShortOptString() (shortOptString string) {
 	if option.HasShortOpt() {
 		shortOptString = option.ShortOpt()
 
-		if option.Flags&Flag == 0 && !option.HasLongOpt() && option.Flags&Usage == 0 && option.Flags&Help == 0 {
+		if !option.HasLongOpt() && option.Flags&(Flag|Usage|Help) == 0 {
 			shortOptString = shortOptString + " " + option.LongOpt()
+		}
+
+		if option.Flags&(Flag|NoLongOpt) == Flag|NoLongOpt {
+			shortOptString = shortOptString + " "
 		}
 	}
 

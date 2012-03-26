@@ -110,7 +110,7 @@ func TestBasicOutputForFlags(t *testing.T) {
 	}
 
 	if got, expected := (Option{"method|m", "...", Flag | NoLongOpt, ""}.HelpText(20)),
-		"    -m                        ..."; got != expected {
+		"    -m                         ..."; got != expected {
 		t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected)
 	}
 }

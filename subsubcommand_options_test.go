@@ -40,10 +40,11 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 					"setenv": {
 						"app setenv description",
 						Definitions{
-							{"persist|p", "persist this", Optional | Flag, ""},
+							{"persist|p", "persist this", Optional | Flag | NoLongOpt, ""},
 							{"alias|a", "alias name", Optional, ""},
-							{"name", "app's name", IsArg | Required, ""},
-							{"key", "environment variable's name", IsArg | Required, ""},
+							{"name", "app name", IsArg | Required, ""},
+							{"key", "env key", IsArg | Required, ""},
+							{"value", "env value", IsArg | Optional, ""},
 						},
 					},
 				},
@@ -94,10 +95,11 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 			"setenv": {
 				"app setenv description",
 				Definitions{
-					{"persist|p", "persist this", Optional | Flag, ""},
+					{"persist|p", "persist this", Optional | Flag | NoLongOpt, ""},
 					{"alias|a", "alias name", Optional, ""},
-					{"name", "app's name", IsArg | Required, ""},
-					{"key", "environment variable's name", IsArg | Required, ""},
+					{"name", "app name", IsArg | Required, ""},
+					{"key", "env key", IsArg | Required, ""},
+					{"value", "env value", IsArg | Optional, ""},
 				},
 			},
 		},
@@ -317,6 +319,7 @@ func TestSubSubCommandHelpForSubCommand(t *testing.T) {
 	os.Args = []string{"prog", "app"}
 
 	expectedUsage := `Usage: prog app [-f <foo>] <command>
+
 `
 	expectedHelp := expectedUsage + `app description
 
@@ -327,6 +330,37 @@ Options:
 Available commands:
     getenv                    app getenv description
     setenv                    app setenv description
+
+`
+
+	if got := ssco.Help(); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+	if got := ssco.Usage(); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+}
+
+func TestSubSubCommandHelpForSubSubCommand(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+	os.Args = []string{"prog", "app", "setenv"}
+
+	expectedUsage := `Usage: prog app setenv [-p] [-a <alias>] <name> <key> [<value>]
+
+`
+	expectedHelp := expectedUsage + `app setenv description
+
+Options:
+    -p                    persist this
+    -a, --alias=<alias>   alias name
+    -h, --help            usage (-h) / detailed help text (--help)
+
+Arguments:
+    <name>                app name
+    <key>                 env key
+    <value>               env value
 
 `
 
