@@ -75,28 +75,28 @@ func (sco SubCommandOptions) parseCommandLineImpl(subCommand string, args []stri
 	return
 }
 
-func (sco SubCommandOptions) Usage(scope string) (output string) {
-	return sco.UsageCustomArg0(scope, filepath.Base(os.Args[0]))
+func (sco SubCommandOptions) Usage() (output string) {
+	return sco.UsageCustomArg0(filepath.Base(os.Args[0]))
 }
 
-func (sco SubCommandOptions) UsageCustomArg0(scope string, arg0 string) (output string) {
+func (sco SubCommandOptions) UsageCustomArg0(arg0 string) (output string) {
 	subCommand, err := sco.findSubCommand()
 	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
 	if err != nil || !foundSubCommand {
 		output = sco.Global.UsageCustomArg0(arg0)
 	} else {
-		output = flattenedOptions.UsageCustomArg0(arg0 + " " + scope)
+		output = flattenedOptions.UsageCustomArg0(arg0 + " " + subCommand)
 	}
 
 	return
 }
 
-func (sco SubCommandOptions) Help(scope string) (output string) {
-	return sco.HelpCustomArg0(scope, filepath.Base(os.Args[0]))
+func (sco SubCommandOptions) Help() (output string) {
+	return sco.HelpCustomArg0(filepath.Base(os.Args[0]))
 }
 
-func (sco SubCommandOptions) HelpCustomArg0(scope string, arg0 string) (output string) {
+func (sco SubCommandOptions) HelpCustomArg0(arg0 string) (output string) {
 	subCommand, err := sco.findSubCommand()
 	flattenedOptions, foundSubCommand := sco.SubCommands[subCommand]
 
@@ -104,7 +104,7 @@ func (sco SubCommandOptions) HelpCustomArg0(scope string, arg0 string) (output s
 		subCommand = "*"
 		flattenedOptions = sco.Global
 	} else {
-		arg0 = arg0 + " " + scope
+		arg0 = arg0 + " " + subCommand
 	}
 
 	output = flattenedOptions.HelpCustomArg0(arg0)
