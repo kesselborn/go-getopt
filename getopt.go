@@ -90,7 +90,8 @@ func (optionsDefinition Options) parseCommandLineImpl(args []string, environment
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
 		usageString = "-" + usageString
 		helpString = "--" + helpString
-		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString)
+
+		wantsHelpOrUsage := optionsDefinition.checkForHelpOrUsage(args, usageString, helpString)
 
 		if err == nil {
 			err = optionsDefinition.setEnvAndConfigValues(options, environment)
@@ -189,6 +190,9 @@ func (optionsDefinition Options) parseCommandLineImpl(args []string, environment
 				firstMissingArgumentName := requiredArguments.Definitions[len(arguments)].Key()
 				err = &GetOptError{MissingArgument, "Missing required argument <" + firstMissingArgumentName + ">"}
 			}
+		}
+		if wantsHelpOrUsage != nil {
+			err = wantsHelpOrUsage
 		}
 	}
 

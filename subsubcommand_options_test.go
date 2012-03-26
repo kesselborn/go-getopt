@@ -448,6 +448,16 @@ Available commands:
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
 	}
 
+	os.Args = []string{"prog", "app", "--help"}
+	if got := ssco.Help(); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+	os.Args = []string{"prog", "app", "-h"}
+	if got := ssco.Usage(); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
 }
 
 func TestSubSubCommandHelpForSubSubCommand(t *testing.T) {

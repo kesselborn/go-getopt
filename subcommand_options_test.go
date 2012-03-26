@@ -327,4 +327,14 @@ Arguments:
 		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
 	}
 
+	os.Args = []string{"prog", "register", "--help"}
+	if got := sco.Help(); got != expectedHelp {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedHelp, " ", "_", -1) + "|\n")
+	}
+
+	os.Args = []string{"prog", "register", "-h"}
+	if got := sco.Usage(); got != expectedUsage {
+		t.Errorf("Usage output not as expected:\ngot:      |" + strings.Replace(got, " ", "_", -1) + "|\nexpected: |" + strings.Replace(expectedUsage, " ", "_", -1) + "|\n")
+	}
+
 }
