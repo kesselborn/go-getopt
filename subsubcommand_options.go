@@ -81,11 +81,13 @@ func (ssco SubSubCommandOptions) findScopeAndSubCommand() (scope string, subComm
 
 func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 
-	if scope, subCommand, err = ssco.findScopeAndSubCommand(); err == nil {
+	if scope, subCommand, _ = ssco.findScopeAndSubCommand(); err == nil {
 		var flattenedOptions Options
 		if flattenedOptions, err = ssco.flattenToOptions(scope, subCommand); err == nil {
 			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
-			arguments = arguments[2:]
+			if len(arguments) > 2 {
+				arguments = arguments[2:]
+			}
 		}
 	}
 
