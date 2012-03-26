@@ -66,7 +66,7 @@ func (ssco SubSubCommandOptions) findScopeAndSubCommand() (scope string, subComm
 
 		if sco, err = ssco.flattenToSubCommandOptions(scope); err == nil {
 			var arguments []string
-			if _, arguments, _, err = sco.Global.ParseCommandLine(); len(arguments) > 1 {
+			if _, arguments, _, _ = sco.Global.ParseCommandLine(); len(arguments) > 1 {
 				subCommand = arguments[1]
 				if _, present := sco.SubCommands[subCommand]; present != true {
 					err = &GetOptError{UnknownSubCommand, "Given sub command '" + subCommand + "' not defined"}
@@ -80,19 +80,19 @@ func (ssco SubSubCommandOptions) findScopeAndSubCommand() (scope string, subComm
 	return
 }
 
-//func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-//func (sco SubCommandOptions) ParseCommandLine() (subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-//
-//	if subCommand, err = sco.findSubCommand(); err == nil {
-//		var flattenedOptions Options
-//		if flattenedOptions, err = sco.flattenToOptions(subCommand); err == nil {
-//			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
-//			arguments = arguments[1:]
-//		}
-//	}
-//
-//	return
-//}
+func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
+
+	if scope, subCommand, err = ssco.findScopeAndSubCommand(); err == nil {
+		var flattenedOptions Options
+		if flattenedOptions, err = ssco.flattenToOptions(scope, subCommand); err == nil {
+			options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
+			arguments = arguments[2:]
+		}
+	}
+
+	return
+}
+
 //
 //func (sco SubCommandOptions) Usage(scope string) (output string) {
 //	return sco.UsageCustomArg0(scope, filepath.Base(os.Args[0]))

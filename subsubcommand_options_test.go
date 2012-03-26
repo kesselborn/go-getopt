@@ -40,6 +40,8 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 					"setenv": {
 						"app setenv description",
 						Definitions{
+							{"persist|p", "persist this", Optional | Flag, ""},
+							{"alias|a", "alias name", Optional, ""},
 							{"name", "app's name", IsArg | Required, ""},
 							{"key", "environment variable's name", IsArg | Required, ""},
 						},
@@ -92,6 +94,8 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 			"setenv": {
 				"app setenv description",
 				Definitions{
+					{"persist|p", "persist this", Optional | Flag, ""},
+					{"alias|a", "alias name", Optional, ""},
 					{"name", "app's name", IsArg | Required, ""},
 					{"key", "environment variable's name", IsArg | Required, ""},
 				},
@@ -161,6 +165,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 }
+
 func TestSubSubCommandScopeFinder(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 
@@ -203,52 +208,64 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "app"}
-	if _, _, err := ssco.findScopeAndSubcommand(); err == nil || err.ErrorCode != NoSubcommand {
+	if _, _, err := ssco.findScopeAndSubCommand(); err == nil || err.ErrorCode != NoSubCommand {
+		t.Errorf("did not throw error on missing subcommand")
+	}
+
+	os.Args = []string{"prog", "unknownscope"}
+	if _, _, err := ssco.findScopeAndSubCommand(); err == nil || err.ErrorCode != UnknownScope {
+		t.Errorf("did not throw error on unknown scope")
+	}
+
+	os.Args = []string{"prog", "app", "unknowncommand"}
+	if _, _, err := ssco.findScopeAndSubCommand(); err == nil || err.ErrorCode != UnknownSubCommand {
 		t.Errorf("did not throw error on unknown subcommand")
 	}
 }
 
-//func TestSubSubCommandOptionsParser(t *testing.T) {
-//	ssco := testingSubSubDefinitions()
-//
-//func TestSubcommandOptionsParser(t *testing.T) {
-//	sco := SubCommandOptions{
-//		"*": {
-//			{"command", "command to execute", IsSubcommand, ""},
-//			{"foo|f", "some arg", Optional, ""}},
-//		"getenv": {
-//			{"bar|b", "some arg", Optional, ""},
-//			{"name", "app's name", IsArg | Required, ""},
-//			{"key", "environment variable's name", IsArg | Required, ""}},
-//	}
-//
-//	os.Args = []string{"prog", "-fbar", "getenv", "--bar=foo", "foo", "bar"}
-//	scope, options, arguments, _, _ := sco.ParseCommandLine()
-//
-//	if scope != "getenv" {
-//		t.Errorf("SubCommandOptions parsing: failed to correctly parse scope: Expected: getenv, Got: " + scope)
-//	}
-//
-//	if options["foo"].String != "bar" {
-//		t.Errorf("SubCommandOptions parsing: failed to correctly parse option: Expected: bar, Got: " + options["foo"].String)
-//	}
-//
-//	if options["bar"].String != "foo" {
-//		t.Errorf("SubCommandOptions parsing: failed to correctly parse option: Expected:  foo, Got: " + options["foo"].String)
-//	}
-//
-//	if scope != "getenv" {
-//		t.Errorf("SubCommandOptions parsing: failed to correctly parse sub command: Expected: getenv, Got: " + scope)
-//	}
-//
-//	if arguments[0] != "foo" {
-//		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg1: Expected: foo, Got: " + arguments[0])
-//	}
-//
-//	if arguments[1] != "bar" {
-//		t.Errorf("SubCommandOptions parsing: failed to correctly parse arg2: Expected: bar, Got: " + arguments[1])
-//	}
-//}
+func TestSubSubCommandOptionsParser(t *testing.T) {
+	ssco := testingSubSubDefinitions()
+
+	os.Args = []string{"prog", "-sfoo.com", "app", "-ffoo", "setenv", "-p", "-aFOO", "name", "val", "--", "pass", "through"}
+	scope, command, options, arguments, passThrough, err := ssco.ParseCommandLine()
+
+	if err != nil {
+		t.Errorf("Got an unexpected error while parsing SubSubCommandOptions: " + err.Message)
+	}
+
+	if scope != "app" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse scope: Expected: app, Got: " + scope)
+	}
+
+	if command != "setenv" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse command: Expected: setenv, Got: " + scope)
+	}
+
+	if options["server"].String != "foo.com" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse option: Expected: foo.com, Got: " + options["server"].String)
+	}
+
+	if options["alias"].String != "FOO" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse option: Expected:  FOO, Got: " + options["foo"].String)
+	}
+
+	if arguments[0] != "name" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse arg1: Expected: name, Got: " + arguments[0])
+	}
+
+	if arguments[1] != "val" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse arg2: Expected: val, Got: " + arguments[1])
+	}
+
+	if passThrough[0] != "pass" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse pass through[0]: Expected: pass, Got: " + passThrough[0])
+	}
+
+	if passThrough[1] != "through" {
+		t.Errorf("SubSubCommandOptions parsing: failed to correctly parse pass through[0]: Expected: through, Got: " + passThrough[0])
+	}
+}
+
 //
 //func TestErrorMessageForMissingArgs(t *testing.T) {
 //	sco := SubCommandOptions{
