@@ -1,25 +1,12 @@
+Error
+====
+  * use error interface instead of *GetOptError
+
 Subcommands:
 ============
-
-  * create new type `SubCommandOptions`
-  * create convert `SubCommandOptions` -> `Options`
-  * new flag in Option: `IsSubCommand`
-  * new flag in Option: `IsParentCommandOption`
-  * create usage and help functions for `SubCommandOptions`
 
   * Checks: generic options have to be present
   * Checks: "*" must not contain IsArgs
   * Checks: "*" IsSubcommand must be last
-
-
-  * create new type `SubSubCommandOptions`
-  * ...
   * check: subcommand: command has to be first options
 
-  * convert new types to Options
-
-Done
-====
-  * change argv[0] usage in help text
-  * ideally: don't fiddle around w/ env vars
-  * use `usage` for overview help functions (needs split up of usage I guess)
