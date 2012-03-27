@@ -86,13 +86,13 @@ func TestRequiredArgument(t *testing.T) {
 		t.Errorf("missing required argument did raise wrong error")
 	}
 
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Missing required argument <source>" {
-		t.Errorf("wrong error message for missing required argument:\n\texpected: %s\n\tgot     : %s", "Missing required argument <source>", err.Message)
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Error() != "Missing required argument <source>" {
+		t.Errorf("wrong error message for missing required argument:\n\texpected: %s\n\tgot     : %s", "Missing required argument <source>", err.Error())
 	}
 
 	os.Args = []string{"prog", "file1"}
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Message != "Missing required argument <destination>" {
-		t.Errorf("wrong error message for missing required argument:\n\texpected: %s\n\tgot     : %s", "Missing required argument <destination>", err.Message)
+	if _, _, _, err := options.ParseCommandLine(); err == nil || err.Error() != "Missing required argument <destination>" {
+		t.Errorf("wrong error message for missing required argument:\n\texpected: %s\n\tgot     : %s", "Missing required argument <destination>", err.Error())
 	}
 
 	os.Args = []string{"prog", "file1", "file1.bak"}

@@ -127,7 +127,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := ssco.flattenToSubCommandOptions("app"); err != nil {
-		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Error())
 	}
 
 	if sco, _ := ssco.flattenToSubCommandOptions("app"); equalSubCommandOptions(sco, expectedAppSubOptions) == false {
@@ -135,7 +135,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := ssco.flattenToSubCommandOptions("revision"); err != nil {
-		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Error())
 	}
 
 	if sco, _ := ssco.flattenToSubCommandOptions("revision"); equalSubCommandOptions(sco, expectedRevisionOptions) == false {
@@ -159,7 +159,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := ssco.flattenToOptions("app", "getenv"); err != nil {
-		t.Errorf("conversion SubSubCommandOptions -> Options failed (app/getenv); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SubSubCommandOptions -> Options failed (app/getenv); \nGot the following error: %s", err.Error())
 	}
 
 	if options, _ := ssco.flattenToOptions("app", "getenv"); equalOptions(options, expectedAppGetEnvOptions) == false {
@@ -197,7 +197,7 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 
 	os.Args = []string{"prog", "-s", "10.20.30.40", "app", "-ffoo", "getenv", "key"}
 	if _, _, err := ssco.findScopeAndSubCommand(); err != nil {
-		t.Errorf("did not correctly find subcommand app / getenv; Error message: " + err.Message)
+		t.Errorf("did not correctly find subcommand app / getenv; Error message: " + err.Error())
 	}
 
 	if scope, command, _ := ssco.findScopeAndSubCommand(); scope != "app" || command != "getenv" {
@@ -232,7 +232,7 @@ func TestSubSubCommandOptionsParser(t *testing.T) {
 	scope, command, options, arguments, passThrough, err := ssco.ParseCommandLine()
 
 	if err != nil {
-		t.Errorf("Got an unexpected error while parsing SubSubCommandOptions: " + err.Message)
+		t.Errorf("Got an unexpected error while parsing SubSubCommandOptions: " + err.Error())
 	}
 
 	if scope != "app" {
@@ -294,85 +294,59 @@ func TestErrorMessages(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ := ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
-	}
-
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command set help option")
 	}
 
 	os.Args = []string{"prog", "app", "-h"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did set usage option correctly")
 	}
 
 	os.Args = []string{"prog", "app", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not set help option correctly")
 	}
 
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
-	}
 }
 
 func TestWantsHelpAndUsage(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 
 	os.Args = []string{"prog", "-h"}
-	_, _, _, _, _, err := ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ := ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did not set usage option correctly")
 	}
 
 	os.Args = []string{"prog", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
-	}
-
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not help option correctly")
 	}
 
 	os.Args = []string{"prog", "app", "-h"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did not set usage option correclty")
 	}
 
 	os.Args = []string{"prog", "app", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not set help option correctly")
 	}
 
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
-	}
 }
 
 func TestErrorMessageForMissingArgsInSsco(t *testing.T) {
@@ -385,8 +359,8 @@ func TestErrorMessageForMissingArgsInSsco(t *testing.T) {
 		t.Errorf("missing arg did not raise error")
 	}
 
-	if expected := "Missing required argument <name>"; err.Message != expected {
-		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
+	if expected := "Missing required argument <name>"; err.Error() != expected {
+		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Error() + "\n\tExpected: " + expected)
 	}
 
 }

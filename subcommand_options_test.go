@@ -84,7 +84,7 @@ func TestSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := sco.flattenToOptions("getenv"); err != nil {
-		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot the following error: %s", err.Error())
 	}
 
 	if options, _ := sco.flattenToOptions("getenv"); equalOptions(options, expectedGetenvOptions) == false {
@@ -92,7 +92,7 @@ func TestSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := sco.flattenToOptions("register"); err != nil {
-		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot the following error: %s", err.Error())
 	}
 
 	if options, _ := sco.flattenToOptions("register"); equalOptions(options, expectedRegisterOptions) == false {
@@ -190,27 +190,18 @@ func TestSubCommandOptionsParser(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "-h"}
-	_, _, _, _, err := sco.ParseCommandLine()
+	_, parsedOptions, _, _, _ := sco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did not set usage option correctly")
 	}
 
 	os.Args = []string{"prog", "--help"}
-	_, _, _, _, err = sco.ParseCommandLine()
+	_, parsedOptions, _, _, _ = sco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not set help option correctly")
 	}
-
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
-	}
-
 }
 
 func TestErrorMessageForMissingArgs(t *testing.T) {
@@ -241,8 +232,8 @@ func TestErrorMessageForMissingArgs(t *testing.T) {
 		t.Errorf("missing arg did not raise error")
 	}
 
-	if expected := "Missing required argument <name>"; err.Message != expected {
-		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
+	if expected := "Missing required argument <name>"; err.Error() != expected {
+		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Error() + "\n\tExpected: " + expected)
 	}
 
 }
