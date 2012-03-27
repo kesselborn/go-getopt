@@ -1,4 +1,15 @@
 
+0.4.0 / 2012-03-27 
+==================
+
+  * this release introduces SubCommandOptions and SubSubCommandOptions for git
+    like subcommand parsing. The naming will most probably change in the future
+    as it is kind of bad. Code works but needs to be refactored
+
+  * WantsHelp and WantsUsage is not an error anymore but is added to the options
+    map
+
+
 0.3.8 / 2012-01-06
 ==================
 
