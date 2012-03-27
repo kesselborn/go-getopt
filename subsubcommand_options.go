@@ -90,7 +90,7 @@ func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand st
 		arguments = arguments[2:]
 	}
 
-	if scopeScError != nil && ((err != nil && err.ErrorCode != WantsUsage && err.ErrorCode != WantsHelp) || err == nil) {
+	if scopeScError != nil {
 		err = scopeScError
 	}
 

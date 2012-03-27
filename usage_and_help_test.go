@@ -230,14 +230,18 @@ func TestUsageAndHelpOption(t *testing.T) {
 
 	os.Args = []string{"prog", "barbaz", "-d", "-h", "-p5000,6000", "foobar"}
 	syscall.Clearenv()
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsUsage {
-		t.Errorf("usage call did not return help error")
+	parsedOptions, _, _, _ := options.ParseCommandLine()
+
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("usage call did not set usage option correctly")
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "--help", "-p5000,6000", "foobar"}
 	syscall.Clearenv()
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
-		t.Errorf("help call did not return help error")
+	parsedOptions, _, _, _ = options.ParseCommandLine()
+
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("help call did not set help option correclty")
 	}
 }
 
@@ -276,14 +280,16 @@ func TestUsageAndHelpOptionWithOwnIdentifiers(t *testing.T) {
 
 	os.Args = []string{"prog", "barbaz", "-d", "-c", "-p5000,6000", "foobar"}
 	syscall.Clearenv()
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsUsage {
-		t.Errorf("usage call did not return help error with custom '-c' for usage")
+	parsedOptions, _, _, _ := options.ParseCommandLine()
+	if helpOption, present := parsedOptions["chelp"]; !present || helpOption.String != "usage" {
+		t.Errorf("usage call did not set usage option with custom '-c' for usage")
 	}
 
 	os.Args = []string{"prog", "barbaz", "-d", "--chelp", "-p5000,6000", "foobar"}
 	syscall.Clearenv()
-	if _, _, _, err := options.ParseCommandLine(); err == nil || err.ErrorCode != WantsHelp {
-		t.Errorf("help call did not return help error with custom '--chelp' for usage")
+	parsedOptions, _, _, _ = options.ParseCommandLine()
+	if helpOption, present := parsedOptions["chelp"]; !present || helpOption.String != "help" {
+		t.Errorf("help call did not set help option correctly with custom '--chelp' for usage")
 	}
 
 }

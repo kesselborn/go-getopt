@@ -294,85 +294,59 @@ func TestErrorMessages(t *testing.T) {
 	}
 
 	os.Args = []string{"prog", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ := ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
-	}
-
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command set help option")
 	}
 
 	os.Args = []string{"prog", "app", "-h"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did set usage option correctly")
 	}
 
 	os.Args = []string{"prog", "app", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not set help option correctly")
 	}
 
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
-	}
 }
 
 func TestWantsHelpAndUsage(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 
 	os.Args = []string{"prog", "-h"}
-	_, _, _, _, _, err := ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ := ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did not set usage option correctly")
 	}
 
 	os.Args = []string{"prog", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
-	}
-
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not help option correctly")
 	}
 
 	os.Args = []string{"prog", "app", "-h"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsUsage error")
-	}
-
-	if err.ErrorCode != WantsUsage {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "usage" {
+		t.Errorf("Wants usage for global command did not set usage option correclty")
 	}
 
 	os.Args = []string{"prog", "app", "--help"}
-	_, _, _, _, _, err = ssco.ParseCommandLine()
+	_, _, parsedOptions, _, _, _ = ssco.ParseCommandLine()
 
-	if err == nil {
-		t.Errorf("Wants usage for global command did not throw correct WantsHelp error")
+	if helpOption, present := parsedOptions["help"]; !present || helpOption.String != "help" {
+		t.Errorf("Wants help for global command did not set help option correctly")
 	}
 
-	if err.ErrorCode != WantsHelp {
-		t.Errorf("Wants usage for global command not correctly identified: Error message was: " + err.Message)
-	}
 }
 
 func TestErrorMessageForMissingArgsInSsco(t *testing.T) {

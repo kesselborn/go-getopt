@@ -16,8 +16,6 @@ const (
 	ConsistencyError
 	ConfigFileNotFound
 	ConfigParsed
-	WantsUsage
-	WantsHelp
 	MissingArgument
 	NoSubCommand
 	NoScope
@@ -49,13 +47,13 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 }
 
 // todo: method signature sucks
-func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string) (err *GetOptError) {
+func (optionsDefinition Options) checkForHelpOrUsage(args []string, usageString string, helpString string) (wantsHelp bool, wantsUsage bool) {
 	for _, arg := range args {
 		switch arg {
 		case usageString:
-			err = &GetOptError{WantsUsage, ""}
+			wantsUsage = true
 		case helpString:
-			err = &GetOptError{WantsHelp, ""}
+			wantsHelp = true
 		case OPTIONS_SEPARATOR:
 			goto allOptsParsed
 		}
@@ -88,10 +86,8 @@ func (optionsDefinition Options) parseCommandLineImpl(args []string, environment
 		}
 
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
-		usageString = "-" + usageString
-		helpString = "--" + helpString
 
-		wantsHelpOrUsage := optionsDefinition.checkForHelpOrUsage(args, usageString, helpString)
+		wantsHelp, wantsUsage := optionsDefinition.checkForHelpOrUsage(args, "-"+usageString, "--"+helpString)
 
 		if err == nil {
 			err = optionsDefinition.setEnvAndConfigValues(options, environment)
@@ -191,8 +187,11 @@ func (optionsDefinition Options) parseCommandLineImpl(args []string, environment
 				err = &GetOptError{MissingArgument, "Missing required argument <" + firstMissingArgumentName + ">"}
 			}
 		}
-		if wantsHelpOrUsage != nil {
-			err = wantsHelpOrUsage
+		if wantsHelp {
+			options[helpString], err = assignValue("", "help")
+		}
+		if wantsUsage {
+			options[helpString], err = assignValue("", "usage")
 		}
 	}
 
