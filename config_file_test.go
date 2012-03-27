@@ -1,9 +1,9 @@
 package getopt
 
 import (
-	"testing"
 	"fmt"
 	"os"
+	"testing"
 )
 
 func TestConfigParsing(t *testing.T) {
@@ -21,15 +21,18 @@ func TestConfigParsing(t *testing.T) {
 	}
 
 	configFile, _ := readConfigFile("./config_sample.conf")
-	if config := mapifyConfig(configFile); config["FOO"] != "bar" || config["BAR"] != "baz" {
+	if config := mapifyEnvironment(configFile); config["FOO"] != "bar" || config["BAR"] != "baz" {
 		t.Errorf("config file was not mapped correctly:\ngot:      |" + fmt.Sprintf("%#v", config) + "\nexpected: |map[string] string{\"BAR\":\"baz\", \"FOO\":\"bar\"}\n")
 	}
 }
 
 func TestOptionCascade(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", Required | IsConfigFile, "/tmp/foo"},
+		"",
+		Definitions{
+			{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+			{"config|c|CONFIG", "configuration file", Required | IsConfigFile, "/tmp/foo"},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -80,8 +83,11 @@ func TestOptionCascade(t *testing.T) {
 
 func TestDefaultConfigFileAndRequiredOption(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", Required, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		"",
+		Definitions{
+			{"foo|f|FOO", "bogus var", Required, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -93,8 +99,11 @@ func TestDefaultConfigFileAndRequiredOption(t *testing.T) {
 
 func TestDefaultConfigFile(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		"",
+		Definitions{
+			{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -106,8 +115,11 @@ func TestDefaultConfigFile(t *testing.T) {
 
 func TestDefaultConfigFileWithNoLongOpt(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault | NoLongOpt, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		"",
+		Definitions{
+			{"foo|f|FOO", "bogus var", ExampleIsDefault | NoLongOpt, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "./config_sample.conf"},
+		},
 	}
 
 	os.Args = []string{"prog"}
@@ -119,8 +131,11 @@ func TestDefaultConfigFileWithNoLongOpt(t *testing.T) {
 
 func TestConfigFileNotFoundErrors(t *testing.T) {
 	options := Options{
-		{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
-		{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "/i/dont/exist.conf"},
+		"",
+		Definitions{
+			{"foo|f|FOO", "bogus var", ExampleIsDefault, "yamalla"},
+			{"config|c|CONFIG", "configuration file", IsConfigFile | ExampleIsDefault, "/i/dont/exist.conf"},
+		},
 	}
 
 	os.Args = []string{"prog"}

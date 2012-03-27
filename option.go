@@ -7,18 +7,21 @@ package getopt
 
 import "strings"
 
-const Required = 1
-const Optional = 2
-const Flag = 4
-const NoLongOpt = 8
-const ExampleIsDefault = 16
-const IsArg = 32
-const Argument = 64
-const Usage = 128
-const Help = 256
-const IsPassThrough = 512
-const IsConfigFile = 1024
-const NoEnvHelp = 2048
+const (
+	Required = 1 << iota
+	Optional
+	Flag
+	NoLongOpt
+	ExampleIsDefault
+	IsArg
+	Argument
+	Usage
+	Help
+	IsPassThrough
+	IsConfigFile
+	NoEnvHelp
+	IsSubCommand
+)
 
 type Option struct {
 	OptionDefinition string

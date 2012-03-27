@@ -11,21 +11,26 @@ import (
 	"path/filepath"
 )
 
-type Options []Option
+type Definitions []Option
+type Description string
 
-func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, overwrites []string) (err *GetOptError) {
-	overwritesMap := mapifyConfig(overwrites)
-	acceptedEnvVars := make(map[string]Option)
+type Options struct {
+	Description Description
+	Definitions Definitions
+}
 
-	for _, opt := range optionsDefinition {
+func (optionsDefinition Options) setEnvAndConfigValues(options map[string]OptionValue, environment map[string]string) (err *GetOptError) {
+	significantEnvVars := make(map[string]Option)
+
+	for _, opt := range optionsDefinition.Definitions {
 		if value := opt.EnvVar(); value != "" {
-			acceptedEnvVars[value] = opt
+			significantEnvVars[value] = opt
 		}
 	}
 
-	for key, acceptedEnvVar := range acceptedEnvVars {
-		if value := overwritesMap[key]; value != "" {
-			options[acceptedEnvVar.Key()], err = assignValue(acceptedEnvVar.DefaultValue, value)
+	for key, significantEnvVar := range significantEnvVars {
+		if value := environment[key]; value != "" {
+			options[significantEnvVar.Key()], err = assignValue(significantEnvVar.DefaultValue, value)
 			if err != nil {
 				break
 			}
@@ -36,10 +41,42 @@ func (optionsDefinition Options) setEnvAndConfigValues(options map[string]Option
 }
 
 func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptError) {
-	consistencyErrorPrefix := "wrong getopt usage: "
-
 	foundOptionalArg := false
-	for _, option := range optionsDefinition {
+	shortOpts := make(map[string]bool, len(optionsDefinition.Definitions))
+	longOpts := make(map[string]bool, len(optionsDefinition.Definitions))
+	envVars := make(map[string]bool, len(optionsDefinition.Definitions))
+
+	for _, option := range optionsDefinition.Definitions {
+		optionString := fmt.Sprintf("%#v", option)
+		consistencyErrorPrefix := optionString + " wrong getopt usage: "
+
+		if option.HasLongOpt() {
+			longOpt := option.LongOpt()
+			if _, present := longOpts[longOpt]; present {
+				err = &GetOptError{ConsistencyError, consistencyErrorPrefix + " long opt '" + longOpt + "' already used in other option"}
+			} else {
+				longOpts[longOpt] = true
+			}
+		}
+
+		if option.HasShortOpt() {
+			shortOpt := option.ShortOpt()
+			if _, present := shortOpts[shortOpt]; present {
+				err = &GetOptError{ConsistencyError, consistencyErrorPrefix + " short opt '" + shortOpt + "' already used in other option"}
+			} else {
+				shortOpts[shortOpt] = true
+			}
+		}
+
+		if option.HasEnvVar() {
+			envVar := option.EnvVar()
+			if _, present := envVars[envVar]; present {
+				err = &GetOptError{ConsistencyError, consistencyErrorPrefix + " environment variable '" + envVar + "' already used in other option"}
+			} else {
+				envVars[envVar] = true
+			}
+		}
+
 		switch {
 		case option.Flags&IsArg > 0 && option.Flags&Required == 0 && option.Flags&Optional == 0:
 			err = &GetOptError{ConsistencyError, consistencyErrorPrefix + "an argument must be explicitly set to be Optional or Required"}
@@ -64,7 +101,7 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 }
 
 func (options Options) FindOption(optionString string) (option Option, found bool) {
-	for _, cur := range options {
+	for _, cur := range options.Definitions {
 		if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
 			option = cur
 			found = true
@@ -100,7 +137,7 @@ func (options Options) IsFlag(optionName string) (isFlag bool) {
 }
 
 func (options Options) ConfigOptionKey() (key string) {
-	for _, option := range options {
+	for _, option := range options.Definitions {
 		if option.Flags&IsConfigFile > 0 {
 			key = option.Key()
 			break
@@ -111,9 +148,9 @@ func (options Options) ConfigOptionKey() (key string) {
 }
 
 func (options Options) RequiredArguments() (requiredOptions Options) {
-	for _, cur := range options {
-		if cur.Flags&Required != 0 && cur.Flags&IsArg != 0 {
-			requiredOptions = append(requiredOptions, cur)
+	for _, cur := range options.Definitions {
+		if (cur.Flags&Required != 0 && cur.Flags&IsArg != 0) || cur.Flags&IsSubCommand != 0 {
+			requiredOptions.Definitions = append(requiredOptions.Definitions, cur)
 		}
 	}
 
@@ -121,7 +158,7 @@ func (options Options) RequiredArguments() (requiredOptions Options) {
 }
 
 func (options Options) RequiredOptions() (requiredOptions []string) {
-	for _, cur := range options {
+	for _, cur := range options.Definitions {
 		if cur.Flags&Required != 0 && cur.Flags&IsArg == 0 && cur.Flags&IsPassThrough == 0 {
 			requiredOptions = append(requiredOptions, cur.LongOpt())
 		}
@@ -130,12 +167,11 @@ func (options Options) RequiredOptions() (requiredOptions []string) {
 	return
 }
 
-func (options Options) Usage() (output string) {
-	programName := filepath.Base(os.Args[0])
-	output = "Usage: " + programName
+func (options Options) commandDefinition(arg0 string) (output string) {
+	output = arg0
 
 	passThroughSeparatorPrinted := false
-	for _, option := range options {
+	for _, option := range options.Definitions {
 		if option.Flags&IsPassThrough > 0 && !passThroughSeparatorPrinted {
 			output = output + " --"
 			passThroughSeparatorPrinted = true
@@ -144,26 +180,40 @@ func (options Options) Usage() (output string) {
 		output = output + " " + option.Usage()
 	}
 
-	output = output + "\n\n"
+	return
+}
+
+func (options Options) UsageCustomArg0(arg0 string) (output string) {
+	return "Usage: " + options.commandDefinition(arg0) + "\n\n"
+}
+
+func (options Options) Usage() (output string) {
+	return options.UsageCustomArg0(filepath.Base(os.Args[0]))
+}
+
+func (options Options) Help() (output string) {
+	return options.HelpCustomArg0(filepath.Base(os.Args[0]))
+}
+
+func (options Options) calculateLongOptTextLenght() (length int) {
+	for _, option := range options.Definitions {
+		if curLength := len(option.LongOptString()); curLength > length {
+			length = curLength
+		}
+	}
+
+	length = length + 2
 
 	return
 }
 
-func (options Options) Help(description string) (output string) {
-	output = options.Usage()
-	if description != "" {
-		output = output + description + "\n\n"
+func (options Options) HelpCustomArg0(arg0 string) (output string) {
+	output = options.UsageCustomArg0(arg0)
+	if options.Description != "" {
+		output = output + string(options.Description) + "\n\n"
 	}
 
-	longOptTextLength := 0
-
-	for _, option := range options {
-		if length := len(option.LongOptString()); length > longOptTextLength {
-			longOptTextLength = length
-		}
-	}
-
-	longOptTextLength = longOptTextLength + 2
+	longOptTextLength := options.calculateLongOptTextLenght()
 
 	var argumentsString string
 	var optionsString string
@@ -171,8 +221,10 @@ func (options Options) Help(description string) (output string) {
 
 	usageOpt, helpOpt := options.usageHelpOptionNames()
 
-	for _, option := range options {
+	for _, option := range options.Definitions {
 		switch {
+		case option.Flags&IsSubCommand > 0:
+			continue
 		case option.Flags&IsPassThrough > 0:
 			passThroughString = passThroughString + option.HelpText(longOptTextLength) + "\n"
 		case option.Flags&IsArg > 0:

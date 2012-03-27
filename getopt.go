@@ -7,17 +7,23 @@ package getopt
 
 import "os"
 
-const InvalidOption = 1
-const MissingValue = 2
-const InvalidValue = 3
-const MissingOption = 4
-const OptionValueError = 5
-const ConsistencyError = 6
-const ConfigFileNotFound = 8
-const ConfigParsed = 9
-const WantsUsage = 10
-const WantsHelp = 11
-const MissingArgument = 12
+const (
+	InvalidOption = iota
+	MissingValue
+	InvalidValue
+	MissingOption
+	OptionValueError
+	ConsistencyError
+	ConfigFileNotFound
+	ConfigParsed
+	WantsUsage
+	WantsHelp
+	MissingArgument
+	NoSubCommand
+	NoScope
+	UnknownSubCommand
+	UnknownScope
+)
 
 const OPTIONS_SEPARATOR = "--"
 
@@ -30,7 +36,7 @@ func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOp
 	shortOpt = "h"
 	longOpt = "help"
 
-	for _, option := range optionsDefinition {
+	for _, option := range optionsDefinition.Definitions {
 		if option.Flags&Usage > 0 {
 			shortOpt = option.ShortOpt()
 		}
@@ -60,17 +66,16 @@ allOptsParsed:
 }
 
 func (optionsDefinition Options) ParseCommandLine() (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-	return optionsDefinition.parseCommandLineImpl(0)
+	return optionsDefinition.parseCommandLineImpl(os.Args[1:], mapifyEnvironment(os.Environ()), 0)
 }
 
-func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
-	args := os.Args[1:]
+func (optionsDefinition Options) parseCommandLineImpl(args []string, environment map[string]string, flags int) (options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 
 	if err = checkOptionsDefinitionConsistency(optionsDefinition); err == nil {
 		options = make(map[string]OptionValue)
 		arguments = make([]string, 0)
 
-		for _, option := range optionsDefinition {
+		for _, option := range optionsDefinition.Definitions {
 			switch {
 			case option.Flags&Flag != 0: // all flags are false by default
 				options[option.Key()], err = assignValue(false, "false")
@@ -85,10 +90,11 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 		usageString, helpString := optionsDefinition.usageHelpOptionNames()
 		usageString = "-" + usageString
 		helpString = "--" + helpString
-		err = optionsDefinition.checkForHelpOrUsage(args, usageString, helpString)
+
+		wantsHelpOrUsage := optionsDefinition.checkForHelpOrUsage(args, usageString, helpString)
 
 		if err == nil {
-			err = optionsDefinition.setEnvAndConfigValues(options, os.Environ())
+			err = optionsDefinition.setEnvAndConfigValues(options, environment)
 
 			for i := 0; i < len(args) && err == nil; i++ {
 
@@ -162,8 +168,8 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 
 		if configKey := optionsDefinition.ConfigOptionKey(); configKey != "" && flags&ConfigParsed == 0 {
 			if option, found := options[configKey]; found {
-				if e := processConfigFile(option.String); e == nil {
-					return optionsDefinition.parseCommandLineImpl(flags | ConfigParsed)
+				if environment, e := processConfigFile(option.String, environment); e == nil {
+					return optionsDefinition.parseCommandLineImpl(args, environment, flags|ConfigParsed)
 				} else if option.Set == true { // if config file had a default value, don't freak out
 					err = e
 				}
@@ -180,10 +186,13 @@ func (optionsDefinition Options) parseCommandLineImpl(flags int) (options map[st
 
 			requiredArguments := optionsDefinition.RequiredArguments()
 
-			if numOfRequiredArguments := len(requiredArguments); numOfRequiredArguments > len(arguments) {
-				firstMissingArgumentName := requiredArguments[len(arguments)].Key()
+			if numOfRequiredArguments := len(requiredArguments.Definitions); numOfRequiredArguments > len(arguments) {
+				firstMissingArgumentName := requiredArguments.Definitions[len(arguments)].Key()
 				err = &GetOptError{MissingArgument, "Missing required argument <" + firstMissingArgumentName + ">"}
 			}
+		}
+		if wantsHelpOrUsage != nil {
+			err = wantsHelpOrUsage
 		}
 	}
 

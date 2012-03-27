@@ -9,9 +9,12 @@ import "testing"
 
 func TestIsOptionalOption(t *testing.T) {
 	options := Options{
-		{"verbose", "show verbose output", Optional, ""},
-		{"logfile|l", "log to file <logfile>", Optional | NoLongOpt, ""},
-		{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+		"",
+		Definitions{
+			{"verbose", "show verbose output", Optional, ""},
+			{"logfile|l", "log to file <logfile>", Optional | NoLongOpt, ""},
+			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+		},
 	}
 
 	if options.IsOptional("verbose") != true {
@@ -35,9 +38,12 @@ func TestIsOptionalOption(t *testing.T) {
 
 func TestIsRequiredOption(t *testing.T) {
 	options := Options{
-		{"verbose", "show verbose output", Required, ""},
-		{"logfile|l", "log to file <logfile>", Required | NoLongOpt, ""},
-		{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+		"",
+		Definitions{
+			{"verbose", "show verbose output", Required, ""},
+			{"logfile|l", "log to file <logfile>", Required | NoLongOpt, ""},
+			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", 0, ""},
+		},
 	}
 
 	if options.IsRequired("verbose") != true {
@@ -61,9 +67,12 @@ func TestIsRequiredOption(t *testing.T) {
 
 func TestIsFlagOption(t *testing.T) {
 	options := Options{
-		{"verbose", "show verbose output", Flag, ""},
-		{"logfile|l", "log to file <logfile>", Flag | Optional | NoLongOpt, ""},
-		{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""},
+		"",
+		Definitions{
+			{"verbose", "show verbose output", Flag, ""},
+			{"logfile|l", "log to file <logfile>", Flag | Optional | NoLongOpt, ""},
+			{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""},
+		},
 	}
 
 	if options.IsFlag("verbose") != true {
@@ -90,7 +99,7 @@ func TestFindOption(t *testing.T) {
 	option2 := Option{"logfile|l", "log to file <logfile>", Optional | NoLongOpt, ""}
 	option3 := Option{"verbose", "show verbose output", Flag, ""}
 
-	options := Options{option1, option2, option3}
+	options := Options{"", Definitions{option1, option2, option3}}
 
 	if val, _ := options.FindOption("method"); val.neq(option1) {
 		t.Errorf("couldn't find option 'method'")

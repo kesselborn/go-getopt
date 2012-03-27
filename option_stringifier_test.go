@@ -55,12 +55,22 @@ func TestUsageOutput(t *testing.T) {
 		t.Errorf("Error creating usage text (optional flag):\ngot:      " + got + "\nexpected: " + expected)
 	}
 
+	if got, expected := (Option{"method|m", "...", Flag | Optional | NoLongOpt, ""}.Usage()),
+		"[-m]"; got != expected {
+		t.Errorf("Error creating usage text (optional flag):\ngot:      " + got + "\nexpected: " + expected)
+	}
+
 	if got, expected := (Option{"method", "...", Flag | Optional, ""}.Usage()),
 		"[--method]"; got != expected {
 		t.Errorf("Error creating usage text (optional flag, no short):\ngot:      " + got + "\nexpected: " + expected)
 	}
 
 	if got, expected := (Option{"method|m", "...", Flag, ""}.Usage()),
+		"-m"; got != expected {
+		t.Errorf("Error creating usage text (flag):\ngot:      " + got + "\nexpected: " + expected)
+	}
+
+	if got, expected := (Option{"method|m", "...", Flag | NoLongOpt, ""}.Usage()),
 		"-m"; got != expected {
 		t.Errorf("Error creating usage text (flag):\ngot:      " + got + "\nexpected: " + expected)
 	}
@@ -89,6 +99,18 @@ func TestBasicOutput(t *testing.T) {
 
 	if got, expected := (Option{"method|m", "method: one of either 'heartbeat' or 'nagios'", Required, ""}.HelpText(20)),
 		"    -m, --method=<method>      method: one of either 'heartbeat' or 'nagios'"; got != expected {
+		t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected)
+	}
+}
+
+func TestBasicOutputForFlags(t *testing.T) {
+	if got, expected := (Option{"method|m", "...", Flag, ""}.HelpText(20)),
+		"    -m, --method               ..."; got != expected {
+		t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected)
+	}
+
+	if got, expected := (Option{"method|m", "...", Flag | NoLongOpt, ""}.HelpText(20)),
+		"    -m                         ..."; got != expected {
 		t.Errorf("Error stringifying option:\ngot:      " + got + "\nexpected: " + expected)
 	}
 }

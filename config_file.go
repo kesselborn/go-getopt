@@ -2,13 +2,11 @@ package getopt
 
 import (
 	"io/ioutil"
-	"strings"
-	"fmt"
 	"regexp"
-	"os"
+	"strings"
 )
 
-func mapifyConfig(environment []string) (envArray map[string]string) {
+func mapifyEnvironment(environment []string) (envArray map[string]string) {
 	envArray = make(map[string]string)
 
 	for _, cur := range environment {
@@ -22,13 +20,14 @@ func mapifyConfig(environment []string) (envArray map[string]string) {
 }
 
 func readConfigFile(path string) (configEntries []string, err *GetOptError) {
+	// ignore all lines without a '=' and with invalid key names
 	validConfigEntry := regexp.MustCompile("^[A-z0-9_.,]+=.*$")
 
 	content, ioErr := ioutil.ReadFile(path)
-	contentStringified := fmt.Sprintf("%s", content)
+	contentStringified := string(content)
 
 	if ioErr != nil {
-		err = &GetOptError{ConfigFileNotFound, ioErr.String()}
+		err = &GetOptError{ConfigFileNotFound, ioErr.Error()}
 	} else {
 		for _, line := range strings.Split(contentStringified, "\n") {
 			if validConfigEntry.MatchString(line) {
@@ -40,12 +39,15 @@ func readConfigFile(path string) (configEntries []string, err *GetOptError) {
 	return
 }
 
-func processConfigFile(path string) (err *GetOptError) {
-	configEntries, err := readConfigFile(path)
+func processConfigFile(path string, environment map[string]string) (newEnvironment map[string]string, err *GetOptError) {
+	newEnvironment = environment
+
+	configEntries, err := readConfigFile(strings.TrimSpace(path))
+
 	if err == nil {
-		for key, value := range mapifyConfig(configEntries) {
-			if os.Getenv(key) == "" {
-				os.Setenv(key, value)
+		for key, value := range mapifyEnvironment(configEntries) {
+			if newEnvironment[key] == "" {
+				newEnvironment[key] = value
 			}
 		}
 	}
