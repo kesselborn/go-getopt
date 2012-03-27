@@ -1,13 +1,13 @@
 package main
 
 import (
-  "fmt"
-  getopt "github.com/kesselborn/go-getopt"
-  "os"
+	"fmt"
+	getopt "github.com/kesselborn/go-getopt"
+	"os"
 )
 
 func main() {
-  ssco := getopt.SubSubCommandOptions{
+	ssco := getopt.SubSubCommandOptions{
 		getopt.Options{
 			"global description",
 			getopt.Definitions{
@@ -64,26 +64,28 @@ func main() {
 		},
 	}
 
-  scope, subCommand, options, arguments, passThrough, e := ssco.ParseCommandLine()
+	scope, subCommand, options, arguments, passThrough, e := ssco.ParseCommandLine()
 
-  if e != nil {
-    exit_code := 0
+	help, wantsHelp := options["help"]
 
-    switch {
-    case e.ErrorCode == getopt.WantsUsage:
-      fmt.Print(ssco.Usage())
-    case e.ErrorCode == getopt.WantsHelp:
-      fmt.Print(ssco.Help())
-    default:
-      fmt.Println(ssco.Help(), "\n", "**** Error: ", e.Message, "\n")
-      exit_code = e.ErrorCode
-    }
-    os.Exit(exit_code)
-  }
+	if e != nil || wantsHelp {
+		exit_code := 0
 
-  fmt.Printf("scope:\n%s", scope)
-  fmt.Printf("subCommand:\n%s", subCommand)
-  fmt.Printf("options:\n%#v", options)
-  fmt.Printf("arguments: %#v\n", arguments)
-  fmt.Printf("passThrough: %#v\n", passThrough)
+		switch {
+		case wantsHelp && help.String == "usage":
+			fmt.Print(ssco.Usage())
+		case wantsHelp && help.String == "help":
+			fmt.Print(ssco.Help())
+		default:
+			fmt.Println("**** Error: ", e.Error(), "\n", ssco.Help())
+			exit_code = e.ErrorCode
+		}
+		os.Exit(exit_code)
+	}
+
+	fmt.Printf("scope:\n%s", scope)
+	fmt.Printf("subCommand:\n%s", subCommand)
+	fmt.Printf("options:\n%#v", options)
+	fmt.Printf("arguments: %#v\n", arguments)
+	fmt.Printf("passThrough: %#v\n", passThrough)
 }

@@ -3,7 +3,7 @@ build: fmt
 	go build -x
 
 fmt:
-	gofmt -s=true -w *.go
+	gofmt -s=true -w */*.go *.go
 
 test:
 	go test -v
