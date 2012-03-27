@@ -7,3 +7,5 @@ _*.go
 tags
 simple-example/simple-example
 subcommand-example/subcommand-example
+subsubcommand-example/subsubcommand-example
+Session.vim
