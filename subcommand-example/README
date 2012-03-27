@@ -1,0 +1,19 @@
+# Try the following commands:
+
+./getopt-sample-app                  # returns an error that required option is missing
+
+./getopt-sample-app -i4              # works
+./getopt-sample-app -i 4             # same as above
+./getopt-sample-app --instances 4    # same as above
+./getopt-sample-app --instances=4    # same as above
+
+./getopt-sample-app -di4
+./getopt-sample-app -d -i4           # same as above
+./getopt-sample-app -d -i 4          # same as above
+
+# Execute commands below and look at the value of the 'keys' option:
+./getopt-sample-app -i4                                                                # set via default config file
+KEYS=from,env,var ./getopt-sample-app -i4                                              # set via env var
+./getopt-sample-app -i4 -c config_sample_2.conf                                        # set via other config file
+KEYS=from,env,var ./getopt-sample-app -i4 -c config_sample_2.conf                      # env var is higher prioritized than alternative config file
+KEYS=from,env,var ./getopt-sample-app -i4 -c config_sample_2.conf --keys=from,option   # passing in option overwrites everything else
