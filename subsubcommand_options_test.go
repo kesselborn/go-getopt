@@ -127,7 +127,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := ssco.flattenToSubCommandOptions("app"); err != nil {
-		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (app); \nGot the following error: %s", err.Error())
 	}
 
 	if sco, _ := ssco.flattenToSubCommandOptions("app"); equalSubCommandOptions(sco, expectedAppSubOptions) == false {
@@ -135,7 +135,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := ssco.flattenToSubCommandOptions("revision"); err != nil {
-		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SuSubCommandOptions -> SubCommandOptions failed (revision); \nGot the following error: %s", err.Error())
 	}
 
 	if sco, _ := ssco.flattenToSubCommandOptions("revision"); equalSubCommandOptions(sco, expectedRevisionOptions) == false {
@@ -159,7 +159,7 @@ func TestSubSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := ssco.flattenToOptions("app", "getenv"); err != nil {
-		t.Errorf("conversion SubSubCommandOptions -> Options failed (app/getenv); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SubSubCommandOptions -> Options failed (app/getenv); \nGot the following error: %s", err.Error())
 	}
 
 	if options, _ := ssco.flattenToOptions("app", "getenv"); equalOptions(options, expectedAppGetEnvOptions) == false {
@@ -197,7 +197,7 @@ func TestSubSubCommandSubCommand(t *testing.T) {
 
 	os.Args = []string{"prog", "-s", "10.20.30.40", "app", "-ffoo", "getenv", "key"}
 	if _, _, err := ssco.findScopeAndSubCommand(); err != nil {
-		t.Errorf("did not correctly find subcommand app / getenv; Error message: " + err.Message)
+		t.Errorf("did not correctly find subcommand app / getenv; Error message: " + err.Error())
 	}
 
 	if scope, command, _ := ssco.findScopeAndSubCommand(); scope != "app" || command != "getenv" {
@@ -232,7 +232,7 @@ func TestSubSubCommandOptionsParser(t *testing.T) {
 	scope, command, options, arguments, passThrough, err := ssco.ParseCommandLine()
 
 	if err != nil {
-		t.Errorf("Got an unexpected error while parsing SubSubCommandOptions: " + err.Message)
+		t.Errorf("Got an unexpected error while parsing SubSubCommandOptions: " + err.Error())
 	}
 
 	if scope != "app" {
@@ -359,8 +359,8 @@ func TestErrorMessageForMissingArgsInSsco(t *testing.T) {
 		t.Errorf("missing arg did not raise error")
 	}
 
-	if expected := "Missing required argument <name>"; err.Message != expected {
-		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
+	if expected := "Missing required argument <name>"; err.Error() != expected {
+		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Error() + "\n\tExpected: " + expected)
 	}
 
 }

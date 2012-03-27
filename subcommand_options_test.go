@@ -84,7 +84,7 @@ func TestSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := sco.flattenToOptions("getenv"); err != nil {
-		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SubCommandOptions -> Options failed (getenv); \nGot the following error: %s", err.Error())
 	}
 
 	if options, _ := sco.flattenToOptions("getenv"); equalOptions(options, expectedGetenvOptions) == false {
@@ -92,7 +92,7 @@ func TestSubCommandOptionsConverter(t *testing.T) {
 	}
 
 	if _, err := sco.flattenToOptions("register"); err != nil {
-		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot the following error: %s", err.Message)
+		t.Errorf("conversion SubCommandOptions -> Options failed (register); \nGot the following error: %s", err.Error())
 	}
 
 	if options, _ := sco.flattenToOptions("register"); equalOptions(options, expectedRegisterOptions) == false {
@@ -232,8 +232,8 @@ func TestErrorMessageForMissingArgs(t *testing.T) {
 		t.Errorf("missing arg did not raise error")
 	}
 
-	if expected := "Missing required argument <name>"; err.Message != expected {
-		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Message + "\n\tExpected: " + expected)
+	if expected := "Missing required argument <name>"; err.Error() != expected {
+		t.Errorf("Error handling for missing arguments is messed up:\n\tGot     : " + err.Error() + "\n\tExpected: " + expected)
 	}
 
 }

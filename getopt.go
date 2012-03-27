@@ -27,7 +27,11 @@ const OPTIONS_SEPARATOR = "--"
 
 type GetOptError struct {
 	ErrorCode int
-	Message   string
+	message   string
+}
+
+func (err *GetOptError) Error() (message string) {
+	return err.message
 }
 
 func (optionsDefinition Options) usageHelpOptionNames() (shortOpt string, longOpt string) {

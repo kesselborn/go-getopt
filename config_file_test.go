@@ -12,7 +12,7 @@ func TestConfigParsing(t *testing.T) {
 	}
 
 	if _, err := readConfigFile("./config_sample.conf"); err != nil {
-		t.Errorf("reading an existing config file failed: " + err.Message)
+		t.Errorf("reading an existing config file failed: " + err.Error())
 	}
 
 	expected := []string{"FOO=bar", "BAR=baz"}
@@ -141,12 +141,12 @@ func TestConfigFileNotFoundErrors(t *testing.T) {
 	os.Args = []string{"prog"}
 	os.Setenv("FOO", "")
 	if opts, _, _, err := options.ParseCommandLine(); opts["foo"].String != "yamalla" || err != nil {
-		t.Errorf("did fail with non-existant default config file, error message: '" + err.Message + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
+		t.Errorf("did fail with non-existant default config file, error message: '" + err.Error() + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
 	}
 
 	os.Args = []string{"prog", "-c", "/i/dont/but/was/set/explicitly.conf"}
 	os.Setenv("FOO", "")
 	if opts, _, _, err := options.ParseCommandLine(); opts["foo"].String != "yamalla" || err.ErrorCode != ConfigFileNotFound {
-		t.Errorf("did fail with non-existant set config file, error message: '" + err.Message + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
+		t.Errorf("did fail with non-existant set config file, error message: '" + err.Error() + "', expected: 'yamalla', got: '" + opts["foo"].String + "'")
 	}
 }
