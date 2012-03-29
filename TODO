@@ -9,4 +9,4 @@ Subcommands:
   * Checks: "*" must not contain IsArgs
   * Checks: "*" IsSubcommand must be last
   * check: subcommand: command has to be first options
-
+  * check: sub and subsub contains at least one option w/ IsSubCommand flag

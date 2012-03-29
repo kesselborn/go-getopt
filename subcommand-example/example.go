@@ -11,7 +11,7 @@ func main() {
 		getopt.Options{
 			"global description",
 			getopt.Definitions{
-				{"foo|f", "some arg", getopt.Optional, ""},
+				{"foo|f", "some arg", getopt.Optional | getopt.ExampleIsDefault, "foo"},
 				{"command", "command to execute", getopt.IsSubCommand, ""},
 			},
 		},

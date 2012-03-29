@@ -12,7 +12,7 @@ func main() {
 			"global description",
 			getopt.Definitions{
 				{"config|c", "config file", getopt.IsConfigFile | getopt.ExampleIsDefault, "/etc/visor.conf"},
-				{"server|s", "doozer server", getopt.Optional, ""},
+				{"server|s", "doozer server", getopt.Required, ""},
 				{"scope", "scope", getopt.IsSubCommand, ""},
 			},
 		},

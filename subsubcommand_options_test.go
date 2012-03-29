@@ -71,6 +71,55 @@ func testingSubSubDefinitions() (ssco SubSubCommandOptions) {
 
 	return
 }
+
+func TestExampleIsDefaultError(t *testing.T) {
+	ssco := SubSubCommandOptions{
+		Options{
+			"global description",
+			Definitions{
+				{"server|s", "doozer server", Required | ExampleIsDefault, ""},
+				{"scope", "scope", IsSubCommand, ""},
+			},
+		},
+		Scopes{
+			"app": {
+				Options{
+					"app description",
+					Definitions{
+						{"foo|f", "a param", Optional, ""},
+						{"command", "command to execute", IsSubCommand, ""},
+					},
+				},
+				SubCommands{
+					"getenv": {
+						"app getenv description",
+						Definitions{
+							{"key", "environment variable's name", IsArg | Required, ""},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	os.Args = []string{"prog", "app", "getenv", "foo"}
+
+	_, _, _, _, _, err := ssco.ParseCommandLine()
+
+	if err != nil {
+		t.Errorf("got error where no error was: %#v", err)
+	}
+
+	os.Args = []string{"prog", "nonexistantscope"}
+
+	_, _, _, _, _, err = ssco.ParseCommandLine()
+
+	if err.ErrorCode != UnknownScope {
+		t.Errorf("wrong scope was detected incorrectly, got error: %d: %s", err.ErrorCode, err.Error())
+	}
+
+}
+
 func TestSubSubCommandOptionsConverter(t *testing.T) {
 	ssco := testingSubSubDefinitions()
 

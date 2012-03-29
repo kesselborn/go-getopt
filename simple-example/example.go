@@ -46,10 +46,12 @@ func main() {
 	fmt.Printf("debug: %#v\n", options["debug"].Bool)
 	fmt.Printf("config: %#v\n", options["config"].String)
 	fmt.Printf("ports: %#v\n", options["ports"].IntArray)
+	fmt.Printf("sports: %#v\n", options["sports"].IntArray)
 	fmt.Printf("secondaryports: %#v\n", options["sports"].IntArray)
 	fmt.Printf("instances: %#v\n", options["instances"].Int)
 	fmt.Printf("keys: %#v\n", options["keys"].StrArray)
 	fmt.Printf("logfile: %#v\n", options["logfile"].String)
+	fmt.Printf("directories: %#v\n", options["directories"].String)
 	fmt.Printf("files: %#v\n", options["files"].StrArray)
 
 	fmt.Printf("arguments: %#v\n", arguments)
