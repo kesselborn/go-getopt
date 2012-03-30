@@ -81,16 +81,26 @@ func (ssco SubSubCommandOptions) findScopeAndSubCommand() (scope string, subComm
 
 func (ssco SubSubCommandOptions) ParseCommandLine() (scope string, subCommand string, options map[string]OptionValue, arguments []string, passThrough []string, err *GetOptError) {
 	var scopeScError *GetOptError
+	var flattenedOptions Options
 
 	scope, subCommand, scopeScError = ssco.findScopeAndSubCommand()
-	flattenedOptions, _ := ssco.flattenToOptions(scope, subCommand)
+
+	switch {
+	case subCommand == "":
+		flattenedOptions = ssco.Global
+	case scope == "":
+		flattenedOptions = ssco.Global
+	default:
+		flattenedOptions, _ = ssco.flattenToOptions(scope, subCommand)
+	}
+
 	options, arguments, passThrough, err = flattenedOptions.ParseCommandLine()
 
 	if len(arguments) > 2 {
 		arguments = arguments[2:]
 	}
 
-	if scopeScError != nil {
+	if scopeScError != nil && err == nil {
 		err = scopeScError
 	}
 
