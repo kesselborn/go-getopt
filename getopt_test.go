@@ -38,6 +38,49 @@ func TestShortOptionsFlagsParsing(t *testing.T) {
 
 }
 
+func TestLongOptionsFlagsParsing(t *testing.T) {
+	options := Options{
+		"",
+		Definitions{
+			{"verbose|v", "verbose mode", Flag, ""},
+			{"debug", "very very verbose mode", Flag, ""},
+		},
+	}
+
+	os.Args = []string{"prog", "--verbose"}
+	if opts, _, _, e := options.ParseCommandLine(); e == nil {
+		if opts["verbose"].Bool != true {
+			t.Errorf("verbose flag was not set for --verbose")
+		}
+		if opts["debug"].Bool != false {
+			t.Errorf("debug flag was set for --verbose")
+		}
+	} else {
+		t.Errorf("error was set for --verbose")
+	}
+
+	os.Args = []string{"prog", "--error"}
+	if _, _, _, e := options.ParseCommandLine(); e == nil {
+		t.Errorf("error was not set for --error")
+	}
+
+	os.Args = []string{"prog", "-v-"} // bug?
+	if opts, _, _, e := options.ParseCommandLine(); e == nil {
+		t.Errorf("error was not set for -v-")
+		if opts["verbose"].Bool != true {
+			t.Errorf("verbose flag was not set for -v-")
+		}
+		if opts["debug"].Bool != false {
+			t.Errorf("debug flag was set for -v-")
+		}
+	}
+
+	os.Args = []string{"prog", "-v-debug"} // bug?
+	if _, _, _, e := options.ParseCommandLine(); e == nil {
+		t.Errorf("error was not set for -v-debug")
+	}
+}
+
 func TestShortOptionRequiredParsing(t *testing.T) {
 	options := Options{"", Definitions{{"method|m|MON_METHOD", "method: one of either 'heartbeat' or 'nagios'", Required, ""}}}
 

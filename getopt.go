@@ -134,6 +134,11 @@ func (optionsDefinition Options) parseCommandLineImpl(args []string, environment
 					opt, val, found = parseLongOpt(token)
 				}
 
+				if !found {
+					err = &GetOptError{InvalidOption, "invalid option '" + token + "'"}
+					break
+				}
+
 				currentOption, found := optionsDefinition.FindOption(opt)
 				key := currentOption.Key()
 
