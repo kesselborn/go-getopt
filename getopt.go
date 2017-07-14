@@ -123,7 +123,7 @@ func (optionsDefinition Options) parseCommandLineImpl(args []string, environment
 						currentOption, _ := optionsDefinition.FindOption(opt)
 						key := currentOption.Key()
 
-						options[key], err = assignValue(currentOption.DefaultValue, "true")
+						options[key], err = assignValue(true, "true")
 
 						// make it look as if we have a normal option with a '-' prefix
 						buffer = "-" + buffer[2:]
