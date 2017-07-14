@@ -102,7 +102,7 @@ func checkOptionsDefinitionConsistency(optionsDefinition Options) (err *GetOptEr
 
 func (options Options) FindOption(optionString string) (option Option, found bool) {
 	for _, cur := range options.Definitions {
-		if cur.ShortOpt() == optionString || cur.LongOpt() == optionString {
+		if (cur.HasShortOpt() && cur.ShortOpt() == optionString) || (cur.HasLongOpt() && cur.LongOpt() == optionString) {
 			option = cur
 			found = true
 			break
